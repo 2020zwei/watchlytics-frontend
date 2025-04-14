@@ -1,154 +1,468 @@
+// "use client";
+
+// import { Button, Checkbox, Form, Input } from "@heroui/react";
+// import axios from "axios";
+// import { toast } from "react-toastify";
+// import { setCookie } from "cookies-next";
+// import { useRouter } from "next/navigation";
+
+// import { FormEvent, useState } from "react";
+// import { EyeSlashFilledIcon } from "@/components/icon/EyeSlashFilledIcon";
+// import { EyeFilledIcon } from "@/components/icon/EyeFilledIcon";
+// import Link from "next/link";
+// import Image from "next/image";
+
+// // Type for form data
+// type FormDataType = Record<string, string | FormDataEntryValue>;
+
+// interface IError {
+//   api: {
+//     [key: string]: Record<string, string>;
+//   };
+// }
+
+// export default function SignIn() {
+//   const router = useRouter();
+//   const [submitted, setSubmitted] = useState<FormDataType | null>(null);
+//   const [errors, setErrors] = useState<any>();
+//   const [password, setPassword] = useState<string>("");
+//   const [isSelected, setIsSelected] = useState<boolean>(false);
+//   const [passwordTouched, setPasswordTouched] = useState<boolean>(false);
+//   const [isVisible, setIsVisible] = useState<boolean>(false); // State for password visibility
+
+//   // Real-time password validation
+//   const getPasswordError = (value: string): string | null => {
+//     if (value.length < 4) {
+//       return "Password must be 4 characters or more";
+//     }
+//     if ((value.match(/[A-Z]/g) || []).length < 1) {
+//       return "Password needs at least 1 uppercase letter";
+//     }
+//     if ((value.match(/[^a-z]/gi) || []).length < 1) {
+//       return "Password needs at least 1 symbol";
+//     }
+//     return null;
+//   };
+//   const toggleVisibility = () => {
+//     setIsVisible(!isVisible); // Toggle visibility state
+//   };
+//   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+//     e.preventDefault();
+
+//     const data = Object.fromEntries(
+//       new FormData(e.currentTarget)
+//     ) as FormDataType;
+
+//     const newErrors: { [key: string]: Record<string, string> } = {};
+
+//     const passwordError = getPasswordError(data.password as string);
+//     if (passwordError) {
+//       newErrors.password = { message: passwordError };
+//     }
+
+//     if (Object.keys(newErrors).length > 0) {
+//       setErrors(newErrors);
+//       return;
+//     }
+
+//     // Clear errors and submit data if no errors
+//     setErrors({});
+//     setSubmitted(data);
+//     try {
+//       console.log("hellojjjjjjjj");
+//       const response = await axios.post(
+//         "https://api-dev.watchlytics.io/api/auth/signin/",
+//         {
+//           email: data.email,
+//           password: data.password,
+//         }
+//       );
+
+//       const result = response.data;
+//       console.log(result, "result");
+//       // ✅ Set access_token in cookie
+//       setCookie("access_token", result.access_token, {
+//         maxAge: 60 * 60 * 24 * 7, // 7 days
+//         path: "/",
+//       });
+//       toast.success("Login Successfully  !", {
+//         position: "top-right",
+//       });
+//       // ✅ Redirect to profile
+//       router.push("/profile");
+
+//       // Optional: handle token or redirect
+//       console.log("Login successful:", result?.access_token);
+//     } catch (error: any) {
+//       console.log(error?.response?.data?.non_field_errors, "result");
+//       toast.error(`Signin failed,${error?.response?.data?.non_field_errors}`, {
+//         position: "top-right",
+//       });
+//       if (axios.isAxiosError(error)) {
+//         setErrors(error?.response?.data?.non_field_errors || "Sign-in failed");
+//         // setErrors({ api: { message: apiMessage } });
+//       } else {
+//         setErrors({ api: { message: "Unexpected error occurred" } });
+//       }
+//     }
+//   };
+
+//   // onBlur handler for password to set field as touched
+//   const handlePasswordBlur = () => {
+//     setPasswordTouched(true);
+//   };
+
+//   return (
+//     <div className="w-full lg:w-[56.5%] flex justify-center items-center justify-center-center">
+//       <div className="w-full max-w-xl mx-auto">
+//         <div className="flex items-center mb-8">
+//           <div className="w-6 h-6  rounded-full flex items-center justify-center mr-2">
+//             <Image src="/clock.svg" alt="clock" width={48} height={48} />
+//           </div>
+//           <span className="text-[#003BFF] font-medium tracking-wide text-lg">
+//             Watchlytics
+//           </span>
+//         </div>
+//         <h1 className="text-[2.5rem] font-bold mb-8 text-[#1E293B]">Sign In</h1>
+
+//         <Form
+//           className="space-y-4"
+//           validationErrors={errors}
+//           onReset={() => setSubmitted(null)}
+//           onSubmit={onSubmit}
+//         >
+//           <div className="flex flex-col gap-4 w-full">
+//             <Input
+//               isRequired
+//               errorMessage={({ validationDetails }) => {
+//                 if (validationDetails.valueMissing) {
+//                   return "Please enter your email";
+//                 }
+//                 if (validationDetails.typeMismatch) {
+//                   return "Please enter a valid email address";
+//                 }
+//                 return undefined;
+//               }}
+//               label="Email"
+//               radius="sm"
+//               size="lg"
+//               labelPlacement="outside"
+//               name="email"
+//               placeholder="Enter your email"
+//               type="email"
+//               variant="bordered"
+//             />
+
+//             <Input
+//               isRequired
+//               variant="bordered"
+//               radius="sm"
+//               size="lg"
+//               errorMessage={
+//                 passwordTouched
+//                   ? getPasswordError(password) || undefined
+//                   : undefined
+//               }
+//               isInvalid={passwordTouched && getPasswordError(password) !== null}
+//               label="Password"
+//               labelPlacement="outside"
+//               name="password"
+//               placeholder="Enter your password"
+//               value={password}
+//               onValueChange={setPassword}
+//               onBlur={handlePasswordBlur}
+//               type={isVisible ? "text" : "password"}
+//               endContent={
+//                 <button
+//                   className="focus:outline-none"
+//                   type="button"
+//                   onClick={toggleVisibility}
+//                 >
+//                   {!isVisible ? (
+//                     <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+//                   ) : (
+//                     <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+//                   )}
+//                 </button>
+//               }
+//             />
+//             {/* {JSON.stringify(errors)} */}
+//             <div className="flex justify-between items-center mb-4">
+//               <Checkbox
+//                 isSelected={isSelected}
+//                 onValueChange={setIsSelected}
+//                 size="sm"
+//                 className="text-gray-500 text-sm"
+//               >
+//                 Remember me
+//               </Checkbox>
+//               <a href="#" className="text-gray-400 text-sm">
+//                 Forgot password?
+//               </a>
+//             </div>
+
+//             <Button
+//               radius="sm"
+//               isLoading
+//               size="lg"
+//               color="primary"
+//               type="submit"
+//               className="w-full text-white bg-[linear-gradient(180deg,_#092CA2_0%,_#003BFF_100%)] hover:opacity-90"
+//             >
+//               Sign In
+//             </Button>
+
+//             <div className="text-center mt-6 text-sm text-gray-600">
+//               Don’t have an account?{" "}
+//               <Link
+//                 href="/sign-up"
+//                 className="text-[#0047FF] font-medium underline"
+//               >
+//                 Sign Up
+//               </Link>
+//             </div>
+//           </div>
+//         </Form>
+//       </div>
+//     </div>
+//   );
+// }
+
 "use client";
 
-import { useState } from "react";
+import { Button, Checkbox, Form, Input } from "@heroui/react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { setCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 
+import { FormEvent, useState } from "react";
+import { EyeSlashFilledIcon } from "@/components/icon/EyeSlashFilledIcon";
+import { EyeFilledIcon } from "@/components/icon/EyeFilledIcon";
+import Link from "next/link";
+import Image from "next/image";
+
+// Type for form data
+type FormDataType = Record<string, string | FormDataEntryValue>;
+
 export default function SignIn() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  // const [submitted, setSubmitted] = useState<FormDataType | null>(null);
+  const [errors, setErrors] = useState<any>();
+  const [password, setPassword] = useState<string>("");
+  const [isSelected, setIsSelected] = useState<boolean>(false); // Remember me checkbox state
+  const [passwordTouched, setPasswordTouched] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false); // State for password visibility
+  const [loading, setLoading] = useState<boolean>(false); // New state for button loading
 
-  async function handleSubmit(e: React.FormEvent) {
+  // Real-time password validation
+  const getPasswordError = (value: string): string | null => {
+    if (value.length < 4) {
+      return "Password must be 4 characters or more";
+    }
+    if ((value.match(/[A-Z]/g) || []).length < 1) {
+      return "Password needs at least 1 uppercase letter";
+    }
+    if ((value.match(/[^a-z]/gi) || []).length < 1) {
+      return "Password needs at least 1 symbol";
+    }
+    return null;
+  };
+
+  const toggleVisibility = () => {
+    setIsVisible(!isVisible); // Toggle visibility state
+  };
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
+
+    const data = Object.fromEntries(
+      new FormData(e.currentTarget)
+    ) as FormDataType;
+    const newErrors: { [key: string]: Record<string, string> } = {};
+
+    const passwordError = getPasswordError(data.password as string);
+    if (passwordError) {
+      newErrors.password = { message: passwordError };
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    // Clear errors and submit data if no errors
+    setErrors({});
+    // setSubmitted(data);
+
+    // Set loading state to true when API call begins
     setLoading(true);
-
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      console.log("hellojjjjjjjj");
+      const response = await axios.post(
+        "https://api-dev.watchlytics.io/api/auth/signin/",
+        {
+          email: data.email,
+          password: data.password,
+        }
+      );
 
-      const data = await response.json();
+      const result = response.data;
+      console.log(result, "result");
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to sign in");
+      // Set access_token cookie according to "Remember me" checkbox.
+      // If selected, cookie will persist for 7 days; if not, it becomes a session cookie.
+      if (isSelected) {
+        setCookie("access_token", result.access_token, {
+          maxAge: 60 * 60 * 24 * 7, // 7 days
+          path: "/",
+        });
+      } else {
+        setCookie("access_token", result.access_token, {
+          path: "/",
+        });
       }
 
-      // Redirect to home page on successful login
-      router.push("/");
-      router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      toast.success("Login Successfully!", {
+        position: "top-right",
+      });
+      // Redirect to profile
+      router.push("/UI/profile");
+
+      console.log("Login successful:", result?.access_token);
+    } catch (error: any) {
+      console.log(error?.response?.data?.non_field_errors, "result");
+      toast.error(`Signin failed, ${error?.response?.data?.non_field_errors}`, {
+        position: "top-right",
+      });
+      if (axios.isAxiosError(error)) {
+        setErrors(error?.response?.data?.non_field_errors || "Sign-in failed");
+      } else {
+        setErrors({ api: { message: "Unexpected error occurred" } });
+      }
     } finally {
+      // Reset loading state once API call is complete
       setLoading(false);
     }
-  }
+  };
+
+  // onBlur handler for password to set field as touched
+  const handlePasswordBlur = () => {
+    setPasswordTouched(true);
+  };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold">Sign in</h1>
-          <p className="text-gray-600 mt-2">
-            Enter your credentials to access your account
-          </p>
+    <div className="w-full lg:w-[56.5%] flex justify-center items-center justify-center-center">
+      <div className="w-full max-w-xl mx-auto">
+        <div className="flex items-center mb-8">
+          <div className="w-6 h-6 rounded-full flex items-center justify-center mr-2">
+            <Image src="/clock.svg" alt="clock" width={48} height={48} />
+          </div>
+          <span className="text-[#003BFF] font-medium tracking-wide text-lg">
+            Watchlytics
+          </span>
         </div>
+        <h1 className="text-[2.5rem] font-bold mb-8 text-[#1E293B]">Sign In</h1>
 
-        {error && (
-          <div className="bg-red-50 text-red-500 p-3 rounded-md mb-4">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Email
-            </label>
-            <input
-              id="email"
+        <Form
+          className="space-y-4"
+          validationErrors={errors}
+          // onReset={() => setSubmitted(null)}
+          onSubmit={onSubmit}
+        >
+          <div className="flex flex-col gap-4 md:w-[28rem] w-full">
+            <Input
+              isRequired
+              errorMessage={({ validationDetails }) => {
+                if (validationDetails.valueMissing) {
+                  return "Please enter your email";
+                }
+                if (validationDetails.typeMismatch) {
+                  return "Please enter a valid email address";
+                }
+                return undefined;
+              }}
+              label="Email"
+              radius="sm"
+              size="lg"
+              labelPlacement="outside"
+              name="email"
+              placeholder="Enter your email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="you@example.com"
+              variant="bordered"
             />
-          </div>
 
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
+            <Input
+              isRequired
+              variant="bordered"
+              radius="sm"
+              size="lg"
+              errorMessage={
+                passwordTouched
+                  ? getPasswordError(password) || undefined
+                  : undefined
+              }
+              isInvalid={passwordTouched && getPasswordError(password) !== null}
+              label="Password"
+              labelPlacement="outside"
+              name="password"
+              placeholder="Enter your password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onValueChange={setPassword}
+              onBlur={handlePasswordBlur}
+              type={isVisible ? "text" : "password"}
+              endContent={
+                <button
+                  className="focus:outline-none"
+                  type="button"
+                  onClick={toggleVisibility}
+                >
+                  {!isVisible ? (
+                    <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                  ) : (
+                    <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                  )}
+                </button>
+              }
             />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-              />
-              <label
-                htmlFor="remember-me"
-                className="ml-2 block text-sm text-gray-700"
+            {/* {JSON.stringify(errors)} */}
+            <div className="flex justify-between items-center mb-4">
+              <Checkbox
+                isSelected={isSelected}
+                onValueChange={setIsSelected}
+                size="sm"
+                className="text-gray-500 text-sm"
               >
                 Remember me
-              </label>
-            </div>
-            <a href="#" className="text-sm text-blue-600 hover:underline">
-              Forgot password?
-            </a>
-          </div>
+              </Checkbox>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-          >
-            {loading ? "Signing in..." : "Sign in"}
-          </button>
-        </form>
-
-        <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <Link href="/forgot-password " className="text-gray-500 text-sm">
+                Forgot password?
+              </Link>
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">
-                Or continue with
-              </span>
-            </div>
-          </div>
 
-          <div className="mt-6">
-            <button
-              type="button"
-              className="w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            <Button
+              radius="sm"
+              isLoading={loading} // Button loading state managed here
+              size="lg"
+              color="primary"
+              type="submit"
+              className="w-full text-white bg-[linear-gradient(180deg,_#092CA2_0%,_#003BFF_100%)] hover:opacity-90"
             >
-              Continue with Google
-            </button>
-          </div>
-        </div>
+              Sign In
+            </Button>
 
-        <p className="mt-8 text-center text-sm text-gray-600">
-          Do not have an account?{" "}
-          <a
-            href="/auth/signin"
-            className="font-medium text-blue-600 hover:underline"
-          >
-            Sign in
-          </a>
-        </p>
+            <div className="text-center mt-6 text-sm text-gray-600">
+              Don’t have an account?{" "}
+              <Link
+                href="/sign-up"
+                className="text-[#0047FF] font-medium underline"
+              >
+                Sign Up
+              </Link>
+            </div>
+          </div>
+        </Form>
       </div>
     </div>
   );
