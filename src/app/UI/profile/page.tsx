@@ -14,7 +14,11 @@
 //   // const [dataFound, setDataFound] = useState(false); // Flag indicating whether profile data was found
 
 //   // State for profile image (for header & profile picture) and cover image.
-//   const [profileImage, setProfileImage] = useState<any>();
+//   // Initially, profileImage could be a URL (string) or a File (when updated).
+//   const [profileImage, setProfileImage] = useState<any>(
+//     "/placeholder.svg?height=300&width=300"
+//   );
+//   const [url, setURL] = useState<any>();
 //   const [coverImage, setCoverImage] = useState("/profile.png");
 
 //   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -62,7 +66,7 @@
 //           // setDataFound(true);
 //           // Update form fields and image states based on your API response.
 //           setFormData({
-//             name: response.data.data.last_name || "",
+//             name: response.data.data.first_name || "",
 //             email: response.data.data.email || "",
 //             phone: response.data.data.phone_number || "",
 //             password: response.data.data.password || "",
@@ -138,7 +142,8 @@
 //     setIsConfirmPasswordVisible(!isConfirmPasswordVisible);
 //   };
 
-//   // PUT request to update profile data with validation before it was let.
+//   // Updated update handler builds a FormData payload,
+//   // uploading the profile image (binary) as the primary image in the payload.
 //   const handleUpdateClick = async () => {
 //     const newErrors: Record<string, string> = {};
 
@@ -168,16 +173,32 @@
 
 //     try {
 //       const token = getAccessToken();
-//       // Include images with the payload.
-//       const payload = {
-//         ...formData,
-//         profilePicture: profileImage,
-//         coverPicture: coverImage,
-//       };
+//       // Build FormData to include text fields and binary file for the profile image.
+//       const payload = new FormData();
+//       payload.append("name", formData.name);
+//       payload.append("email", formData.email);
+//       payload.append("phone", formData.phone);
+//       payload.append("password", formData.password);
+//       payload.append("clientId", formData.clientId);
+//       // Check if profileImage is a File instance (binary data) and append accordingly.
+//       if (profileImage instanceof File) {
+//         payload.append("profile_picture", profileImage);
+//       } else {
+//         // Otherwise, if it's a URL string, append it as is.
+//         payload.append("profile_picture", profileImage);
+//       }
+//       // Append cover picture as well.
+//       payload.append("coverPicture", coverImage);
+
 //       const response = await axios.put(
 //         "https://api-dev.watchlytics.io/api/auth/update/",
 //         payload,
-//         { headers: { Authorization: `Bearer ${token}` } }
+//         {
+//           headers: {
+//             "Content-Type": "multipart/form-data",
+//             Authorization: `Bearer ${token}`,
+//           },
+//         }
 //       );
 //       console.log("Update successful:", response.data);
 //       setIsEditing(false);
@@ -195,28 +216,9 @@
 //     }
 //   };
 
-//   // For updating the profile picture. (Assuming single file input handles profile image.)
-//   // const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-//   //   if (e.target.files && e.target.files[0]) {
-//   //     const reader = new FileReader();
-//   //     reader.onload = (event) => {
-//   //       if (event.target?.result) {
-//   //         // Update profile picture state.
-//   //         setProfileImage(event.target.result as string);
-//   //       }
-//   //     };
-//   //     reader.readAsDataURL(e.target.files[0]);
-//   //   }
-//   // };
-//   // const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-//   //   if (e.target.files && e.target.files[0]) {
-//   //     const file = e.target.files[0];
-//   //     // Store the binary file so it can be sent later in the payload.
-//   //     setProfileImage(file);
-//   //     // Create a preview URL to update the displayed image.
-//   //     setProfileImage(URL.createObjectURL(file));
-//   //   }
-//   // };
+//   // Updated handleImageChange accepts only JPG and PNG files,
+//   // stores the file as binary in state (to be sent in the FormData), and
+//   // does not create a preview URL (since the binary is uploaded directly).
 //   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
 //     if (e.target.files && e.target.files[0]) {
 //       const file = e.target.files[0];
@@ -231,11 +233,13 @@
 
 //       // Save the file (binary) in state for later uploading.
 //       setProfileImage(file);
-//       // Set a preview of the image.
-//       // setProfileImage(URL.createObjectURL(file));
+//       // (Optional) You can create a preview URL if needed:
+//       setURL(URL.createObjectURL(file));
 //     }
 //   };
-//   console.log(profileImage, "image");
+
+//   console.log(url, "image");
+
 //   return (
 //     <>
 //       {/* Desktop Header - Hidden on mobile */}
@@ -244,7 +248,7 @@
 //           <Image src="/Notification.svg" alt="clock" width={40} height={40} />
 //           <div className="h-8 w-8 rounded-full bg-gray-200 overflow-hidden border border-gray-200">
 //             <img
-//               src={profileImage || "/placeholder.svg?height=300&width=300"}
+//               src={profileImage || url}
 //               alt="User"
 //               className="h-full w-full object-cover"
 //             />
@@ -286,9 +290,7 @@
 //                   onClick={handleImageClick}
 //                 >
 //                   <img
-//                     src={
-//                       profileImage || "/placeholder.svg?height=300&width=300"
-//                     }
+//                     src={profileImage || url}
 //                     alt="Profile"
 //                     className="h-full w-full object-cover"
 //                   />
@@ -434,7 +436,7 @@
 //                     <input
 //                       id="password"
 //                       name="password"
-//                       type={isPasswordVisible ? "text" : "password"}
+//                       type={!isPasswordVisible ? "text" : "password"}
 //                       value={formData.password}
 //                       onChange={handleInputChange}
 //                       disabled={!isEditing}
@@ -472,7 +474,7 @@
 //                     <input
 //                       id="confirmPassword"
 //                       name="confirmPassword"
-//                       type={isConfirmPasswordVisible ? "text" : "password"}
+//                       type={!isConfirmPasswordVisible ? "text" : "password"}
 //                       value={formData.confirmPassword}
 //                       onChange={handleInputChange}
 //                       disabled={!isEditing}
@@ -574,6 +576,9 @@ export default function ProfilePage() {
   });
 
   const [originalData, setOriginalData] = useState({ ...formData });
+
+  // Loader state for update/save action.
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // Utility function to get token from cookie if needed.
   const getAccessToken = () => {
@@ -679,6 +684,7 @@ export default function ProfilePage() {
   const handleUpdateClick = async () => {
     const newErrors: Record<string, string> = {};
 
+    // Basic required field validations.
     if (!formData.name.trim()) {
       newErrors.name = "Name is required";
     }
@@ -695,6 +701,30 @@ export default function ProfilePage() {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
+    // Additional validations.
+    // Email validation using regex.
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      newErrors.email = "Invalid email format";
+    }
+    // Phone validation: Must be exactly 10 digits.
+    const phoneRegex = /^\d{10}$/;
+    if (formData.phone && !phoneRegex.test(formData.phone)) {
+      newErrors.phone = "Phone number must be 10 digits";
+    }
+    // Password validation: Minimum 6 characters.
+    if (formData.password && formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+    // Client ID must be between 8 to 10 characters.
+    if (
+      formData.clientId &&
+      (formData.clientId.toString().length < 8 ||
+        formData.clientId.toString().length > 10)
+    ) {
+      newErrors.clientId = "Client ID must be between 8 to 10 characters";
+    }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       toast.error("Please fix the errors before updating", {
@@ -703,15 +733,17 @@ export default function ProfilePage() {
       return;
     }
 
+    setIsUpdating(true); // Show loader
+
     try {
       const token = getAccessToken();
       // Build FormData to include text fields and binary file for the profile image.
       const payload = new FormData();
-      payload.append("name", formData.name);
+      payload.append("first_name", formData.name);
       payload.append("email", formData.email);
-      payload.append("phone", formData.phone);
+      payload.append("phone_number", formData.phone);
       payload.append("password", formData.password);
-      payload.append("clientId", formData.clientId);
+      payload.append("client_id", formData.clientId);
       // Check if profileImage is a File instance (binary data) and append accordingly.
       if (profileImage instanceof File) {
         payload.append("profile_picture", profileImage);
@@ -739,6 +771,8 @@ export default function ProfilePage() {
     } catch (error) {
       console.error("Failed to update profile", error);
       toast.error("Failed to update profile", { position: "top-right" });
+    } finally {
+      setIsUpdating(false); // Hide loader after request completes
     }
   };
 
@@ -763,10 +797,15 @@ export default function ProfilePage() {
         return;
       }
 
-      // Save the file (binary) in state for later uploading.
-      setProfileImage(file);
-      // (Optional) You can create a preview URL if needed:
-      setURL(URL.createObjectURL(file));
+      try {
+        // Save the file (binary) in state for later uploading.
+        setProfileImage(file);
+        // Create a preview URL.
+        setURL(URL.createObjectURL(file));
+      } catch (error) {
+        console.error("Image upload error", error);
+        toast.error("Failed to upload image", { position: "top-right" });
+      }
     }
   };
 
@@ -778,9 +817,36 @@ export default function ProfilePage() {
       <header className="hidden md:flex bg-white p-4 justify-end items-center border-b shadow-sm">
         <div className="flex items-center gap-4">
           <Image src="/Notification.svg" alt="clock" width={40} height={40} />
+          {/* Loader in Hero UI if update is in progress */}
+          {isUpdating && (
+            <div className="flex items-center">
+              <span className="mr-2 text-blue-600">Saving...</span>
+              {/* Simple loader spinner */}
+              <svg
+                className="animate-spin h-5 w-5 text-blue-600"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8H4z"
+                ></path>
+              </svg>
+            </div>
+          )}
           <div className="h-8 w-8 rounded-full bg-gray-200 overflow-hidden border border-gray-200">
             <img
-              src={profileImage || url}
+              src={profileImage instanceof File ? url : profileImage}
               alt="User"
               className="h-full w-full object-cover"
             />
@@ -822,7 +888,7 @@ export default function ProfilePage() {
                   onClick={handleImageClick}
                 >
                   <img
-                    src={profileImage || url}
+                    src={profileImage instanceof File ? url : profileImage}
                     alt="Profile"
                     className="h-full w-full object-cover"
                   />
@@ -955,6 +1021,9 @@ export default function ProfilePage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter your phone number"
                   />
+                  {errors.phone && (
+                    <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+                  )}
                 </div>
                 {/* Password */}
                 <div className="mt-6">
