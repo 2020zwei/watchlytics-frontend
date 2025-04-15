@@ -8,9 +8,11 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { EyeSlashFilledIcon } from "@/components/icon/EyeSlashFilledIcon";
 import { EyeFilledIcon } from "@/components/icon/EyeFilledIcon";
+import { Button } from "@heroui/react";
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   // const [dataFound, setDataFound] = useState(false); // Flag indicating whether profile data was found
 
   // State for profile image (for header & profile picture) and cover image.
@@ -44,7 +46,6 @@ export default function ProfilePage() {
   const [originalData, setOriginalData] = useState({ ...formData });
 
   // Loader state for update/save action.
-  const [isUpdating, setIsUpdating] = useState(false);
 
   // Utility function to get token from cookie if needed.
   const getAccessToken = () => {
@@ -199,8 +200,7 @@ export default function ProfilePage() {
       return;
     }
 
-    setIsUpdating(true); // Show loader
-
+    setLoading(true);
     try {
       const token = getAccessToken();
       // Build FormData to include text fields and binary file for the profile image.
@@ -212,14 +212,21 @@ export default function ProfilePage() {
       payload.append("client_id", formData.clientId);
       // Check if profileImage is a File instance (binary data) and append accordingly.
       if (profileImage instanceof File) {
+        console.log("here");
+        // Only append if it's a new file (updated image)
         payload.append("profile_picture", profileImage);
-      } else {
-        // Otherwise, if it's a URL string, append it as is.
-        payload.append("profile_picture", profileImage);
+      } else if (
+        profileImage &&
+        typeof profileImage == "string" &&
+        profileImage !== ""
+      ) {
+        console.log("here2");
+        // If it's a URL string, only append if it has a value (indicating it wasn't left empty)
+        // payload.append("profile_picture", profileImage);
       }
       // Append cover picture as well.
       payload.append("coverPicture", coverImage);
-
+      // setLoading(true);
       const response = await axios.put(
         "https://api-dev.watchlytics.io/api/auth/update/",
         payload,
@@ -238,7 +245,8 @@ export default function ProfilePage() {
       console.error("Failed to update profile", error);
       toast.error("Failed to update profile", { position: "top-right" });
     } finally {
-      setIsUpdating(false); // Hide loader after request completes
+      setLoading(false);
+      window.location.reload();
     }
   };
 
@@ -275,7 +283,7 @@ export default function ProfilePage() {
     }
   };
 
-  console.log(url, "image");
+  console.log(profileImage, "image");
 
   return (
     <>
@@ -284,32 +292,7 @@ export default function ProfilePage() {
         <div className="flex items-center gap-4">
           <Image src="/Notification.svg" alt="clock" width={40} height={40} />
           {/* Loader in Hero UI if update is in progress */}
-          {isUpdating && (
-            <div className="flex items-center">
-              <span className="mr-2 text-blue-600">Saving...</span>
-              {/* Simple loader spinner */}
-              <svg
-                className="animate-spin h-5 w-5 text-blue-600"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v8H4z"
-                ></path>
-              </svg>
-            </div>
-          )}
+
           <div className="h-8 w-8 rounded-full bg-gray-200 overflow-hidden border border-gray-200">
             <img
               src={profileImage instanceof File ? url : profileImage}
@@ -573,18 +556,19 @@ export default function ProfilePage() {
             <div className="mt-8 flex justify-between">
               {isEditing ? (
                 <div className="space-x-4">
-                  <button
+                  <Button
+                    isLoading={loading}
                     onClick={handleUpdateClick}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md"
+                    className="bg-[linear-gradient(180deg,_#092CA2_0%,_#003BFF_100%)] hover:opacity-90 text-white px-4 py-2 rounded-md"
                   >
                     Save
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={handleCancelClick}
                     className="bg-gray-300 text-black px-4 py-2 rounded-md"
                   >
                     Cancel
-                  </button>
+                  </Button>
                 </div>
               ) : (
                 ""
