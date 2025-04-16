@@ -221,11 +221,7 @@ export default function Layout({ children }: LayoutProps) {
             <span className="sr-only">Toggle menu</span>
           </button>
 
-          <div className="flex items-center">
-            <span className="text-xl font-semibold">Watchlytics</span>
-          </div>
-
-          <div className="flex items-center gap-4">
+          {/* <div className="flex items-center gap-4">
             <div className="h-8 w-8 rounded-full bg-gray-200 overflow-hidden border border-gray-200">
               <img
                 src="/profile.png"
@@ -233,7 +229,7 @@ export default function Layout({ children }: LayoutProps) {
                 className="h-full w-full object-cover"
               />
             </div>
-          </div>
+          </div> */}
         </header>
 
         {children}
