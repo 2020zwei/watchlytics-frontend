@@ -209,6 +209,7 @@ export default function ProfilePage() {
       payload.append("email", formData.email);
       payload.append("phone_number", formData.phone);
       payload.append("password", formData.password);
+      payload.append("confirm_password", formData.confirmPassword);
       payload.append("client_id", formData.clientId);
       // Check if profileImage is a File instance (binary data) and append accordingly.
       if (profileImage instanceof File) {
@@ -225,7 +226,7 @@ export default function ProfilePage() {
         // payload.append("profile_picture", profileImage);
       }
       // Append cover picture as well.
-      payload.append("coverPicture", coverImage);
+      // payload.append("coverPicture", coverImage);
       // setLoading(true);
       const response = await axios.put(
         "https://api-dev.watchlytics.io/api/auth/update/",
