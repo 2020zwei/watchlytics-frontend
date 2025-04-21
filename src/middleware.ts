@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
+import { isTokenValid } from "./utils/isTokenValid";
 const publicRoutes = [
   "/",
   "/login",
@@ -9,14 +9,11 @@ const publicRoutes = [
   "/reset-password",
 ];
 
-const privateRoutes = ["/UI/profile"];
+const privateRoutes = ["/UI/profile", "/UI/inventory","/subscription"];
 
-export function middleware(request: NextRequest) {
+export function middleware(request: NextRequest, response:NextResponse) {
   const token = request.cookies.get("access_token")?.value;
-  console.log("[token]", token);
-
   const pathname = request.nextUrl.pathname;
-  console.log("[pathname]", pathname);
 
   const isPublicRoute = publicRoutes.some((route) =>
     pathname.startsWith(route)
@@ -24,10 +21,11 @@ export function middleware(request: NextRequest) {
   const isPrivateRoute = privateRoutes.some((route) =>
     pathname.startsWith(route)
   );
+  const isLoginPage = pathname === "/login";
 
-  // ✅ If user is NOT logged in and tries to access a private route
-  if (!token && isPrivateRoute) {
-    console.log("if1");
+  const isInvalidToken = token && !isTokenValid(token);
+
+  if ((isInvalidToken || (!token && isPrivateRoute)) && !isLoginPage) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -35,14 +33,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // ✅ If user IS logged in and tries to access a public route
-  if (token && isPublicRoute) {
-    console.log("if2");
+  if (token && isPublicRoute && !isLoginPage) {
     return NextResponse.redirect(new URL("/UI/profile", request.url));
   }
 
-  console.log("if3");
-  // ✅ Otherwise, allow the request
   return NextResponse.next();
 }
 
@@ -61,5 +55,6 @@ export const config = {
     "/forgot-password",
     "/reset-password",
     "/UI/profile",
+    "/subscription"
   ],
 };

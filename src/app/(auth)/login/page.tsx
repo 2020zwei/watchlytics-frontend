@@ -233,10 +233,10 @@
 import { Button, Checkbox, Form, Input } from "@heroui/react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { setCookie } from "cookies-next";
+import { deleteCookie, getCookies, setCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { EyeSlashFilledIcon } from "@/components/icon/EyeSlashFilledIcon";
 import { EyeFilledIcon } from "@/components/icon/EyeFilledIcon";
 import Link from "next/link";
@@ -300,7 +300,7 @@ export default function SignIn() {
     try {
       console.log("hellojjjjjjjj");
       const response = await axios.post(
-        "https://api-dev.watchlytics.io/api/auth/signin/",
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/signin/`,
         {
           email: data.email,
           password: data.password,
@@ -350,6 +350,10 @@ export default function SignIn() {
   const handlePasswordBlur = () => {
     setPasswordTouched(true);
   };
+
+  useEffect(() => {
+    deleteCookie("access_token")
+  }, [])
 
   return (
     <div className="w-full lg:w-[56.5%] flex justify-center items-center justify-center-center">

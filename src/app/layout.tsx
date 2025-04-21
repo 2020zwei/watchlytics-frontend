@@ -36,19 +36,22 @@
 // }
 
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Archivo, Inter } from "next/font/google";
 import { Providers } from "./providers";
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
+import clsx from "clsx";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+
+const archivo = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -64,7 +67,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="light" style={{ colorScheme: "light" }}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={clsx("antialiased", archivo.variable,inter.variable)}
       >
         <Providers>{children}</Providers>
       </body>

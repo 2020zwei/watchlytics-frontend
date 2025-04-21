@@ -22,4 +22,17 @@ export const URLS = {
   ACCOUNT_TYPE: "/auth/profile/",
   BONUS_CATEGORY: "/program/category/?name=bonus",
   BONUS_ID: "/program/",
+  ME: "/auth/me/",
+  UPDATE_PROFILE: "/auth/update/",
 };
+
+export const METHODS = {
+  POST: "POST",
+  GET: "GET",
+  PUT: "PUT",
+  DELETE: "DELETE",
+  PATCH: "PATCH",
+} as const
+
+export type METHODTYPES = keyof typeof METHODS;
+

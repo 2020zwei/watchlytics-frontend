@@ -1,6 +1,8 @@
+import { METHODTYPES, RequestTypes } from "@/types";
 import axios from "axios";
 
 const BASE_URL = "https://api-dev.watchlytics.io/";
+
 
 // Create an axios instance
 const baseInstance = axios.create({
@@ -164,3 +166,16 @@ export const deleteApiWithAuth = async (url) => {
     return err.response.data;
   }
 };
+export const sendRequest = async ({ payload }: RequestTypes) => {
+  try {
+    const method: METHODTYPES = payload?.method || "GET"
+    const res = await baseInstance.delete(url);
+    return {
+      data: res.data.data,
+      success: res.data.success,
+    };
+  } catch (err) {
+    return err.response.data;
+  }
+};
+

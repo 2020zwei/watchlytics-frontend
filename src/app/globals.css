@@ -2,8 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
+input:-webkit-autofill {
+  background-color: transparent !important;
+  box-shadow: 0 0 0px 1000px white inset !important;
+}
+
 .img-bg {
   background-image: url("../../public/img.svg");
   background-size: cover;
   background-position: top;
 }
+
+body {
+  font-family: var(--font-archivo), sans-serif;
+}
+
+select::after {
+  content: "fd";
+  position: relative;
+}
+
+.scrollable::-webkit-scrollbar {
+  width: 1px;
+  height: 1px;
+}
+
+/* Track (Background of the Scrollbar) */
+.scrollable::-webkit-scrollbar-track {
+  background: #264AC3;
+  border-radius: 1px;
+}
+
+/* Handle (Draggable part) */
+.scrollable::-webkit-scrollbar-thumb {
+  background:#264AC3;
+  border-radius: 1px;
+}
+
+/* Handle on hover */
+.scrollable::-webkit-scrollbar-thumb:hover {
+  background:#264AC3;
+}
+
+.border-gradient {
+  border-width: 1px;
+  border-style: solid;
+  border-image-slice: 1;
+  border-image-source: linear-gradient(180deg, #092CA2 0%, #003BFF 100%);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
