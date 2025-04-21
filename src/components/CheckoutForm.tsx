@@ -42,6 +42,10 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        if (name) {
+            toast.error("Please fill card holder field")
+            return false
+        }
         e.preventDefault();
         setIsSubmitting(true);
 
@@ -174,7 +178,8 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                             isSubmitting ||
                             !isCardComplete ||
                             !isExpiryComplete ||
-                            !isCvcComplete
+                            !isCvcComplete ||
+                            !name
                         }
                         isLoading={isSubmitting}
                     />
