@@ -74,7 +74,7 @@ const Page = () => {
                 </div>
                 <div className='pt-3'>
                     <div className=" overflow-x-auto">
-                        <table className="border-collapse min-w-[1200px]">
+                        <table className="border-collapse min-w-[1200px] w-full">
                             <thead className="bg-blue-gradient text-white">
                                 <tr>
                                     <th className="rounded-tl-lg rounded-bl-lg w-7"></th>

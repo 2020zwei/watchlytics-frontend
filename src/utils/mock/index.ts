@@ -267,3 +267,4 @@ export const SidebarItems = [
         "icon": "/Log Out.svg"
     },
 ]
+
