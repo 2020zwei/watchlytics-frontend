@@ -41,7 +41,7 @@ const page = () => {
             {
                 loading ? <div className="h-[calc(100vh-200px)] flex justify-center items-center"><Spinner /></div>
                     : <RoundedBox className='!bg-blue-100'>
-                        <div className='grid lg:grid-cols-4 md:grid-cols-4 sm:grid-cols-2 md:gap-4 gap-8 sm:p-14 p-4 mt-10'>
+                        <div className='grid lg:grid-cols-4 md:grid-cols-4 sm:grid-cols-2 md:gap-4 gap-8 sm:p-10 p-4 mt-10'>
                             {
                                 plansTypes.map((item, index) => (
                                     <RoundedBox key={item.name} className={clsx("max-h-[600px] min-h-[600px] relative !bg-transparent border border-blue-150 px-4 py-7 flex flex-col justify-between", index === 1 || index === 3 ? "sm:mt-24" : "")}>
