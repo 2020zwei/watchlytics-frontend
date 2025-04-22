@@ -11,15 +11,18 @@ import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 
 const page = () => {
-  const [subscription, setSubscription] = useState<any>({})
+  const [subscription, setSubscription] = useState<any>()
   const [loading, setLoading] = useState(false)
   const navigate = useRouter()
   const [isDisabled, setIsDisabled] = useState(false)
+
   const getSubscriptionDetail = () => {
     setLoading(true)
     sendRequest({ url: "/subscription/details/", method: "GET" }).then(res => {
-      setSubscription(res.data.plan)
       setLoading(false)
+      setSubscription(res.data.plan)
+  
+
     })
   }
 
@@ -38,8 +41,14 @@ const page = () => {
   useEffect(() => {
     getSubscriptionDetail()
   }, [])
+
+
+
   if (loading) {
     return <div className="h-[calc(100vh-200px)] flex justify-center items-center"><Spinner /></div>
+  }
+  if(subscription){
+    return <div className='text-center'>Not found</div>
   }
   return (
     <div>
