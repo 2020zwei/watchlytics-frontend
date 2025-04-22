@@ -1,6 +1,5 @@
 "use client"
 import CheckoutForm from '@/components/CheckoutForm'
-import { Button } from '@/components/common/baseButton/BaseButton'
 import RoundedBox from '@/components/common/baseButton/RoundedBox'
 import Icon from '@/components/common/Icon'
 import clsx from 'clsx'
