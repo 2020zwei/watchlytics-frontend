@@ -148,8 +148,7 @@ export default function ProfilePage() {
   }
   return (
     <>
-      <div className="pt-5 xl:ps-5 lg:ps-3">
-        <RoundedBox className="shadow">
+        <RoundedBox>
           <div
             style={{
               backgroundImage: `url("/profile.png")`
@@ -226,7 +225,6 @@ export default function ProfilePage() {
             </form>
           </div>
         </RoundedBox>
-      </div>
       <ToastContainer />
     </>
   );

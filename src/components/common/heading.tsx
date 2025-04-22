@@ -16,7 +16,7 @@ const Heading = <T extends ElementType = "h5">({
 
     return (
         <Component
-            className={clsx("font-medium text-xl text-dark-800", className)}
+            className={clsx(className,"font-medium text-xl text-dark-800")}
             {...rest}
         >
             {children}
