@@ -1,11 +1,18 @@
 "use client"
 import Image from 'next/image'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@heroui/react";
 import Icon from './Icon';
 import Link from 'next/link';
 
 const Header = () => {
+  useEffect(() => {
+    const profileImg = document.getElementById("header-profile") as HTMLImageElement | null;
+    if (profileImg) {
+      // @ts-ignore
+      profileImg.src = localStorage.getItem("profile_picture");
+    }
+  }, [])
   return (
     <header className=' fixed start-0 top-0 xl:ps-[310px] z-40 border-b border-gray-20 bg-white ps-[250px] min-h-[100px] right-0 flex items-center'>
       <div className="flex items-center justify-end w-full pe-4">

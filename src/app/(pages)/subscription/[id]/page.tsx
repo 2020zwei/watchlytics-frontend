@@ -50,11 +50,11 @@ const page = () => {
                     <RoundedBox className='lg:col-span-8 md:col-span-7 col-span-12 !bg-transparent border border-gray-180'>
                         <div className='max-w-[620px] mx-auto px-4'>
                             <div className='mx-auto text-center pt-8 px-5'>
-                                <h1 className=' font-bold lg:text-3xl md:text-2xl text-xl text-blue-850'>Subscription Plan</h1>
+                                <h1 className=' font-bold lg:text-3xl md:text-2xl text-xl text-blue-850 pb-1'>Subscription Plan</h1>
                                 <p className='text-gray-180'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In lacus facilisi donece gestas egestas pellentesque magna.</p>
                             </div>
                             <h3 className=' text-blue-850 text-2xl font-medium text-center pt-3'>Select Payment Method:</h3>
-                            <div className="flex items-center justify-center mt-5">
+                            <div className="flex items-center justify-center mt-5 gap-6">
                                 <button className={clsx("p-[0.04rem] rounded-lg min-w-[83px]", paymentType ? "border-gradient" : "")} onClick={() => setPaymentType(true)}>
                                     <span className='bg-[#F2F5FF] w-full rounded-lg text-blue-850 text-xl font-semibold h-9 flex justify-center items-center'><Icon name='visacard' /></span>
                                 </button>
@@ -90,7 +90,7 @@ const page = () => {
                                             </ul>
                                         </div>
                                         <div className='text-blue-850'>
-                                            <span className=' md:text-4xl text-xl font-bold'>{plan.price}</span>
+                                            <span className=' md:text-4xl text-xl font-bold'>${plan.price}</span>
                                             <span className=' font-medium ps-1'>/Month</span>
                                         </div>
                                     </div>

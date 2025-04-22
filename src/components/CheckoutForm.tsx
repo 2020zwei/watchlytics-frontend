@@ -8,15 +8,16 @@ import {
 } from "@stripe/react-stripe-js";
 import type { StripeElementChangeEvent } from "@stripe/stripe-js";
 import { useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { Button } from "./common/baseButton/BaseButton";
 import { sendRequest } from "@/utils/apis";
 import Icon from "./common/Icon";
+import { useRouter } from "next/navigation";
 
 const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string }) => {
     const stripe = useStripe();
     const elements = useElements();
-
+    const navigate = useRouter()
     const [cardNumberError, setCardNumberError] = useState("");
     const [csvError, setCsvError] = useState("");
     const [expiryError, setExpiryError] = useState("");
@@ -42,7 +43,8 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        if (name) {
+        e.preventDefault()
+        if (!name) {
             toast.error("Please fill card holder field")
             return false
         }
@@ -81,11 +83,10 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                 .then((res) => {
                     if (res?.data?.success) {
                         toast.success(res.data.message);
+                        navigate.push("/UI/profile")
                     } else {
-                        if (res?.response?.data?.is_duplicate) {
-                            toast.info(res?.response?.data?.message);
-                        } else {
-                            toast.error("Subscription not successfully completed");
+                        if (res?.response?.data) {
+                            toast.error(res?.response?.data?.message);
                         }
                     }
                 })
@@ -113,7 +114,7 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
     return (
         <>
             <form onSubmit={handleSubmit} className="space-y-4 py-4">
-                <div className="rounded-lg border border-gray-180 p-3 flex items-center gap-3 h-14">
+                <div className="rounded-lg border border-gray-180 px-3 flex items-center gap-3 h-14">
                     <span><Icon name="user" /></span>
                     <input
                         className="bg-transparent w-full text-gray-180 placeholder:text-gray-180 outline-none"
@@ -124,7 +125,7 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                 </div>
                 {/* Card Number */}
                 <div className="space-y-1">
-                    <div className="rounded-lg border border-gray-180 p-3 flex items-center gap-3 h-14">
+                    <div className="rounded-lg border border-gray-180 px-3 flex items-center gap-3 h-14">
                         {/* <span><Icon name="card" /></span> */}
                         <CardNumberElement
                             onChange={handleCardNumberChange}
@@ -139,7 +140,7 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
 
                 <div className=" grid md:grid-cols-2 md:gap-8 gap-4">
                     <div className="space-y-1">
-                        <div className="rounded-lg border border-gray-180 p-3 flex items-center gap-3 h-14">
+                        <div className="rounded-lg border border-gray-180 px-3 flex items-center gap-3 h-14">
                             <span><Icon name="calender" /></span>
                             <CardExpiryElement
                                 onChange={handleExpiryChange}
@@ -153,7 +154,7 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
 
                     {/* CVC */}
                     <div className="space-y-1">
-                        <div className="rounded-lg border border-gray-180 p-3 flex items-center gap-3 h-14">
+                        <div className="rounded-lg border border-gray-180 px-3 flex items-center gap-3 h-14">
                             <CardCvcElement
                                 onChange={handleCvcChange}
                                 options={{ style: stripeInputStyle, placeholder: "CVC" }}
@@ -179,13 +180,12 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                             !isCardComplete ||
                             !isExpiryComplete ||
                             !isCvcComplete ||
-                            !name
+                            !(name.toString().length > 2)
                         }
                         isLoading={isSubmitting}
                     />
                 </div>
             </form>
-            <ToastContainer />
         </>
     );
 };

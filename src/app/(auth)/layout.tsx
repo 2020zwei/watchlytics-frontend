@@ -1,6 +1,5 @@
 import clsx from "clsx";
 import React from "react";
-import { ToastContainer } from "react-toastify";
 
 export default function AuthLayout({
   children,
@@ -24,7 +23,7 @@ export default function AuthLayout({
 
       {/* Right side sign-in form */}
       <div className="pt-5 flex-1">   {children}</div>
-      <ToastContainer />
+
     </div>
   );
 }
