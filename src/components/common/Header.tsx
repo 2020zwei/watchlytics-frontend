@@ -1,18 +1,15 @@
 "use client"
 import Image from 'next/image'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@heroui/react";
 import Icon from './Icon';
 import Link from 'next/link';
+import { useAppContext } from '@/providers/AppContextProvider';
 
 const Header = () => {
-  useEffect(() => {
-    const profileImg = document.getElementById("header-profile") as HTMLImageElement | null;
-    if (profileImg) {
-      // @ts-ignore
-      profileImg.src = localStorage.getItem("profile_picture");
-    }
-  }, [])
+  const { user } = useAppContext();
+  console.log(user, "Bilal")
+
   return (
     <header className=' fixed start-0 top-0 xl:ps-[310px] z-40 border-b border-gray-20 bg-white ps-[250px] min-h-[100px] right-0 flex items-center'>
       <div className="flex items-center justify-end w-full pe-4">
@@ -21,7 +18,7 @@ const Header = () => {
           <DropdownTrigger>
             <Button className=' bg-transparent'>
               <div className='w-10 h-10 border bg-gray-50 rounded-full'>
-                <Image src="" alt="usefer" width={40} height={40} id='header-profile' className=' rounded-full object-cover h-full w-full' />
+                {user?.image ? <img src={user?.image} alt="usefer" width={40} height={40} className=' rounded-full object-cover h-full w-full' /> : null}
               </div>
               <span><Icon name='caret' fill='#ACACAC' className='!mx-0' /></span>
             </Button>

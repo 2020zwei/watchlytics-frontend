@@ -18,9 +18,11 @@ import { URLS, METHODS } from "@/utils/constants";
 import { Spinner } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { useAppContext } from "@/providers/AppContextProvider";
 
 type FormSchemaType = z.infer<typeof ProfileFormSchema>;
 export default function ProfilePage() {
+  const { setCurrentUser } = useAppContext();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [apiLoading, setApiLoading] = useState<boolean>(true);
@@ -85,10 +87,8 @@ export default function ProfilePage() {
       formData.get("confirm_password") && setValue("confirm_password", formData.get("confirm_password"))
       // @ts-ignore
       localStorage.setItem("profile_picture", fileMeta?.url)
-      const profileImg = document.getElementById("header-profile") as HTMLImageElement | null;
-      if (profileImg && fileMeta?.url) {
-        profileImg.src = fileMeta?.url;
-      }
+      setCurrentUser({ image: fileMeta?.url })
+
       formData.get("confirm_password") && navigate.push("/login")
     }
     else {
@@ -120,7 +120,7 @@ export default function ProfilePage() {
               data[key] = res?.data?.data[key]
             }
           })
-          // localStorage.setItem("profile_picture", res?.data?.data?.profile_picture)
+          setCurrentUser({ image: res?.data?.data?.profile_picture })
           reset(data, { keepDirty: false, keepIsValid: false });
         }
       }).finally(() => {

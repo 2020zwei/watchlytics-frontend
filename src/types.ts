@@ -34,4 +34,9 @@ export type Plans = {
     is_popular: boolean;
 };
 
+export type USER = {
+    name?: string,
+    image?: string
+}
+
 
