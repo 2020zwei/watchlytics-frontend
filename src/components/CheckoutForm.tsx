@@ -32,9 +32,9 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
     const stripeInputStyle = {
         base: {
             fontSize: "16px",
-            color: "#ACACAC",
+            color: "#808080",
             "::placeholder": {
-                color: "#ACACAC",
+                color: "#808080",
             },
         },
         invalid: {
@@ -117,7 +117,7 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                 <div className="rounded-lg border border-gray-180 px-3 flex items-center gap-3 h-14">
                     <span><Icon name="user" /></span>
                     <input
-                        className="bg-transparent w-full text-gray-180 placeholder:text-gray-180 outline-none"
+                        className="bg-transparent w-full text-[#808080] placeholder:text-[#808080] outline-none"
                         required
                         placeholder="Card holder name"
                         onChange={(e: any) => setName(e.target.value)}

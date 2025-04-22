@@ -55,10 +55,10 @@ const page = () => {
                             </div>
                             <h3 className=' text-blue-850 text-2xl font-medium text-center pt-3'>Select Payment Method:</h3>
                             <div className="flex items-center justify-center mt-5 gap-6">
-                                <button className={clsx("p-[0.04rem] rounded-lg min-w-[83px]", paymentType ? "border-gradient" : "")} onClick={() => setPaymentType(true)}>
+                                <button className={clsx("p-[0.04rem]  rounded-lg min-w-[83px]", paymentType ? "border border-blue-850" : "")} onClick={() => setPaymentType(true)}>
                                     <span className='bg-[#F2F5FF] w-full rounded-lg text-blue-850 text-xl font-semibold h-9 flex justify-center items-center'><Icon name='visacard' /></span>
                                 </button>
-                                <button className={clsx("p-[0.04rem] rounded-lg min-w-[83px]", paymentType ? "" : "border-gradient ")} onClick={() => setPaymentType(false)}>
+                                <button className={clsx("p-[0.04rem] rounded-lg min-w-[83px]", paymentType ? "" : "border border-blue-850")} onClick={() => setPaymentType(false)}>
                                     <span className='bg-[#F2F5FF] w-full rounded-lg text-blue-850 text-xl font-semibold h-9 flex justify-center items-center'><Icon name='paypal' /></span>
                                 </button>
                             </div>
