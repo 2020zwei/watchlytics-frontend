@@ -127,7 +127,8 @@ const Icon: React.FC<PropsTypes> = ({ name, fill, className, stroke, size = "2em
                 <path d="M3.02148 9H20.0215" stroke="#ACACAC" stroke-width="1.5" stroke-linecap="round" />
             </svg>
 
-        )
+        ),
+
     };
 
     return icons[name] || null;

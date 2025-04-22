@@ -45,7 +45,7 @@ const page = () => {
                 <Image src="/blue-logo.png" alt='logo' width={40} height={40} />
                 <span className='text-2xl font-medium'>Watchlytics</span>
             </header>
-            <RoundedBox className='!bg-blue-100 sm:p-10 p-5 mt-10'>
+            <RoundedBox className='!bg-blue-100 md:p-14 p-5 mt-10'>
                 <div className='grid md:grid-cols-12 xl:gap-14 lg:gap-10 md:gap-7 gap-5'>
                     <RoundedBox className='lg:col-span-8 md:col-span-7 col-span-12 !bg-transparent border border-gray-180'>
                         <div className='max-w-[620px] mx-auto px-4'>
@@ -65,7 +65,7 @@ const page = () => {
 
                             <div className='pb-3'>
                                 <Elements stripe={stripePromise}>
-                                    <CheckoutForm  planName={plan.name} priceId={plan.stripe_price_id}/>
+                                    <CheckoutForm planName={plan.name} priceId={plan.stripe_price_id} />
                                 </Elements>
                             </div>
                         </div>

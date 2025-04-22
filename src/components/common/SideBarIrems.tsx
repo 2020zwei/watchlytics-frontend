@@ -8,9 +8,10 @@ import React from 'react'
 
 const SideBarIrems = () => {
     const navigate = useRouter()
-    const onLogout = (e: any, href: string) => {
+    const onLogout = async (e: any, href: string) => {
         e.preventDefault()
         if (href == "#") {
+            await fetch("/api/logout");
             navigate.push("/login")
         }
     }

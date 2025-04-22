@@ -642,19 +642,19 @@ export default function Signup() {
 
   const handleClientIdChange = (value: string) => {
     setClientId(value);
-    if (!/^\d{8,10}$/.test(value)) {
-      setClientIdError("Client ID must be 8 to 10 digits");
-    } else {
-      setClientIdError(null);
-    }
+    // if (!/^\d{8,10}$/.test(value)) {
+    //   setClientIdError("Client ID must be 8 to 10 digits");
+    // } else {
+    //   setClientIdError(null);
+    // }
 
-    if (errors.clientId) {
-      setErrors((prevErrors: any) => {
-        const newErrors = { ...prevErrors };
-        delete newErrors.clientId;
-        return newErrors;
-      });
-    }
+    // if (errors.clientId) {
+    //   setErrors((prevErrors: any) => {
+    //     const newErrors = { ...prevErrors };
+    //     delete newErrors.clientId;
+    //     return newErrors;
+    //   });
+    // }
   };
 
   const toggleVisibility = () => {
@@ -687,11 +687,11 @@ export default function Signup() {
     }
 
     const clientIdValue = data.clientId ? (data.clientId as string).trim() : "";
-    if (!clientIdValue) {
-      newErrors.clientId = { message: "Please enter your client id" };
-    } else if (!/^\d{8,10}$/.test(clientIdValue)) {
-      newErrors.clientId = { message: "Client ID must be 8 to 10 digits" };
-    }
+    // if (!clientIdValue) {
+    //   newErrors.clientId = { message: "Please enter your client id" };
+    // } else if (!/^\d{8,10}$/.test(clientIdValue)) {
+    //   newErrors.clientId = { message: "Client ID must be 8 to 10 digits" };
+    // }
 
     const passwordError = getPasswordError(data.password as string);
     if (passwordError) {
@@ -711,7 +711,7 @@ export default function Signup() {
       password: data.password,
       first_name: data.name,
       lastname: "",
-      client_id: Number(data.clientId),
+      client_id: Number(data.clientId)|| undefined,
     };
     setLoading(true);
     try {
@@ -725,6 +725,7 @@ export default function Signup() {
       toast.success("Signup Successful!", { position: "top-right" });
       router.push("/login");
     } catch (error: any) {
+      console.log(error)
       toast.error("Signup failed!", { position: "top-right" });
       if (axios.isAxiosError(error)) {
         setErrors(error?.response?.data?.errors);
@@ -847,14 +848,14 @@ export default function Signup() {
                 name="clientId"
                 value={clientId}
                 onValueChange={handleClientIdChange}
-                errorMessage={
-                  clientIdError ||
-                  (errors.clientId ? errors.clientId.message : undefined)
-                }
-                isInvalid={!!clientIdError || !!errors.clientId}
+                // errorMessage={
+                //   clientIdError ||
+                //   (errors.clientId ? errors.clientId.message : undefined)
+                // }
+                // isInvalid={!!clientIdError || !!errors.clientId}
                 label={
                   <div className="flex items-center top-[1.5625rem] gap-1 justify-between">
-                    <span>Client ID</span>
+                    <span>IFS Client ID</span>
                     <Image
                       src="/i.svg"
                       alt="Client ID Icon"
