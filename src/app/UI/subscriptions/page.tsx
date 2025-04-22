@@ -50,11 +50,11 @@ const page = () => {
             <p className=' text-gray-190'>Current Plan</p>
             <div>
               <div className='flex items-center gap-3'>
-                <Heading className='!text-2xl !font-semibold'>{subscription.current_subscription}</Heading>
-                <span className='text-sm pt-1 text-gray-180'>{subscription.end_date}</span>
+                <Heading className='!text-2xl !font-semibold'>{subscription?.current_subscription}</Heading>
+                <span className='text-sm pt-1 text-gray-180'>{subscription?.end_date}</span>
               </div>
               <ul className='pt-3 flex flex-col gap-3'>
-                {subscription.features?.split(",")?.map((feature: string) => (
+                {subscription?.features?.split(",")?.map((feature: string) => (
                   <li className='gap-2 font-medium text-dark-700 flex' key={feature}>
                     <span><Icon name='checkmark' className="text-blue-850 text-xl" /></span>
                     {feature}
@@ -65,8 +65,8 @@ const page = () => {
           </div>
           <div className='flex flex-col gap-2'>
             <Button title='Upgrade Plan' className='h-10 !min-w-[166px] max-w-[166px]' onPress={() => navigate.push(`/subscription`)}></Button>
-            <TransparentButton isDisabled={subscription.is_cancel_subscription || isDisabled} title='Cancel Subscription' className='h-10 !min-w-[166px] max-w-[166px]'
-              onPress={() => subscription.is_cancel_subscription || isDisabled ? undefined : handleCancleSubscription()}></TransparentButton>
+            <TransparentButton isDisabled={subscription?.is_cancel_subscription || isDisabled} title='Cancel Subscription' className='h-10 !min-w-[166px] max-w-[166px]'
+              onPress={() => subscription?.is_cancel_subscription || isDisabled ? undefined : handleCancleSubscription()}></TransparentButton>
           </div>
         </div>
       </RoundedBox >
