@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 html{
-  background: transparent;
+  background: #f0f1f3 !important;
 }
 
 input:-webkit-autofill {

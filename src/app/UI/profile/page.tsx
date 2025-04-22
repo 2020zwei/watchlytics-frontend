@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FileMetaTypes, RequestTypes } from "@/types";
 import { ProfileFormFields, ProfileFormSchema } from "@/utils/mock";
@@ -18,6 +17,7 @@ import { sendRequest } from "@/utils/apis";
 import { URLS, METHODS } from "@/utils/constants";
 import { Spinner } from "@heroui/react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 type FormSchemaType = z.infer<typeof ProfileFormSchema>;
 export default function ProfilePage() {
@@ -77,19 +77,19 @@ export default function ProfilePage() {
     }
     const res = await sendRequest(PAYLOAD)
     if (res?.status === 200) {
+      toast.success(res?.data?.message)
       setIsEditing(false)
       // @ts-ignore
       fileMeta?.file && setFileMeta((prev) => ({ ...prev, file: null }))
       // @ts-ignore
-      formData.get("confirm_password")&&setValue("confirm_password", formData.get("confirm_password"))
+      formData.get("confirm_password") && setValue("confirm_password", formData.get("confirm_password"))
+      // @ts-ignore
+      localStorage.setItem("profile_picture", fileMeta?.url)
       const profileImg = document.getElementById("header-profile") as HTMLImageElement | null;
-      if (profileImg) {
-        // @ts-ignore
+      if (profileImg && fileMeta?.url) {
         profileImg.src = fileMeta?.url;
       }
-      toast.success(res?.data?.message)
       formData.get("confirm_password") && navigate.push("/login")
-
     }
     else {
       Object.keys(res.response.data).forEach(key => {
@@ -120,11 +120,7 @@ export default function ProfilePage() {
               data[key] = res?.data?.data[key]
             }
           })
-          const profileImg = document.getElementById("header-profile") as HTMLImageElement | null;
-          if (profileImg) {
-            profileImg.src = res?.data?.data?.profile_picture;
-          }
-
+          // localStorage.setItem("profile_picture", res?.data?.data?.profile_picture)
           reset(data, { keepDirty: false, keepIsValid: false });
         }
       }).finally(() => {
@@ -148,84 +144,84 @@ export default function ProfilePage() {
   }
   return (
     <>
-        <RoundedBox>
-          <div
-            style={{
-              backgroundImage: `url("/profile.png")`
-            }}
-            className={clsx("bg-no-repeat flex justify-end items-end bg-cover py-6 object-contain h-[280px] w-full")}
-          >
-            {
-              isEditing ? null : <div className="pe-5 relative z-[11]"><Button onPress={() => setIsEditing(!isEditing)} title='Edit Profile' className='h-10 px-5' /></div>
-            }
+      <RoundedBox>
+        <div
+
+          style={{
+            backgroundImage: `url("/profile.png")`
+          }}
+          className={clsx("bg-no-repeat rounded-lg flex justify-end items-end bg-cover py-6 object-contain h-[280px] w-full")}
+        >
+          {
+            isEditing ? null : <div className="pe-5 relative z-[11]"><Button onPress={() => setIsEditing(!isEditing)} title='Edit Profile' className='h-10 px-5' /></div>
+          }
+        </div>
+        <div className="relative sm:-mt-24 -mt-20 px-8 pb-6 z-10">
+          <div className={clsx("w-fit", isEditing ? "" : " pointer-events-none")}>
+            <FileUploader
+              onChange={(fileData) => {
+                setFileMeta(null)
+                setFileMeta(fileData);
+              }}
+            >
+              <RoundedBox className={clsx("sm:w-[140px] sm:h-[140px] w-[100px] h-[100px] -ms-6 outline-gray-180 overflow-hidden !rounded-full border")}>
+                {fileMeta?.url || fileMeta ? (
+                  <img
+                    width={140}
+                    // @ts-ignore
+                    src={fileMeta?.url || fileMeta}
+                    alt="Selected Image"
+                    className="w-full h-full object-cover"
+                  />
+                ) : null}
+              </RoundedBox>
+            </FileUploader>
+            <Heading>{getValues("first_name")}</Heading>
+            <div className=" text-sm text-gray-190">Joined {getValues("date_joined")}</div>
           </div>
-          <div className="relative sm:-mt-24 -mt-20 px-8 pb-6 z-10">
-            <div className={clsx("w-fit", isEditing ? "" : " pointer-events-none")}>
-              <FileUploader
-                onChange={(fileData) => {
-                  setFileMeta(null)
-                  setFileMeta(fileData);
-                }}
-              >
-                <RoundedBox className={clsx("sm:w-[140px] sm:h-[140px] w-[100px] h-[100px] -ms-6 outline-gray-180 overflow-hidden !rounded-full border")}>
-                  {fileMeta?.url || fileMeta ? (
-                    <img
-                      width={140}
-                      // @ts-ignore
-                      src={fileMeta?.url || fileMeta}
-                      alt="Selected Image"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : null}
-                </RoundedBox>
-              </FileUploader>
-              <Heading>{getValues("first_name")}</Heading>
-              <div className=" text-sm text-gray-190">Joined {getValues("date_joined")}</div>
-            </div>
-            <form className="mt-6" onSubmit={handleSubmit(onSubmit)}>
-              <Heading>Personal Information</Heading>
-              <fieldset className="grid sm:grid-cols-2 grid-cols-1 gap-3 mt-3">
-                {
-                  ProfileFormFields.map((field) => (
-                    <FormField
-                      fieldType={field.fieldType}
-                      type={
-                        field.type === "password"
-                          ? togglePassType[field.name]
-                            ? "text"
-                            : "password"
-                          : field.type
-                      }
-                      key={field.label}
-                      isDisabled={field?.type === "email" ? true : !isEditing}
-                      label={field.label}
-                      name={field.name}
-                      control={control}
-                      placeholder={field.placeholder}
-                      errors={errors}
-                      inputContainer="w-full"
-                      containerClass="bloc"
-                      iconSize="1.5rem"
-                      icon={
-                        field.type === "password"
-                          ? togglePassType[field.name]
-                            ? "eyeOff"
-                            : "filledEye"
-                          : undefined
-                      }
-                      onPasswordToggle={() => handleTogglePasswordType(field.name)}
-                    />
-                  ))
-                }
-              </fieldset>
-              {isEditing ? <div className="flex items-center gap-3 mt-6">
-                <Button isLoading={loading} title='Update' type="submit" className='h-10' isDisabled={!isFormReady} />
-                <TransparentButton title='Cancel' className='h-10' onPress={handleReset} />
-              </div> : null}
-            </form>
-          </div>
-        </RoundedBox>
-      <ToastContainer />
+          <form className="mt-6" onSubmit={handleSubmit(onSubmit)}>
+            <Heading>Personal Information</Heading>
+            <fieldset className="grid sm:grid-cols-2 grid-cols-1 gap-3 mt-3">
+              {
+                ProfileFormFields.map((field) => (
+                  <FormField
+                    fieldType={field.fieldType}
+                    type={
+                      field.type === "password"
+                        ? togglePassType[field.name]
+                          ? "text"
+                          : "password"
+                        : field.type
+                    }
+                    key={field.label}
+                    isDisabled={field?.type === "email" ? true : !isEditing}
+                    label={field.label}
+                    name={field.name}
+                    control={control}
+                    placeholder={field.placeholder}
+                    errors={errors}
+                    inputContainer="w-full"
+                    containerClass="bloc"
+                    iconSize="1.5rem"
+                    icon={
+                      field.type === "password"
+                        ? togglePassType[field.name]
+                          ? "eyeOff"
+                          : "filledEye"
+                        : undefined
+                    }
+                    onPasswordToggle={() => handleTogglePasswordType(field.name)}
+                  />
+                ))
+              }
+            </fieldset>
+            {isEditing ? <div className="flex items-center gap-3 mt-6">
+              <Button isLoading={loading} title='Update' type="submit" className='h-10' isDisabled={!isFormReady} />
+              <TransparentButton title='Cancel' className='h-10' onPress={handleReset} />
+            </div> : null}
+          </form>
+        </div>
+      </RoundedBox>
     </>
   );
 }

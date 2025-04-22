@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, type ChangeEvent } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Image from "next/image";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { EyeSlashFilledIcon } from "@/components/icon/EyeSlashFilledIcon";
 import { EyeFilledIcon } from "@/components/icon/EyeFilledIcon";
@@ -605,7 +604,6 @@ export default function ProfilePage() {
           </div>
         </div>
       </main>
-      <ToastContainer />
     </>
   );
 }

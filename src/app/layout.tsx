@@ -41,6 +41,7 @@ import { Providers } from "./providers";
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 import clsx from "clsx";
+import { ToastContainer } from "react-toastify";
 
 
 const archivo = Archivo({
@@ -67,9 +68,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="light" style={{ colorScheme: "light" }}>
       <body
-        className={clsx("antialiased bg-gray-10", archivo.variable,inter.variable)}
+        className={clsx("antialiased", archivo.variable,inter.variable)}
       >
         <Providers>{children}</Providers>
+        <ToastContainer />
       </body>
     </html>
   );

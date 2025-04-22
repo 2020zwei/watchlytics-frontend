@@ -1,4 +1,5 @@
 "use client"
+import { Button } from '@/components/common/baseButton/BaseButton'
 import RoundedBox from '@/components/common/baseButton/RoundedBox'
 import Icon from '@/components/common/Icon'
 import { Plans } from '@/types'
@@ -7,6 +8,7 @@ import { Spinner } from '@heroui/react'
 import clsx from 'clsx'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 const planIcons = {
     "FREE": "freePlan",
@@ -17,6 +19,7 @@ const planIcons = {
 const page = () => {
     const [plansTypes, setPlansTypes] = useState<Plans[]>([])
     const [loading, setLoading] = useState(false)
+    const navegate = useRouter()
     const getSubscriptions = () => {
         setLoading(true)
         sendRequest({ url: "/plans/", method: "GET" }).then(res => {
@@ -46,12 +49,15 @@ const page = () => {
                                 plansTypes.map((item, index) => (
                                     <RoundedBox key={item.name} className={clsx("max-h-[600px] min-h-[600px] relative !bg-transparent border border-blue-150 px-4 py-7 flex flex-col justify-between", index === 1 || index === 3 ? "sm:mt-24" : "")}>
                                         <div className='h-[calc(100%-130px)]'>
-                                            {/* @ts-ignore */}
-                                            <div><Icon name={planIcons[item.name]} /></div>
+                                            <div className='flex items-center justify-between'>
+                                                {/* @ts-ignore */}
+                                                <Icon name={planIcons[item.name]} />
+                                                {item.is_popular ? <Button title='Popular' className='h-10 pointer-events-none cursor-default'></Button> : null}
+                                            </div>
                                             <div className='pt-10 flex flex-col h-full justify-between'>
                                                 <div>
                                                     <h2 className=' font-bold text-3xl text-blue-850'>{item.name}</h2>
-                                                    <h4 className='text-blue-850 font-bold'>Whats Included :</h4>
+                                                    <h4 className='text-blue-850 font-bold'>What`s Included :</h4>
                                                     <ul className='pt-3 flex flex-col gap-3'>
                                                         {item.description?.split(",")?.map((feature) => (
                                                             <li className='gap-2 font-medium text-dark-700 flex' key={feature}>
@@ -62,13 +68,19 @@ const page = () => {
                                                     </ul>
                                                 </div>
                                                 <div className='text-blue-850'>
-                                                    <span className='md:text-4xl text-xl font-bold'>{item.price}</span>
-                                                    <span className=' font-medium ps-1'>/Month</span>
+                                                    <span className='md:text-4xl text-xl font-bold'>${item.price}</span>
+                                                    <span className=' font-medium ps-1'>/ Month</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="relative p-[2px] w-full bg-blue-gradient rounded-[10px] overflow-hidden hover:opacity-70 transition-all duration-300">
-                                            <Link href={`/subscription/${item.id}`} className=" relative w-full rounded-[8px] bg-[#F2F5FF] text-blue-850 text-xl font-semibold h-14 flex justify-center items-center">
+                                        <div className="relative p-[2px] w-full bg-blue-gradient rounded-[10px] overflow-hidden transition-all duration-300">
+                                            <Link onClick={(e) => {
+                                                if (item.name?.toLowerCase() === "free") {
+                                                    e.preventDefault();
+                                                    navegate.push("/UI/prifile")
+                                                }
+                                            }}
+                                                href={item.name?.toLowerCase() === "free" ? "#" : `/subscription/${item.id}`} className=" relative w-full rounded-[8px] bg-[#E4E8F4] hover:bg-transparent hover:text-white transition-all duration-300 text-blue-850 text-xl font-semibold h-14 flex justify-center items-center">
                                                 Get Started
                                             </Link>
                                         </div>
