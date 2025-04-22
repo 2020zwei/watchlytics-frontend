@@ -54,6 +54,7 @@ export const config = {
     "/sign-up",
     "/forgot-password",
     "/reset-password",
+    "/UI/inventory",
     "/UI/profile",
     "/subscription"
   ],

@@ -641,7 +641,7 @@ export default function Signup() {
   };
 
   const handleClientIdChange = (value: string) => {
-    // setClientId(value);
+    setClientId(value);
     // if (!/^\d{8,10}$/.test(value)) {
     //   setClientIdError("Client ID must be 8 to 10 digits");
     // } else {
@@ -711,7 +711,7 @@ export default function Signup() {
       password: data.password,
       first_name: data.name,
       lastname: "",
-      client_id: Number(data.clientId),
+      client_id: Number(data.clientId)|| undefined,
     };
     setLoading(true);
     try {
@@ -725,6 +725,7 @@ export default function Signup() {
       toast.success("Signup Successful!", { position: "top-right" });
       router.push("/login");
     } catch (error: any) {
+      console.log(error)
       toast.error("Signup failed!", { position: "top-right" });
       if (axios.isAxiosError(error)) {
         setErrors(error?.response?.data?.errors);
