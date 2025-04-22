@@ -1,26 +1,54 @@
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+html{
+  background: #f0f1f3 !important;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+input:-webkit-autofill {
+  background-color: transparent !important;
+  box-shadow: 0 0 0px 1000px white inset !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: white;
-    --foreground: black;
-  }
+.img-bg {
+  background-image: url("../../public/img.svg");
+  background-size: cover;
+  background-position: top;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-archivo), sans-serif;
+}
+
+select::after {
+  content: "fd";
+  position: relative;
+}
+
+.scrollable::-webkit-scrollbar {
+  width: 1px;
+  height: 1px;
+}
+
+/* Track (Background of the Scrollbar) */
+.scrollable::-webkit-scrollbar-track {
+  background: #264AC3;
+  border-radius: 1px;
+}
+
+/* Handle (Draggable part) */
+.scrollable::-webkit-scrollbar-thumb {
+  background: #264AC3;
+  border-radius: 1px;
+}
+
+/* Handle on hover */
+.scrollable::-webkit-scrollbar-thumb:hover {
+  background: #264AC3;
+}
+
+.border-gradient {
+  background:linear-gradient(180deg, #092CA2 0%, #003BFF 100%)
+
+
 }
