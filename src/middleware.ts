@@ -9,7 +9,7 @@ const publicRoutes = [
   "/reset-password",
 ];
 
-const privateRoutes = ["/UI/profile", "/UI/inventory","/subscription"];
+const privateRoutes = ["/UI/profile", "/UI/inventory", "/UI/subscriptions","/subscription"];
 
 export function middleware(request: NextRequest, response:NextResponse) {
   const token = request.cookies.get("access_token")?.value;
@@ -56,6 +56,7 @@ export const config = {
     "/reset-password",
     "/UI/inventory",
     "/UI/profile",
+    "/UI/subscriptions",
     "/subscription"
   ],
 };

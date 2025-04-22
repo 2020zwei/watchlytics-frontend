@@ -1,6 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+html{
+  background: transparent;
+}
 
 input:-webkit-autofill {
   background-color: transparent !important;

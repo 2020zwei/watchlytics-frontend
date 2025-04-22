@@ -61,6 +61,7 @@ const config = {
           30: "#f8f8f8",
           25: "#CCCCCC",
           20: "#EEEEEE",
+          10:"#F0F1F3"
 
         },
         orange: {
