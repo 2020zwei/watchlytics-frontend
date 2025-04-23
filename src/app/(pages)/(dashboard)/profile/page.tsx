@@ -158,7 +158,7 @@ export default function ProfilePage() {
           }
         </div>
         <div className="relative sm:-mt-24 -mt-20 px-8 pb-6 z-10">
-          <div className={clsx("w-fit", isEditing ? "" : " pointer-events-none")}>
+          <div className={clsx("w-fit cursor-pointer", isEditing ? "" : " pointer-events-none")}>
             <FileUploader
               onChange={(fileData) => {
                 setFileMeta(null)
