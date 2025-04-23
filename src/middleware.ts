@@ -2,28 +2,33 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { isTokenValid } from "./utils/isTokenValid";
 const publicRoutes = [
-  "/",
   "/login",
   "/sign-up",
   "/forgot-password",
   "/reset-password",
+  ,"/subscription"
 ];
 
-const privateRoutes = ["/UI/profile", "/UI/inventory", "/UI/subscriptions","/subscription"];
+const privateRoutes = ["/dashboard","/profile", "/inventory", "/subscriptions"];
 
 export function middleware(request: NextRequest, response:NextResponse) {
+
   const token = request.cookies.get("access_token")?.value;
+
+  console.log(token,"Bilal123")
   const pathname = request.nextUrl.pathname;
 
-  const isPublicRoute = publicRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
+  // const isPublicRoute = publicRoutes.some((route) =>
+  //   pathname.startsWith(route)
+  // );
   const isPrivateRoute = privateRoutes.some((route) =>
     pathname.startsWith(route)
   );
   const isLoginPage = pathname === "/login";
 
   const isInvalidToken = token && !isTokenValid(token);
+
+ 
 
   if ((isInvalidToken || (!token && isPrivateRoute)) && !isLoginPage) {
     return NextResponse.redirect(new URL("/login", request.url));
@@ -33,30 +38,31 @@ export function middleware(request: NextRequest, response:NextResponse) {
     return NextResponse.next();
   }
 
-  if (token && isPublicRoute && !isLoginPage) {
-    return NextResponse.redirect(new URL("/UI/profile", request.url));
-  }
 
   return NextResponse.next();
 }
 
-export const config = {
-  matcher: [
-    {
-      source:
-        "/((?!api|_next/static|_next/image|favicon.ico|.*.png|.*.svg|.*.jpg).*)",
-      missing: [
-        { type: "header", key: "next-router-prefetch" },
-        { type: "header", key: "purpose", value: "prefetch" },
-      ],
-    },
-    "/login",
-    "/sign-up",
-    "/forgot-password",
-    "/reset-password",
-    "/UI/inventory",
-    "/UI/profile",
-    "/UI/subscriptions",
-    "/subscription"
-  ],
-};
+
+  export const config = {
+    matcher: [
+      "/dashboard",
+      "/login",
+      "/sign-up",
+      "/forgot-password",
+      "/reset-password",
+      "/inventory",
+      "/profile",
+      "/subscriptions",
+      "/subscription",
+      {
+        source:
+          "/((?!api|_next/static|_next/image|favicon.ico|.*.png|.*.svg|.*.jpg).*)",
+        missing: [
+          { type: "header", key: "next-router-prefetch" },
+          { type: "header", key: "purpose", value: "prefetch" },
+        ],
+      },
+    ],
+  };
+  
+

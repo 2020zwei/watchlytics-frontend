@@ -80,13 +80,15 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
             };
 
             sendRequest({ url: "/subscribe/", method: "POST", payload: PAYLOAD })
-                .then((res) => {
+                .then(async (res) => {
+                    console.log(res)
                     if (res?.data?.success) {
+                        await fetch('/api/logout')
                         toast.success(res.data.message);
-                        navigate.push("/UI/profile")
+                        navigate.push("/login")
                     } else {
                         if (res?.response?.data) {
-                            toast.error(res?.response?.data?.message);
+                            toast.error(res?.response?.data?.errors?.error);
                         }
                     }
                 })

@@ -1,14 +1,32 @@
 "use client"
 import Image from 'next/image'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@heroui/react";
 import Icon from './Icon';
 import Link from 'next/link';
 import { useAppContext } from '@/providers/AppContextProvider';
+import { sendRequest } from '@/utils/apis';
+import { METHODS, URLS } from '@/utils/constants';
 
 const Header = () => {
-  const { user } = useAppContext();
-  console.log(user, "Bilal")
+  const { user, setCurrentUser } = useAppContext();
+
+  useEffect(() => {
+    const getProfileInfo = async () => {
+      // @ts-ignore
+      const PAYLOAD: RequestTypes = {
+        url: URLS.ME,
+        method: METHODS.GET,
+      }
+      sendRequest(PAYLOAD).then((res) => {
+        if (res?.data) {
+          setCurrentUser({ image: res?.data?.data?.profile_picture })
+        }
+      })
+    }
+    getProfileInfo()
+  }, [])
+
 
   return (
     <header className=' fixed start-0 top-0 xl:ps-[310px] z-40 border-b border-gray-20 bg-white ps-[250px] min-h-[100px] right-0 flex items-center'>
@@ -29,13 +47,13 @@ const Header = () => {
               key="new"
               className=' text-blue-850 text-sm'
               startContent={<Icon name='users' />}>
-              <Link href="/UI/profile">Profile</Link>
+              <Link href="/profile" className='block'>Profile</Link>
             </DropdownItem>
             <DropdownItem
               key="new"
               className=' text-blue-850 text-sm'
               startContent={<Icon name='card' stroke='#003BFF' />}            >
-              <Link href="/UI/subscriptions">Subscription</Link>
+              <Link href="/subscriptions" className='block'>Subscription</Link>
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>

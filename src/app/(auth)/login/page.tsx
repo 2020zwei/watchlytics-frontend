@@ -233,7 +233,7 @@
 import { Button, Checkbox, Form, Input } from "@heroui/react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { deleteCookie, getCookies, setCookie } from "cookies-next";
+import { deleteCookie, setCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 
 import { FormEvent, useEffect, useState } from "react";
@@ -298,7 +298,6 @@ export default function SignIn() {
     // Set loading state to true when API call begins
     setLoading(true);
     try {
-      console.log("hellojjjjjjjj");
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/signin/`,
         {
@@ -308,10 +307,6 @@ export default function SignIn() {
       );
 
       const result = response.data;
-      console.log(result, "result");
-
-      // Set access_token cookie according to "Remember me" checkbox.
-      // If selected, cookie will persist for 7 days; if not, it becomes a session cookie.
       if (isSelected) {
         setCookie("access_token", result.access_token, {
           maxAge: 60 * 60 * 24 * 7, // 7 days
@@ -326,8 +321,7 @@ export default function SignIn() {
       toast.success("Login Successfully!", {
         position: "top-right",
       });
-      // Redirect to profile
-      router.push("/UI/profile");
+      router.push("/dashboard");
 
       console.log("Login successful:", result?.access_token);
     } catch (error: any) {
