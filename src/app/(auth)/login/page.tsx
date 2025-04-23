@@ -321,7 +321,8 @@ export default function SignIn() {
       toast.success("Login Successfully!", {
         position: "top-right",
       });
-      router.push("/dashboard");
+      localStorage.setItem("isLoggedin", "true")
+      router.push("/profile");
 
       console.log("Login successful:", result?.access_token);
     } catch (error: any) {

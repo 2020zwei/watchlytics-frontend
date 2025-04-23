@@ -19,6 +19,7 @@ import { Spinner } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useAppContext } from "@/providers/AppContextProvider";
+import Icon from "@/components/common/Icon";
 
 type FormSchemaType = z.infer<typeof ProfileFormSchema>;
 export default function ProfilePage() {
@@ -164,7 +165,8 @@ export default function ProfilePage() {
                 setFileMeta(fileData);
               }}
             >
-              <RoundedBox className={clsx("sm:w-[140px] sm:h-[140px] w-[100px] h-[100px] -ms-6 outline-gray-180 overflow-hidden !rounded-full border")}>
+              <RoundedBox className={clsx("sm:w-[140px] flex items-center justify-center sm:h-[140px] w-[100px] h-[100px] -ms-6 outline-gray-180 overflow-hidden !rounded-full border cursor-pointer !bg-gray-100 duration-500 hover:!bg-gray-180")}>
+
                 {fileMeta?.url || fileMeta ? (
                   <img
                     width={140}
@@ -173,7 +175,9 @@ export default function ProfilePage() {
                     alt="Selected Image"
                     className="w-full h-full object-cover"
                   />
-                ) : null}
+                ) : <div>
+                  <Icon name="camera" size="2rem" fill="#808080"/>
+                </div>}
               </RoundedBox>
             </FileUploader>
             <Heading>{getValues("first_name")}</Heading>
