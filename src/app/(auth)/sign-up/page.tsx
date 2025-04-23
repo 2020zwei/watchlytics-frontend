@@ -602,6 +602,7 @@ import { EyeFilledIcon } from "../../../components/icon/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "../../../components/icon/EyeSlashFilledIcon";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { setCookie } from "cookies-next";
 
 type FormDataType = Record<string, string | FormDataEntryValue>;
 
@@ -711,7 +712,7 @@ export default function Signup() {
       password: data.password,
       first_name: data.name,
       lastname: "",
-      client_id: Number(data.clientId)|| undefined,
+      client_id: Number(data.clientId) || undefined,
     };
     setLoading(true);
     try {
@@ -721,9 +722,19 @@ export default function Signup() {
       );
       const result = response.data;
       console.log("Signup successful:", result);
+      if (result) {
+        setCookie("access_token", result.access_token, {
+          maxAge: 60 * 60 * 24 * 7,
+          path: "/",
+        });
+      } else {
+        setCookie("access_token", result.access_token, {
+          path: "/",
+        });
+      }
 
       toast.success("Signup Successful!", { position: "top-right" });
-      router.push("/login");
+      router.push("/subscription");
     } catch (error: any) {
       console.log(error)
       toast.error("Signup failed!", { position: "top-right" });

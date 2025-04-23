@@ -41,7 +41,7 @@ const page = () => {
     return (
         <main className='container max-w-screen-lg pb-10'>
             <header className='flex items-center text-blue-850 pt-7 gap-2'>
-                <Image src="/blue-logo.png" alt='logo' width={40} height={40} />
+                <Image src="/images/blue-logo.png" alt='logo' width={40} height={40} />
                 <span className='text-2xl font-medium'>Watchlytics</span>
             </header>
             <RoundedBox className='!bg-blue-100 md:p-14 p-5 mt-10'>

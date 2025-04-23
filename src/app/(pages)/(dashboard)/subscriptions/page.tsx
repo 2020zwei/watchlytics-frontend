@@ -21,8 +21,6 @@ const page = () => {
     sendRequest({ url: "/subscription/details/", method: "GET" }).then(res => {
       setLoading(false)
       setSubscription(res.data.plan)
-  
-
     })
   }
 
@@ -47,9 +45,7 @@ const page = () => {
   if (loading) {
     return <div className="h-[calc(100vh-200px)] flex justify-center items-center"><Spinner /></div>
   }
-  if(subscription){
-    return <div className='text-center'>Not found</div>
-  }
+
   return (
     <div>
       <Heading className='!text-2xl pb-6'>Subscription</Heading>
@@ -74,8 +70,13 @@ const page = () => {
           </div>
           <div className='flex flex-col gap-2'>
             <Button title='Upgrade Plan' className='h-10 !min-w-[166px] max-w-[166px]' onPress={() => navigate.push(`/subscription`)}></Button>
-            <TransparentButton isDisabled={subscription?.is_cancel_subscription || isDisabled} title='Cancel Subscription' className='h-10 !min-w-[166px] max-w-[166px]'
-              onPress={() => subscription?.is_cancel_subscription || isDisabled ? undefined : handleCancleSubscription()}></TransparentButton>
+            {
+              subscription?.current_subscription.toLowerCase() !== "free" ?
+                <TransparentButton isDisabled={subscription?.is_cancel_subscription || isDisabled} title='Cancel Subscription' className='h-10 !min-w-[166px] max-w-[166px]'
+                  onPress={() => subscription?.is_cancel_subscription || isDisabled ? undefined : handleCancleSubscription()}></TransparentButton>
+                : null
+            }
+
           </div>
         </div>
       </RoundedBox >

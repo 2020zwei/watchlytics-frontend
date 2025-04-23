@@ -220,7 +220,13 @@ export const ProfileFormSchema = z.object({
             message: "Confirm Password must be at least 6 characters",
         }),
 
-    client_id: z.string().min(1, "Client ID is required"),
+    client_id: z
+        .string()
+        .optional()
+        .refine((val) => !val || /^\d{1,10}$/.test(val), {
+            message: "Client ID must be up to 10 digits",
+        }),
+
 })
     .refine((data) => {
         if (!data.password && !data.confirm_password) return true;
@@ -232,12 +238,12 @@ export const ProfileFormSchema = z.object({
 
 export const SidebarItems = [
     {
-        "href": "/",
+        "href": "/dashboard",
         "label": "Dashboard",
         "icon": "/Home.svg"
     },
     {
-        "href": "/UI/inventory",
+        "href": "/inventory",
         "label": "Inventory",
         "icon": "/Inventory.svg"
     },

@@ -34,7 +34,7 @@ const page = () => {
     return (
         <main className='container max-w-screen-lg pb-10'>
             <header className='flex items-center text-blue-850 pt-7 gap-2'>
-                <Image src="/blue-logo.png" alt='logo' width={40} height={40} />
+                <Image src="/images/blue-logo.png" alt='logo' width={40} height={40} />
                 <span className='text-2xl font-medium'>Watchlytics</span>
             </header>
             <div className=' max-w-[500px] mx-auto text-center px-2 pt-16'>
@@ -74,13 +74,7 @@ const page = () => {
                                             </div>
                                         </div>
                                         <div className="relative p-[2px] w-full bg-blue-gradient rounded-[10px] overflow-hidden transition-all duration-300">
-                                            <Link onClick={(e) => {
-                                                if (item.name?.toLowerCase() === "free") {
-                                                    e.preventDefault();
-                                                    navegate.push("/UI/prifile")
-                                                }
-                                            }}
-                                                href={item.name?.toLowerCase() === "free" ? "#" : `/subscription/${item.id}`} className=" relative w-full rounded-[8px] bg-[#E4E8F4] hover:bg-transparent hover:text-white transition-all duration-300 text-blue-850 text-xl font-semibold h-14 flex justify-center items-center">
+                                            <Link href={item.name?.toLowerCase() === "free" ? "/dashboard" : `/subscription/${item.id}`} className=" relative w-full rounded-[8px] bg-[#E4E8F4] hover:bg-transparent hover:text-white transition-all duration-300 text-blue-850 text-xl font-semibold h-14 flex justify-center items-center">
                                                 Get Started
                                             </Link>
                                         </div>
