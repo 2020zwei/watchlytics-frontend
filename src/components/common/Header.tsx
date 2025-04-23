@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useAppContext } from '@/providers/AppContextProvider';
 import { sendRequest } from '@/utils/apis';
 import { METHODS, URLS } from '@/utils/constants';
+import clsx from 'clsx';
 
 const Header = () => {
   const { user, setCurrentUser } = useAppContext();
@@ -35,7 +36,7 @@ const Header = () => {
         <Dropdown className='!rounded-lg'>
           <DropdownTrigger>
             <Button className=' bg-transparent'>
-              <div className='w-10 h-10 border bg-gray-50 rounded-full'>
+              <div className={clsx('w-10 h-10 border rounded-full', user?.image?"":"bg-gray-300")}>
                 {user?.image ? <img src={user?.image} alt="usefer" width={40} height={40} className=' rounded-full object-cover h-full w-full' /> : null}
               </div>
               <span><Icon name='caret' fill='#ACACAC' className='!mx-0' /></span>

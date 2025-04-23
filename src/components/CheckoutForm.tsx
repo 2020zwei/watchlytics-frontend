@@ -83,12 +83,20 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                 .then(async (res) => {
                     console.log(res)
                     if (res?.data?.success) {
-                        await fetch('/api/logout')
                         toast.success(res.data.message);
-                        navigate.push("/login")
+                        console.log(localStorage.getItem("isLoggedin"), 'localStorage.getItem("isLoggedin")')
+                        const isLoggedIn = JSON.parse(localStorage.getItem("isLoggedin") || "false");
+                        if (isLoggedIn) {
+                            navigate.push("/profile");
+                        }
+
+                        else {
+                            await fetch('/api/logout')
+                            navigate.push("/login")
+                        }
                     } else {
                         if (res?.response?.data) {
-                            toast.error(res?.response?.data?.errors?.error);
+                            toast.error(res?.response?.data?.errors?.error || res?.response?.data?.message);
                         }
                     }
                 })

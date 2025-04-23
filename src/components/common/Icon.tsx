@@ -122,8 +122,8 @@ const Icon: React.FC<PropsTypes> = ({ name, fill, className, stroke, size = "2em
         ),
         card: (
             <svg width="22" height="21" viewBox="0 0 22 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="2.02148" y="4" width="18" height="13" rx="2" stroke={stroke||"#ACACAC"} strokeWidth="1.5" />
-                <path d="M6.02148 13H6.03148" stroke={stroke||"#ACACAC"} strokeWidth="1.5" strokeLinecap="round" />
+                <rect x="2.02148" y="4" width="18" height="13" rx="2" stroke={stroke || "#ACACAC"} strokeWidth="1.5" />
+                <path d="M6.02148 13H6.03148" stroke={stroke || "#ACACAC"} strokeWidth="1.5" strokeLinecap="round" />
                 <path d="M3.02148 9H20.0215" stroke={stroke || "#ACACAC"} strokeWidth="1.5" strokeLinecap="round" />
             </svg>
         ),
@@ -134,6 +134,9 @@ const Icon: React.FC<PropsTypes> = ({ name, fill, className, stroke, size = "2em
             </svg>
 
         ),
+        camera: (
+            <svg stroke={stroke || "currentColor"} fill={fill||"currentColor"} strokeWidth="0" viewBox="0 0 512 512" height={size|| "1em"} width={size || "1em"} xmlns="http://www.w3.org/2000/svg"><path d="M512 144v288c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V144c0-26.5 21.5-48 48-48h88l12.3-32.9c7-18.7 24.9-31.1 44.9-31.1h125.5c20 0 37.9 12.4 44.9 31.1L376 96h88c26.5 0 48 21.5 48 48zM376 288c0-66.2-53.8-120-120-120s-120 53.8-120 120 53.8 120 120 120 120-53.8 120-120zm-32 0c0 48.5-39.5 88-88 88s-88-39.5-88-88 39.5-88 88-88 88 39.5 88 88z"></path></svg>
+        )
 
     };
 

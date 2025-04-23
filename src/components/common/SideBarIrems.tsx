@@ -12,6 +12,7 @@ const SideBarItems = () => {
     const pathname = usePathname()
 
     const handleLogout = async () => {
+        localStorage.removeItem("isLoggedin")
         await fetch('/api/logout')
         router.push('/login')
     }
