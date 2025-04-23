@@ -6,10 +6,9 @@ const publicRoutes = [
   "/sign-up",
   "/forgot-password",
   "/reset-password",
-  ,"/subscription"
 ];
 
-const privateRoutes = ["/dashboard","/profile", "/inventory", "/subscriptions"];
+const privateRoutes = ["/dashboard","/profile", "/inventory", "/subscriptions","/subscription"];
 
 export function middleware(request: NextRequest, response:NextResponse) {
 
