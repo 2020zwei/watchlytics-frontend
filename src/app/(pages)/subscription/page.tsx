@@ -27,6 +27,10 @@ const page = () => {
             setLoading(false)
         })
     }
+    const handleFree = async (e: any) => {
+        await fetch('/api/logout')
+        navegate.push("/login")
+    }
     useEffect(() => {
         getSubscriptions()
     }, [])
@@ -74,9 +78,19 @@ const page = () => {
                                             </div>
                                         </div>
                                         <div className="relative p-[2px] w-full bg-blue-gradient rounded-[10px] overflow-hidden transition-all duration-300">
-                                            <Link href={item.name?.toLowerCase() === "free" ? "/dashboard" : `/subscription/${item.id}`} className=" relative w-full rounded-[8px] bg-[#E4E8F4] hover:bg-transparent hover:text-white transition-all duration-300 text-blue-850 text-xl font-semibold h-14 flex justify-center items-center">
+                                            <Link
+                                                href={item.name?.toLowerCase() === "free" ? "#" : `/subscription/${item.id}`}
+                                                onClick={(e) => {
+                                                    if (item.name?.toLowerCase() === "free") {
+                                                        e.preventDefault(); // prevent navigating to '#'
+                                                        handleFree(e);
+                                                    }
+                                                }}
+                                                className="relative w-full rounded-[8px] bg-[#E4E8F4] hover:bg-transparent hover:text-white transition-all duration-300 text-blue-850 text-xl font-semibold h-14 flex justify-center items-center"
+                                            >
                                                 Get Started
                                             </Link>
+
                                         </div>
                                     </RoundedBox>
                                 ))}
