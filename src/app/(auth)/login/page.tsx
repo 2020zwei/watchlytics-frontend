@@ -321,12 +321,18 @@ export default function SignIn() {
       toast.success("Login Successfully!", {
         position: "top-right",
       });
+      console.log(result, "bilal")
       localStorage.setItem("isLoggedin", "true")
-      router.push("/profile");
+      if (!result?.is_subscribed) {
+        router.push("/subscription");
+      }
+      else {
+        router.push("/profile");
+      }
+
 
       console.log("Login successful:", result?.access_token);
     } catch (error: any) {
-      console.log(error?.response?.data?.non_field_errors, "result");
       toast.error(`Signin failed, ${error?.response?.data?.non_field_errors}`, {
         position: "top-right",
       });
