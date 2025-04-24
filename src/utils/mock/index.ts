@@ -1,14 +1,15 @@
+
 import { z } from "zod";
 export const InventoryFormFields = [
     {
         "label": "Product Name",
-        "name": "name",
+        "name": "product_name",
         "placeholder": "Enter Product Name",
         "fieldType": "input"
     },
     {
         "label": "Product ID",
-        "name": "productid",
+        "name": "product_id",
         "placeholder": "Enter product category",
         "fieldType": "input"
     },
@@ -20,39 +21,45 @@ export const InventoryFormFields = [
     },
     {
         "label": "Buying Price",
-        "name": "price",
+        "name": "buying_price",
         "placeholder": "Enter Buying Price",
-        "fieldType": "input"
+        "fieldType": "input",
+        "type": "number"
     },
     {
         "label": "Quantity",
         "name": "quantity",
         "placeholder": "Enter Quantity",
-        "fieldType": "input"
+        "fieldType": "input",
+        "type": "number"
     },
     {
         "label": "Shipping Price",
-        "name": "shippingprice",
+        "name": "shipping_price",
         "placeholder": "Enter Shipping Price",
-        "fieldType": "input"
+        "fieldType": "input",
+        "type": "number"
     },
     {
         "label": "Repair Cost",
-        "name": "repaircost",
+        "name": "repair_cost",
         "placeholder": "Enter Repair Cost",
-        "fieldType": "input"
+        "fieldType": "input",
+        "type": "number"
     },
     {
         "label": "Fees",
         "name": "fees",
         "placeholder": "Enter Fees",
-        "fieldType": "input"
+        "fieldType": "input",
+        "type": "number"
     },
     {
         "label": "Commission",
         "name": "commission",
         "placeholder": "Enter Commission",
-        "fieldType": "input"
+        "fieldType": "input",
+        "type": "number"
     },
     {
         "label": "Unit",
@@ -62,73 +69,78 @@ export const InventoryFormFields = [
     },
     {
         "label": "Date Purchased",
-        "name": "datepurchased",
+        "name": "date_purchased",
         "placeholder": "Enter Date Purchased",
-        "fieldType": "input"
+        "fieldType": "input",
+        "type": "date"
     },
     {
         "label": "Date Sold",
-        "name": "datesold",
+        "name": "date_sold",
         "placeholder": "Enter Date Sold",
         "fieldType": "input"
     },
     {
         "label": "Hold Time",
-        "name": "holdtime",
+        "name": "hold_time",
         "placeholder": "Enter Hold Time",
-        "fieldType": "input"
+        "fieldType": "input",
+        "type": "number"
     },
     {
         "label": "Source of Sale",
-        "name": "sourceofsale",
+        "name": "source_of_sale",
         "placeholder": "Enter Source of Sale",
         "fieldType": "input"
     },
     {
         "label": "Purchased From",
-        "name": "purchasedfrom",
+        "name": "purchased_from",
         "placeholder": "Enter Purchased From",
         "fieldType": "input"
     },
     {
         "label": "Listed On:",
-        "name": "listedon",
+        "name": "listed_on",
         "placeholder": "Enter Listed On",
         "fieldType": "input"
     },
     {
         "label": "MSRP",
-        "name": "MSRP",
+        "name": "msrp",
         "placeholder": "Enter MSRP",
-        "fieldType": "input"
+        "fieldType": "input",
+        "type": "number"
     },
     {
         "label": "Sold Price",
-        "name": "soldprice",
+        "name": "sold_price",
         "placeholder": "Enter Sold Price",
         "fieldType": "input"
     },
     {
         "label": "Whole Price",
-        "name": "wholeprice",
+        "name": "whole_price",
         "placeholder": "Enter Whole Price",
         "fieldType": "input"
     },
     {
         "label": "Website Price",
-        "name": "websiteprice",
+        "name": "website_price",
         "placeholder": "Enter Website Price",
-        "fieldType": "input"
+        "fieldType": "input",
+        "type": "number"
     },
     {
         "label": "Profit Margin",
-        "name": "profitmargin",
+        "name": "profit_margin",
         "placeholder": "Enter Profit Margin",
-        "fieldType": "input"
+        "fieldType": "input",
+        "type": "number"
     },
     {
         "label": "Sold Source",
-        "name": "soldsource",
+        "name": "sold_source",
         "placeholder": "Enter Sold Source",
         "fieldType": "input"
     },
@@ -193,10 +205,38 @@ export const LoginFormFields = [
     password
 ]
 
+
+
+
+
 export const InventoryFormSchema = z.object({
-    name: z.string().min(1, "Please enter product name"),
-    productid: z.string().min(1, "Please enter product id"),
+    product_name: z.string().min(1, "Product name is required"),
+    product_id: z.string().min(1, "Product ID is required"),
+    category: z.string({ required_error: "Category is required" }),
+    buying_price: z.string().min(1, "Buying price is required"),
+    shipping_price: z.string().min(1, "Shipping price is required"),
+    repair_cost: z.string().min(1, "Repair cost is required"),
+    fees: z.string().min(1, "Fees are required"),
+    commission: z.string().min(1, "Commission is required"),
+    msrp: z.string().min(1, "MSRP is required"),
+    whole_price: z.string().min(1, "Wholesale price is required"),
+    website_price: z.string().min(1, "Website price is required"),
+    sold_price: z.string().min(1, "Sold price is required"),
+    profit_margin: z.string().min(1, "Profit margin is required"),
+    quantity: z.string().min(1, "Quantity is required"),
+    unit: z.string().min(1, "Unit is required"),
+    date_purchased: z.string().min(1, "Date purchased is required"),
+    hold_time: z.string().min(1, "Hold time is required"),
+    purchased_from: z.string().min(1, "Purchased from is required"),
+    listed_on: z.string().min(1, "Listed on is required"),
+    sold_source: z.string().min(1, "Sold source is required"),
+    source_of_sale: z.string().min(1, "Source of sale is required"),
+    date_sold: z.string().min(1, "Sold date on is required"),
+    image: z.any({
+        required_error: "Image is required",
+    }),
 });
+
 
 export const ProfileFormSchema = z.object({
     first_name: z.string().min(1, "Name is required"),
@@ -273,4 +313,5 @@ export const SidebarItems = [
         "icon": "/Log Out.svg"
     },
 ]
+export const Filters: string[] = ["brand", "date", "range", "watch", "conditon", "buyer", "seller"]
 

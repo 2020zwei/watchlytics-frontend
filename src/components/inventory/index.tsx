@@ -18,34 +18,59 @@ import { AddInventoryModalTypes, FileMetaTypes } from "@/types";
 import { TransparentButton } from "../common/baseButton/TransparentButton";
 import FormField from "../common/FormField";
 import clsx from "clsx";
+import { sendRequest } from "@/utils/apis";
+import { METHODS, URLS } from "@/utils/constants";
+import { toast } from "react-toastify";
+
 
 type FormSchemaType = z.infer<typeof InventoryFormSchema>;
 
-const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({ isOpen, onOpenChange }) => {
+const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({ isOpen, onOpenChange, options, formTitle, defaultData }) => {
+    const [submitting, setSubmittion] = useState<boolean>(false);
     const [fileMeta, setFileMeta] = useState<FileMetaTypes | null>();
 
     const {
         control,
         handleSubmit,
         reset,
+        setValue,
+        trigger,
         formState: { errors, isDirty, isValid },
     } = useForm<FormSchemaType>({
         resolver: zodResolver(InventoryFormSchema),
-        mode: "onChange"
+        mode: "onChange",
     });
 
-
-    useEffect(() => {
-        reset({
-            productid: "343438",
-            name: "Bilal"
-        })
-    }, [])
-
     const onFormSubmit = (data: FormSchemaType) => {
-        console.log(data)
-        setFileMeta(null);
-        reset()
+        setSubmittion(true)
+        const formData = new FormData()
+        Object.keys(data).forEach((key) => {
+            // @ts-ignore
+            let value = data[key];
+            formData.append(key, value);
+        });
+        const PAYLOAD = {
+            url: defaultData ? URLS.UPDATEPRODUT + defaultData?.id : URLS.ADDPRODUCT,
+            method: defaultData ? METHODS.PATCH : METHODS.POST,
+            payload: formData
+        }
+        sendRequest(PAYLOAD).then((res) => {
+            if (res?.status === 201) {
+                toast.success(defaultData ? "Product successfully updated" : "Product successfully added");
+                setFileMeta(null);
+                onOpenChange(false)
+                reset()
+            }
+            const errors = res?.response?.data?.errors
+            if (errors) {
+                Object.keys(errors).forEach(key => {
+                    toast.error(errors[key])
+                })
+            }
+        }).finally(() => {
+            setSubmittion(false)
+        })
+
     };
 
     useEffect(() => {
@@ -55,6 +80,29 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({ isOpen, onOpenCha
         }
     }, [isOpen])
 
+    const resetAll = async () => {
+        if (defaultData) {
+            const clearedValues = Object.keys(defaultData).reduce((acc, key) => {
+                acc[key] = "";
+                return acc;
+            }, {} as Record<string, any>);
+            reset(clearedValues);
+            onOpenChange(false)
+        }
+        else {
+            onOpenChange(false)
+        }
+    }
+
+    useEffect(() => {
+        if (defaultData) {
+            reset(defaultData)
+        }
+    }, [defaultData])
+
+    useEffect(() => { console.log(fileMeta) }, [fileMeta])
+
+
     return (
         <>
             <Modal
@@ -63,7 +111,7 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({ isOpen, onOpenCha
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
             >
-                <ModalContent className="max-w-[500px] w-full ps-2 pe-1">
+                <ModalContent className="max-w-[600px] w-full ps-2 pe-1">
                     {(onClose) => {
                         const onSubmit = (data: FormSchemaType) => {
                             const res = onFormSubmit(data);
@@ -71,21 +119,23 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({ isOpen, onOpenCha
                         return (
                             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                                 <ModalHeader className="pt-7">
-                                    <Heading>New Product</Heading>
+                                    <Heading>{formTitle}</Heading>
                                 </ModalHeader>
                                 <ModalBody className="max-h-[calc(100vh-200px)] overflow-y-auto">
                                     <RoundedBox >
                                         <FileUploader
                                             onChange={(fileData) => {
                                                 setFileMeta(fileData);
+                                                setValue("image", fileData?.file, { shouldValidate: true });
+                                                trigger("image");
                                             }}
                                         >
                                             <div className="flex items-center gap-5 w-fit -ms-0Pagination">
-                                                <RoundedBox className={clsx("w-20 h-20 outline-gray-180 overflow-hidden", !fileMeta && "outline-dashed")}>
-                                                    {fileMeta?.url ? (
+                                                <RoundedBox className={clsx("w-20 h-20 outline-gray-180 overflow-hidden", !fileMeta || !defaultData?.image && "outline-dashed")}>
+                                                    {fileMeta?.url || defaultData?.image ? (
                                                         <img
                                                             width={80}
-                                                            src={fileMeta?.url}
+                                                            src={fileMeta?.url || defaultData?.image}
                                                             alt="Selected Image"
                                                             className="w-full h-full object-cover"
                                                         />
@@ -107,12 +157,15 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({ isOpen, onOpenCha
                                                         <FormField
                                                             fieldType={field.fieldType}
                                                             key={field.label}
+                                                            type={field?.type}
                                                             label={field.label}
                                                             name={field.name}
                                                             control={control}
                                                             placeholder={field.placeholder}
                                                             errors={errors}
-                                                            options={field.fieldType === "select" ? [{ value: "bilal", label: "bilal" }] : undefined}
+
+                                                            // @ts-ignore
+                                                            options={field.fieldType === "select" ? options : undefined}
                                                         />
                                                     ))
                                                 }
@@ -129,14 +182,16 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({ isOpen, onOpenCha
                                     <TransparentButton
                                         title="Discard"
                                         onPress={() => {
-                                            onClose();
+                                            resetAll()
                                         }}
                                     />
+
                                     <Button
                                         type="submit"
-                                        title="Add Product"
+                                        title={defaultData ? "Update Product" : "Add Product"}
                                         className="h-10"
-                                        disabled={!isValid || !fileMeta || !isDirty}
+                                        isDisabled={!isValid}
+                                        isLoading={submitting}
                                     />
                                 </ModalFooter>
                             </form>

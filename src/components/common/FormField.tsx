@@ -30,6 +30,7 @@ interface FormFieldProps extends StyleProps {
     type?: string;
     fieldType?: "input" | "textarea" | "select" | string;
     options?: Option[];
+    
 }
 
 const FormField: React.FC<FormFieldProps> = ({

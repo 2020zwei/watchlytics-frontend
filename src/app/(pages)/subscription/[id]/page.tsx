@@ -58,7 +58,7 @@ const page = () => {
                                     <span className='bg-[#F2F5FF] w-full rounded-lg text-blue-850 text-xl font-semibold h-9 flex justify-center items-center'><Icon name='visacard' /></span>
                                 </button>
                                 <button className={clsx("p-[0.04rem] rounded-lg min-w-[83px]", paymentType ? "" : "border border-blue-850")} onClick={() => setPaymentType(false)}>
-                                    <span className='bg-[#F2F5FF] w-full rounded-lg text-blue-850 text-xl font-semibold h-9 flex justify-center items-center'><Icon name='paypal' /></span>
+                                    <span className='bg-[#F2F5FF] w-full rounded-lg text-blue-850 text-xl font-semibold h-9 flex justify-center items-center'><Icon name='mastercard' /></span>
                                 </button>
                             </div>
 
