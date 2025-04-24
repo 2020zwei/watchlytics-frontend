@@ -1,6 +1,11 @@
+import { string } from "zod";
+
 export interface AddInventoryModalTypes {
     isOpen: boolean;
     onOpenChange: any;
+    options: DROPDWONOPTION[]
+    defaultData?: any,
+    formTitle: string
 }
 export interface FileMetaTypes {
     url: string;
@@ -38,7 +43,29 @@ export type USER = {
     name?: string,
     image?: string
 }
+export type DROPDWONOPTION = {
+    value?: string,
+    label?: string
+}
 
+export type CATEGORES = {
+    id: number,
+    name: string,
+    description: string
+}
+
+export type RangeType = "daily" | "weekly" | "monthly" | "custom";
+export type ConditionType = "new" | "used" | "refurbished";
+
+export type FILTERTYPES = {
+    brand: string;
+    date: string;
+    range: RangeType;
+    watch: string;
+    condition: ConditionType;
+    buyer: string;
+    seller: string;
+};
 
 
 

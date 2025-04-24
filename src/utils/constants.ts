@@ -24,6 +24,12 @@ export const URLS = {
   BONUS_ID: "/program/",
   ME: "/auth/me/",
   UPDATE_PROFILE: "/auth/update/",
+  CATEGORES: "/v1/inventory/categories/",
+  ADDPRODUCT: "/v1/inventory/products/",
+  PRODUCTS: "/v1/inventory/products/",
+  PRODUTDETAIL: "/v1/inventory/products/",
+  UPDATEPRODUT: "/v1/inventory/products/",
+  DELETEUPDATE: "/v1/inventory/products/",
 };
 
 export const METHODS = {

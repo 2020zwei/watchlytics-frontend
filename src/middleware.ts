@@ -8,7 +8,7 @@ const publicRoutes = [
   "/reset-password",
 ];
 
-const privateRoutes = ["/dashboard","/profile", "/inventory", "/subscriptions","/subscription"];
+const privateRoutes = ["/dashboard","/profile", "/inventory", "/subscriptions","/subscription","/reports"];
 
 export function middleware(request: NextRequest, response:NextResponse) {
 
@@ -50,6 +50,7 @@ export function middleware(request: NextRequest, response:NextResponse) {
       "/forgot-password",
       "/reset-password",
       "/inventory",
+      "/reports",
       "/profile",
       "/subscriptions",
       "/subscription",

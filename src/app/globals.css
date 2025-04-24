@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 html{
-  background: #f0f1f3 !important;
+  background: #f9f9f9 !important;
 }
 
 input:-webkit-autofill {

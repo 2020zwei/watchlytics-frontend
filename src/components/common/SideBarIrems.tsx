@@ -32,16 +32,22 @@ const SideBarItems = () => {
                         <li
                             key={item.label}
                             className={clsx(
-                                'hover:bg-white/10 duration-300 flex items-center px-4 xl:py-4 py-3 rounded-lg font-medium gap-4 relative',
+                                'hover:bg-white/10 duration-300 px-4 xl:py-4 py-3 rounded-lg font-medium relative',
                                 isActive ? 'bg-white/10 text-white' : 'text-gray-200'
                             )}
                         >
-                            <Image src={item.icon} alt="icon" width={22} height={22} />
+
 
                             {item.href === '#' ? (
-                                <button onClick={handleLogout}>{item.label}</button>
+                                <button onClick={handleLogout} className='flex-1 flex items-center gap-4'>
+                                    <Image src={item.icon} alt="icon" width={22} height={22} />
+                                    {item.label}
+                                </button>
                             ) : (
-                                <Link href={item.href}>{item.label}</Link>
+                                <Link href={item.href} className='flex-1 flex items-center gap-4'>
+                                    <Image src={item.icon} alt="icon" width={22} height={22} />
+                                    {item.label}
+                                </Link>
                             )}
                         </li>
                     )
