@@ -78,7 +78,8 @@ export const InventoryFormFields = [
         "label": "Date Sold",
         "name": "date_sold",
         "placeholder": "Enter Date Sold",
-        "fieldType": "input"
+        "fieldType": "input",
+        "type": "date"
     },
     {
         "label": "Hold Time",
@@ -205,10 +206,6 @@ export const LoginFormFields = [
     password
 ]
 
-
-
-
-
 export const InventoryFormSchema = z.object({
     product_name: z.string().min(1, "Product name is required"),
     product_id: z.string().min(1, "Product ID is required"),
@@ -232,9 +229,7 @@ export const InventoryFormSchema = z.object({
     sold_source: z.string().min(1, "Sold source is required"),
     source_of_sale: z.string().min(1, "Source of sale is required"),
     date_sold: z.string().min(1, "Sold date on is required"),
-    image: z.any({
-        required_error: "Image is required",
-    }),
+    image: z.any().optional().nullable(),
 });
 
 
@@ -314,4 +309,15 @@ export const SidebarItems = [
     },
 ]
 export const Filters: string[] = ["brand", "date", "range", "watch", "conditon", "buyer", "seller"]
+export const REPORTFILTEROPTIONS = [
+    "Inventory Valuation Report",
+    "Purchase & Sales Report",
+    "Stock Aging",
+    "Expense Report",
+    "Market Comparison Report",
+    "Monthly Profit & Loss Chart",
+    "User-Specific Reports",
+    "Stock Turnover Analysis",
+    "Live Inventory Dashboard"
+]
 

@@ -1,9 +1,10 @@
+import ExpenseTrackingChart from '@/components/common/ExpenseTrackingChart'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-      Dashboard
+      <ExpenseTrackingChart />
     </div>
   )
 }

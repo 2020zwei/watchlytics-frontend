@@ -7,12 +7,20 @@ import {
 import React from 'react';
 import { TransparentButton } from './baseButton/TransparentButton';
 import { Filters } from '@/utils/mock';
+import { useSearchParams } from 'next/navigation';
 
 interface InventoryFiltersTypes {
     onChange: (selected: string) => void;
 }
 
 const InventoryFilters: React.FC<InventoryFiltersTypes> = ({ onChange }) => {
+    const searchParams = useSearchParams();
+    const handleSelection = (key: string) => {
+        onChange(key);
+    };
+    const filter = searchParams?.toString()
+    const selOption=filter?.slice(filter?.indexOf("=")+1)
+
     return (
         <Dropdown className='!rounded-lg'>
             <DropdownTrigger>
@@ -21,12 +29,13 @@ const InventoryFilters: React.FC<InventoryFiltersTypes> = ({ onChange }) => {
             <DropdownMenu
                 aria-label='Dropdown menu with description'
                 variant='faded'
-                onAction={(key) => onChange(key as string)}
+                onAction={(key) => handleSelection(key as string)}
             >
                 {Filters.map((option: string) => (
                     <DropdownItem
                         key={option}
-                        className='text-blue-850 text-sm'
+                        className={` capitalize text-sm ${selOption === option ? 'bg-gray-300' : 'text-blue-850'
+                            }`}
                     >
                         {option}
                     </DropdownItem>

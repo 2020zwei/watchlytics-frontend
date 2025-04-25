@@ -1,15 +1,30 @@
+"use client"
 import RoundedBox from '@/components/common/baseButton/RoundedBox'
 import Heading from '@/components/common/heading'
+import { REPORTFILTEROPTIONS } from '@/utils/mock'
+import { useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
 
 const page = () => {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const handleFilter = (value: string) => {
+        const currentParams = new URLSearchParams(searchParams.toString());
+        currentParams.set('filter', value);
+        router.push(`/reports?${currentParams.toString().replace(/ /g, '-')}`);
+    };
+    
     return (
         <div>
             <div className='flex items-center justify-between'>
                 <Heading as='h3' className=' md:text-2xl text-lg'>Inventory Valuation Report</Heading>
                 <div className='border rounded-lg border-gray-200 md:px-5 px-3'>
-                    <select className=' bg-transparent outline-none text-sm text-gray-650 min-h-10 md:pe-6 pe-3 md:min-w-[290px]'>
-                        <option value="">Inventory Valuation Report</option>
+                    <select onChange={(e)=>handleFilter(e.target.value)} className="bg-transparent outline-none text-sm text-gray-650 min-h-10 md:pe-6 pe-3 md:min-w-[290px] p-3">
+                        {REPORTFILTEROPTIONS.map((opt) => (
+                            <option key={opt} value={opt}>
+                                {opt}
+                            </option>
+                        ))}
                     </select>
                 </div>
             </div>

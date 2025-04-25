@@ -49,13 +49,16 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({ isOpen, onOpenCha
             let value = data[key];
             formData.append(key, value);
         });
+        if(!fileMeta?.file){
+            formData.delete("image")
+        }
         const PAYLOAD = {
-            url: defaultData ? URLS.UPDATEPRODUT + defaultData?.id : URLS.ADDPRODUCT,
+            url: defaultData ? URLS.UPDATEPRODUT + defaultData?.id+"/" : URLS.ADDPRODUCT,
             method: defaultData ? METHODS.PATCH : METHODS.POST,
             payload: formData
         }
         sendRequest(PAYLOAD).then((res) => {
-            if (res?.status === 201) {
+            if (res?.status === 201 ||res?.status === 200) {
                 toast.success(defaultData ? "Product successfully updated" : "Product successfully added");
                 setFileMeta(null);
                 onOpenChange(false)
@@ -99,9 +102,6 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({ isOpen, onOpenCha
             reset(defaultData)
         }
     }, [defaultData])
-
-    useEffect(() => { console.log(fileMeta) }, [fileMeta])
-
 
     return (
         <>

@@ -67,5 +67,35 @@ export type FILTERTYPES = {
     seller: string;
 };
 
+type Categories = {
+    count: number;
+    label: string;
+};
+
+export type TotalProducts = {
+    count: number;
+    label: string;
+    revenue: number;
+};
+
+export type TopSelling = {
+    count: number;
+    label: string;
+    cost: number;
+};
+
+export type LowStocks = {
+    ordered: number;
+    not_in_stock: number;
+};
+
+export type STATETYPES = {
+    categories: Categories;
+    total_products: TotalProducts;
+    top_selling: TopSelling;
+    low_stocks: LowStocks;
+};
+
+
 
 
