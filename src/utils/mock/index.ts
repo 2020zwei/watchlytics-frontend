@@ -308,7 +308,7 @@ export const SidebarItems = [
         "icon": "/Log Out.svg"
     },
 ]
-export const Filters: string[] = ["brand", "date", "range", "watch", "conditon", "buyer", "seller"]
+export const Filters: string[] = ["brand", "date", "range", "watch conditon", "buyer", "seller"]
 export const REPORTFILTEROPTIONS = [
     "Inventory Valuation Report",
     "Purchase & Sales Report",

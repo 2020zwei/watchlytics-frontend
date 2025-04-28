@@ -23,7 +23,10 @@ const page = () => {
     const getSubscriptions = () => {
         setLoading(true)
         sendRequest({ url: "/plans/", method: "GET" }).then(res => {
-            setPlansTypes(res.data.plans)
+            console.log(res)
+            setPlansTypes(res.plans)
+            setLoading(false)
+        }).finally(() => {
             setLoading(false)
         })
     }
@@ -32,6 +35,7 @@ const page = () => {
         navegate.push("/login")
     }
     useEffect(() => {
+        navegate.push("/subscription")
         getSubscriptions()
     }, [])
 
@@ -81,7 +85,7 @@ const page = () => {
                                                 </div>
                                                 <div className="relative p-[2px] w-full bg-blue-gradient rounded-[10px] overflow-hidden transition-all duration-300">
                                                     <Link
-                                                        href={item.name?.toLowerCase() === "free" ? "#" : `/subscription/${item.id}`}
+                                                        href={item.name?.toLowerCase() === "free" ? "#" : `/checkout/${item.id}`}
                                                         onClick={(e) => {
                                                             if (item.name?.toLowerCase() === "free") {
                                                                 e.preventDefault(); // prevent navigating to '#'

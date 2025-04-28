@@ -113,15 +113,16 @@ export default function ProfilePage() {
         method: METHODS.GET,
       }
       sendRequest(PAYLOAD).then((res) => {
+        console.log(res)
         if (res?.data) {
           setFileMeta(res?.data?.data?.profile_picture)
           const data: any = {}
-          Object.keys(res?.data?.data)?.forEach((key) => {
-            if (res?.data?.data[key]) {
-              data[key] = res?.data?.data[key]
+          Object.keys(res?.data)?.forEach((key) => {
+            if (res?.data[key]) {
+              data[key] = res?.data[key]
             }
           })
-          setCurrentUser({ image: res?.data?.data?.profile_picture })
+          setCurrentUser({ image: res?.data?.profile_picture })
           reset(data, { keepDirty: false, keepIsValid: false });
         }
       }).finally(() => {

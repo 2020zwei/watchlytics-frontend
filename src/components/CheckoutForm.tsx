@@ -82,21 +82,20 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
             sendRequest({ url: "/subscribe/", method: "POST", payload: PAYLOAD })
                 .then(async (res) => {
                     console.log(res)
-                    if (res?.data?.success) {
+                    if (res?.success) {
                         toast.success(res.data.message);
                         console.log(localStorage.getItem("isLoggedin"), 'localStorage.getItem("isLoggedin")')
                         const isLoggedIn = JSON.parse(localStorage.getItem("isLoggedin") || "false");
                         if (isLoggedIn) {
                             navigate.push("/profile");
                         }
-
                         else {
                             await fetch('/api/logout')
                             navigate.push("/login")
                         }
                     } else {
-                        if (res?.response?.data) {
-                            toast.error(res?.response?.data?.errors?.error || res?.response?.data?.message);
+                        if (res?.response) {
+                            toast.error(res?.response?.errors?.error || res?.response?.message);
                         }
                     }
                 })

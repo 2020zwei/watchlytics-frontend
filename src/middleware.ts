@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest } from "next/server";
 import { isTokenValid } from "./utils/isTokenValid";
+const baseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/me/`
 const publicRoutes = [
   "/login",
   "/sign-up",
@@ -9,15 +10,12 @@ const publicRoutes = [
 ];
 
 const privateRoutes = ["/","/dashboard","/profile", "/inventory", "/subscriptions","/subscription","/reports"];
-export function middleware(request: NextRequest, response:NextResponse) {
-  console.log("isInvalidToken")
-
+export async function middleware(request: NextRequest, response:NextResponse) {
   const token = request.cookies.get("access_token")?.value;
   const pathname = request.nextUrl.pathname;
-
-  // const isPublicRoute = publicRoutes.some((route) =>
-  //   pathname.startsWith(route)
-  // );
+  const isPublicRoute = publicRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
   const isPrivateRoute = privateRoutes.some((route) =>
     pathname.startsWith(route)
   );
@@ -25,7 +23,9 @@ export function middleware(request: NextRequest, response:NextResponse) {
 
   const isInvalidToken = token && !isTokenValid(token);
 
- 
+  if (!isInvalidToken && isPublicRoute) {
+    return NextResponse.next();
+  }
 
   if ((isInvalidToken || (!token && isPrivateRoute)) && !isLoginPage) {
   
@@ -33,6 +33,18 @@ export function middleware(request: NextRequest, response:NextResponse) {
   }
 
   if (token && isPrivateRoute) {
+    
+      const meResponse = await fetch('http://localhost:3000/api/me', {
+        headers: {
+          Cookie: `access_token=${token}`,
+        },
+      });
+    
+      const res = await meResponse.json();
+    if (!res.isSubscribed && !pathname.startsWith("/checkout")) {
+      return NextResponse.rewrite(new URL('/subscription/', request.url))
+    }
+
     return NextResponse.next();
   }
 
