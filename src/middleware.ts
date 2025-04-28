@@ -8,13 +8,11 @@ const publicRoutes = [
   "/reset-password",
 ];
 
-const privateRoutes = ["/dashboard","/profile", "/inventory", "/subscriptions","/subscription","/reports"];
-
+const privateRoutes = ["/","/dashboard","/profile", "/inventory", "/subscriptions","/subscription","/reports"];
 export function middleware(request: NextRequest, response:NextResponse) {
+  console.log("isInvalidToken")
 
   const token = request.cookies.get("access_token")?.value;
-
-  console.log(token,"Bilal123")
   const pathname = request.nextUrl.pathname;
 
   // const isPublicRoute = publicRoutes.some((route) =>
@@ -30,6 +28,7 @@ export function middleware(request: NextRequest, response:NextResponse) {
  
 
   if ((isInvalidToken || (!token && isPrivateRoute)) && !isLoginPage) {
+  
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -44,7 +43,7 @@ export function middleware(request: NextRequest, response:NextResponse) {
 
   export const config = {
     matcher: [
-      "/dashboard",
+      "/",
       "/login",
       "/sign-up",
       "/forgot-password",

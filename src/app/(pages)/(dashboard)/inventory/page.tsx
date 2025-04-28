@@ -11,10 +11,12 @@ import Pagination from '@/components/common/Pagination'
 import InventoryFilters from '@/components/common/InventoryFilters'
 import { METHODS, URLS } from '@/utils/constants'
 import { sendRequest } from '@/utils/apis'
-import { CATEGORES, DROPDWONOPTION, RequestTypes } from '@/types'
+import { CATEGORES, DROPDWONOPTION, RequestTypes, STATETYPES } from '@/types'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 const Page = () => {
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [currentPage, setCurrentPage] = useState(1)
     const [apiLoading, setApiLoading] = useState<boolean>(false);
@@ -22,26 +24,13 @@ const Page = () => {
     const [products, setProducts] = useState<any>([])
     const [columns, setColumns] = useState<string[]>([])
     const [product, setProduct] = useState<RequestTypes | null>()
+    const [stats, setStats] = useState<STATETYPES>()
     const STOCKCOLORS: any = { "in_stock": "text-green-600" }
-    const fetData = async () => {
-        setApiLoading(true)
-        // @ts-ignore
-        const PRODUCTPAYLOAD: RequestTypes = {
-            url: URLS.PRODUCTS,
-            method: METHODS.GET,
-        }
+    const fetchCategories = async () => {
         const PAYLOAD: RequestTypes = {
             url: URLS.CATEGORES,
             method: METHODS.GET,
         }
-        sendRequest(PRODUCTPAYLOAD).then((res) => {
-            if (res?.data) {
-                setColumns(Object.keys(res?.data.results[0]))
-                setProducts(res)
-            }
-        }).finally(() => {
-            setApiLoading(false)
-        })
         sendRequest(PAYLOAD).then((res) => {
             if (res?.data) {
                 const options = res?.data?.results?.map((item: CATEGORES) => ({ value: +item.id, label: item.name }))
@@ -49,70 +38,94 @@ const Page = () => {
             }
         })
     }
+    const fetchStats = async () => {
+        sendRequest({ url: URLS.STATS }).then((res) => {
+            console.log(res, 'stats')
+            if (res?.data) {
+                setStats(res?.data)
+            }
+        })
+    }
+    const fetchData = async () => {
+        setApiLoading(true)
+        // @ts-ignore
+        const PAYLOAD: RequestTypes = {
+            url: URLS.PRODUCTS,
+            method: METHODS.GET,
+        }
+        sendRequest(PAYLOAD).then((res) => {
+            if (res?.data) {
+                setColumns(Object.keys(res?.data.results[0]))
+                setProducts(res)
+            }
+        }).finally(() => {
+            setApiLoading(false)
+        })
+    }
+
 
     const handleFilter = (value: string) => {
-        const router = useRouter();
-        const searchParams = useSearchParams();
-
         const currentParams = new URLSearchParams(searchParams.toString());
         currentParams.set('filter', value);
-
         router.push(`/inventory?${currentParams.toString()}`);
     };
 
     useEffect(() => {
-        fetData()
+        fetchCategories()
+        fetchStats()
     }, [])
+
     useEffect(() => {
         if (!isOpen) {
             setProduct(null)
+            fetchData()
         }
     }, [isOpen])
-    
+
     if (apiLoading) {
         return <div className="h-[calc(100vh-200px)] flex justify-center items-center"><Spinner /></div>
     }
     return (
-        <div className="xl:pe-8 lg:pe-6 !ps-3 pt-5">
+        <div className="!ps-3 pt-5">
             <RoundedBox as='section' className="shadow px-4 py-5 gap-3 mb-0.5">
                 <Heading as="h1" className="col-span-12 pb-4">Overall Inventory</Heading>
                 <div className='flex justify-between'>
                     <div className="grid grid-cols-1 gap-3 border-r border-gray-200 lg:pe-14 md:pe-8 pe-3">
                         <Heading>Categories</Heading>
-                        <div className=' font-semibold text-base text-gray-600'>7</div>
-                        <div className=' font-semibold text-base text-gray-500'>Last 7 days</div>
+                        <div className=' font-semibold text-base text-gray-600'>{stats?.categories?.count}</div>
+                        <div className=' font-semibold text-base text-gray-500'>{stats?.categories.label}</div>
                     </div>
                     <div className="grid grid-cols-1 gap-3 border-r border-gray-200  xl:px-12 lg:px-6 md:px-4 px-3">
                         <Heading className=' text-orange-800'>Total Products</Heading>
                         <div className='grid grid-cols-2 font-semibold text-base text-gray-600'>
-                            <span>868</span>
-                            <span className="text-center">$2500</span>
+                            <span>{stats?.total_products?.count}</span>
+                            <span className="text-center">{stats?.total_products.revenue}</span>
                         </div>
                         <div className='grid grid-cols-2 gap-10 font-semibold text-base text-gray-500'>
-                            <span>Last 7 days</span>
+                            <span>{stats?.total_products?.label}</span>
                             <span className="text-center">Revenue</span>
                         </div>
                     </div>
                     <div className="grid grid-cols-1 gap-3 border-r border-gray-200  xl:px-12 lg:px-6 md:px-4 px-3">
                         <Heading className=' text-pink-500'>Top Selling</Heading>
                         <div className='grid grid-cols-2 gap-10 font-semibold text-base text-gray-600'>
-                            <span>5</span>
-                            <span className="text-center">$2500</span>
+                            <span>{stats?.top_selling.count}</span>
+                            <span className="text-center">{stats?.top_selling.cost}</span>
                         </div>
                         <div className='grid grid-cols-2 gap-10 font-semibold text-base text-gray-500'>
-                            <span>Last 7 days</span>
+                            <span>{stats?.top_selling?.label}</span>
                             <span className="text-center">Cost</span>
                         </div>
                     </div>
                     <div className="grid grid-cols-1 gap-3 xl:ps-12 lg:ps-6 md:ps-4 ps-3">
                         <Heading className=' text-red-700'>Low Stocks</Heading>
                         <div className='grid grid-cols-2 gap-10 font-semibold text-base text-gray-600'>
-                            <span>12</span>
-                            <span className="text-end">2</span>
+                            <span>{stats?.low_stocks.ordered}</span>
+                            <span className="text-end">{stats?.low_stocks.not_in_stock}</span>
                         </div>
                         <div className='grid grid-cols-2 gap-10 font-semibold text-base text-gray-500'>
-                            <span>Last 7 days</span>
-                            <span className="text-end">Cost</span>
+                            <span>Ordered</span>
+                            <span className="text-end">Not in stock</span>
                         </div>
                     </div>
                 </div>

@@ -30,6 +30,7 @@ export const URLS = {
   PRODUTDETAIL: "/v1/inventory/products/",
   UPDATEPRODUT: "/v1/inventory/products/",
   DELETEUPDATE: "/v1/inventory/products/",
+  STATS: "/v1/inventory/stats/",
 };
 
 export const METHODS = {

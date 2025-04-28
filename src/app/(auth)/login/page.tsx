@@ -321,17 +321,15 @@ export default function SignIn() {
       toast.success("Login Successfully!", {
         position: "top-right",
       });
-      console.log(result, "bilal")
       localStorage.setItem("isLoggedin", "true")
       if (!result?.is_subscribed) {
+        logout()
         router.push("/subscription");
       }
       else {
         router.push("/profile");
       }
 
-
-      console.log("Login successful:", result?.access_token);
     } catch (error: any) {
       toast.error(`Signin failed, ${error?.response?.data?.non_field_errors}`, {
         position: "top-right",
@@ -351,9 +349,11 @@ export default function SignIn() {
   const handlePasswordBlur = () => {
     setPasswordTouched(true);
   };
-
+  const logout = async () => {
+    await fetch('/api/logout/')
+  }
   useEffect(() => {
-    deleteCookie("access_token")
+    logout()
   }, [])
 
   return (
