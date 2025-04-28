@@ -324,6 +324,7 @@ export default function SignIn() {
       console.log(result, "bilal")
       localStorage.setItem("isLoggedin", "true")
       if (!result?.is_subscribed) {
+        logout()
         router.push("/subscription");
       }
       else {
@@ -351,9 +352,11 @@ export default function SignIn() {
   const handlePasswordBlur = () => {
     setPasswordTouched(true);
   };
-
+  const logout = async () => {
+    await fetch('/api/logout/')
+  }
   useEffect(() => {
-    deleteCookie("access_token")
+    logout()
   }, [])
 
   return (
