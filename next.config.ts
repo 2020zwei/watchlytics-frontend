@@ -15,15 +15,15 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  async redirects() {
-    return [
-      {
-        source: "/",
-        destination: "/login",
-        permanent: false, // Use true if you want it to be cached by browsers and search engines
-      },
-    ];
-  },
+  // async redirects() {
+  //   return [
+  //     {
+  //       source: "/",
+  //       destination: "/login",
+  //       permanent: false, 
+  //     },
+  //   ];
+  // },
 };
 
 export default nextConfig;

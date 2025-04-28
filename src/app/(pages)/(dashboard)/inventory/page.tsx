@@ -86,7 +86,7 @@ const Page = () => {
         return <div className="h-[calc(100vh-200px)] flex justify-center items-center"><Spinner /></div>
     }
     return (
-        <div className="xl:pe-8 lg:pe-6 !ps-3 pt-5">
+        <div className="!ps-3 pt-5">
             <RoundedBox as='section' className="shadow px-4 py-5 gap-3 mb-0.5">
                 <Heading as="h1" className="col-span-12 pb-4">Overall Inventory</Heading>
                 <div className='flex justify-between'>
