@@ -23,8 +23,7 @@ const page = () => {
     const getSubscriptions = () => {
         setLoading(true)
         sendRequest({ url: "/plans/", method: "GET" }).then(res => {
-            console.log(res)
-            setPlansTypes(res.plans)
+            setPlansTypes(res?.data.plans)
             setLoading(false)
         }).finally(() => {
             setLoading(false)
@@ -54,7 +53,7 @@ const page = () => {
                     : <RoundedBox className='!bg-blue-100'>
                         <div className='grid lg:grid-cols-4 md:grid-cols-4 sm:grid-cols-2 md:gap-4 gap-8 sm:p-10 p-4 mt-10'>
                             {
-                                plansTypes.map((item, index) => (
+                                plansTypes?.map((item, index) => (
                                     <div key={item.name} className={clsx(" min-h-[700px] plan-card relative !bg-transparent flex flex-col justify-between", index === 1 || index === 3 ? "sm:mt-24" : "", item.name?.toLowerCase())}>
                                         <div className={clsx("border border-blue-150 rounded-lg px-4 py-7", [1, 3].includes(index) ? "h-full" : " h-[calc(100%-100px)]")}>
                                             <div className='h-[calc(100%-170px)]'>
@@ -87,7 +86,7 @@ const page = () => {
                                                     <Link
                                                         href={item.name?.toLowerCase() === "free" ? "#" : `/checkout/${item.id}`}
                                                         onClick={(e) => {
-                                                            if (item.name?.toLowerCase() === "free") {
+                                                            if (item?.name?.toLowerCase() === "free") {
                                                                 e.preventDefault(); // prevent navigating to '#'
                                                                 handleFree(e);
                                                             }

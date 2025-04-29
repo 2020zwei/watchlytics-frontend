@@ -4,21 +4,20 @@ import RoundedBox from '@/components/common/baseButton/RoundedBox'
 import Heading from '@/components/common/heading'
 import clsx from 'clsx'
 import React, { useEffect, useState } from 'react'
-import { Checkbox, Spinner, useDisclosure } from "@heroui/react";
-import AddInventoryModal from '@/components/inventory/index'
+import { Checkbox, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, useDisclosure } from "@heroui/react";
 import { TransparentButton } from '@/components/common/baseButton/TransparentButton'
 import Pagination from '@/components/common/Pagination'
-import InventoryFilters from '@/components/common/InventoryFilters'
 import { METHODS, URLS } from '@/utils/constants'
 import { sendRequest } from '@/utils/apis'
 import { CATEGORES, DROPDWONOPTION, RequestTypes, STATETYPES } from '@/types'
-import { useRouter, useSearchParams } from 'next/navigation'
 import InventoryFilterModal from '@/components/common/InventoryFilters'
+import AddInventoryModal from "@/components/inventory/AddInventoryModal"
+import Icon from '../common/Icon'
+import { toast } from 'react-toastify'
+import { useSearchParams } from 'next/navigation'
 
 
 const Inventory = () => {
-    const router = useRouter();
-    const searchParams = useSearchParams();
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [currentPage, setCurrentPage] = useState(1)
     const [apiLoading, setApiLoading] = useState<boolean>(false);
@@ -27,6 +26,7 @@ const Inventory = () => {
     const [columns, setColumns] = useState<string[]>([])
     const [product, setProduct] = useState<RequestTypes | null>()
     const [stats, setStats] = useState<STATETYPES>()
+    const searchParams = useSearchParams();
     const STOCKCOLORS: any = { "in_stock": "text-green-600" }
     const fetchCategories = async () => {
         const PAYLOAD: RequestTypes = {
@@ -34,8 +34,8 @@ const Inventory = () => {
             method: METHODS.GET,
         }
         sendRequest(PAYLOAD).then((res) => {
-            if (res?.results?.length) {
-                const options = res?.results?.map((item: CATEGORES) => ({ value: +item.id, label: item.name }))
+            if (res?.data?.results?.length) {
+                const options = res?.data?.results?.map((item: CATEGORES) => ({ value: item.id, label: item.name }))
                 setCategories(options)
             }
         })
@@ -43,33 +43,53 @@ const Inventory = () => {
     const fetchStats = async () => {
         sendRequest({ url: URLS.STATS }).then((res) => {
             console.log(res, "stats")
-            setStats(res)
+            setStats(res?.data)
         })
     }
-    const fetchData = async () => {
+    const fetchData = async (payload: any = null) => {
         setApiLoading(true)
         // @ts-ignore
         const PAYLOAD: RequestTypes = {
             url: URLS.PRODUCTS,
             method: METHODS.GET,
         }
-        sendRequest(PAYLOAD).then((res) => {
-            if (res?.results?.length) {
-                console.log(res?.results)
-                setColumns(Object.keys(res?.results[0]))
-                setProducts(res)
+        sendRequest(payload || PAYLOAD).then((res) => {
+            if (res?.data?.results?.length) {
+                setColumns(Object.keys(res?.data?.results[0]))
+                setProducts(res?.data)
             }
         }).finally(() => {
             setApiLoading(false)
         })
     }
-
-
-    // const handleFilter = (value: string) => {
-    //     const currentParams = new URLSearchParams(searchParams.toString());
-    //     currentParams.set('filter', value);
-    //     router.push(`/inventory?${currentParams.toString()}`);
+    const handleDelete = (row: any) => {
+        const PAYLOAD: RequestTypes = {
+            url: `${URLS.DELETEPRODUCT}/${row?.id}/`,
+            method: METHODS.DELETE,
+        }
+        sendRequest(PAYLOAD).then((res) => {
+            console.log(res, "delete")
+            if (res?.data?.stats) {
+                toast.success("fsfsdfs")
+                fetchData()
+            }
+        })
+    }
+    // const buildQueryParams = () => {
+    //     const params = new URLSearchParams(searchParams.toString());
+    //     const queryObject: Record<string, string | string[]> = {};
+    //     for (const [key, value] of params.entries()) {
+    //         if (queryObject[key]) {
+    //             queryObject[key] = Array.isArray(queryObject[key])
+    //                 ? [...queryObject[key] as string[], value]
+    //                 : [queryObject[key] as string, value];
+    //         } else {
+    //             queryObject[key] = value;
+    //         }
+    //     }
+    //     return queryObject;
     // };
+
 
     useEffect(() => {
         fetchCategories()
@@ -79,23 +99,31 @@ const Inventory = () => {
     useEffect(() => {
         if (!isOpen) {
             setProduct(null)
-            fetchData()
         }
     }, [isOpen])
+
+    useEffect(() => {
+        const params = searchParams.toString()
+        const PAYLOAD: RequestTypes = {
+            url: `${URLS.PRODUCTS}/?${params}&page_size=30`,
+            method: METHODS.GET,
+        }
+        fetchData(PAYLOAD)
+    }, [searchParams])
 
 
     return (
 
-        <div className="!ps-3 pt-5">
-            <RoundedBox as='section' className="shadow px-4 py-5 gap-3 mb-0.5">
+        <div className="pt-5">
+            <RoundedBox as='section' className="lg:px-4 lg:py-5 gap-3 mb-0.5 lg:!bg-white !bg-transparent">
                 <Heading as="h1" className="col-span-12 pb-4">Overall Inventory</Heading>
-                <div className='flex justify-between'>
-                    <div className="grid grid-cols-1 gap-3 border-r border-gray-200 lg:pe-14 md:pe-8 pe-3">
+                <div className='flex justify-between lg:flex-nowrap flex-wrap lg:gap-0 gap-y-3'>
+                    <div className="lg:w-auto sm:w-[49%] w-full lg:p-0 p-4 rounded-lg grid grid-cols-1 gap-3 border-r border-gray-200 bg-white lg:pe-14 md:pe-8 pe-3">
                         <Heading>Categories</Heading>
                         <div className=' font-semibold text-base text-gray-600'>{stats?.categories?.count}</div>
                         <div className=' font-semibold text-base text-gray-500'>{stats?.categories.label}</div>
                     </div>
-                    <div className="grid grid-cols-1 gap-3 border-r border-gray-200  xl:px-12 lg:px-6 md:px-4 px-3">
+                    <div className="lg:w-auto sm:w-[49%] w-full lg:p-0 p-4 rounded-lg grid grid-cols-1 gap-3 border-r border-gray-200 bg-white  xl:px-12 lg:px-6 md:px-4 px-3">
                         <Heading className=' text-orange-800'>Total Products</Heading>
                         <div className='grid grid-cols-2 font-semibold text-base text-gray-600'>
                             <span>{stats?.total_products?.count}</span>
@@ -106,7 +134,7 @@ const Inventory = () => {
                             <span className="text-center">Revenue</span>
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 gap-3 border-r border-gray-200  xl:px-12 lg:px-6 md:px-4 px-3">
+                    <div className="lg:w-auto sm:w-[49%] w-full lg:p-0 p-4 rounded-lg grid grid-cols-1 gap-3 border-r border-gray-200 bg-white  xl:px-12 lg:px-6 md:px-4 px-3">
                         <Heading className=' text-pink-500'>Top Selling</Heading>
                         <div className='grid grid-cols-2 gap-10 font-semibold text-base text-gray-600'>
                             <span>{stats?.top_selling.count}</span>
@@ -117,7 +145,7 @@ const Inventory = () => {
                             <span className="text-center">Cost</span>
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 gap-3 xl:ps-12 lg:ps-6 md:ps-4 ps-3">
+                    <div className="lg:w-auto sm:w-[49%] w-full lg:p-0 p-4 rounded-lg grid grid-cols-1 bg-white gap-3 xl:ps-12 lg:ps-6 md:ps-4 ps-3">
                         <Heading className=' text-red-700'>Low Stocks</Heading>
                         <div className='grid grid-cols-2 gap-10 font-semibold text-base text-gray-600'>
                             <span>{stats?.low_stocks?.ordered}</span>
@@ -132,15 +160,35 @@ const Inventory = () => {
             </RoundedBox>
 
             {/* table section */}
-            <RoundedBox as='section' className="shadow px-4 py-5 gap-3 mt-5">
-                <div className='flex items-center justify-between'>
-                    <Heading>Products</Heading>
-                    <ul className='flex items-center gap-3'>
-                        <li><Button title='Add Product' className='h-10' onPress={onOpen} /></li>                         
-                        <li><InventoryFilterModal brands={categories}/></li>
-                        <li><TransparentButton title='Upload' className='h-10' icon='upload' /></li>
-                        <li><TransparentButton isDisabled={!product} onPress={onOpen} title='Edit' className='h-10' icon='edit' /></li>
-                        <li><Button title='Generate Invoice' className='h-10' icon='download' /></li>
+            <RoundedBox as='section' className="px-4 py-5 gap-3 mt-5">
+                <div className='flex items-center justify-between md:flex-row flex-col'>
+                    <Heading className='text-start md:w-auto w-full md:-order-1 order-1'>Products</Heading>
+                    <ul className='flex items-center gap-3 md:mb-0 mb-5 md:flex-nowrap flex-wrap md:w-auto w-full inventory-btns'>
+                        <li className='xs:w-auto w-[48%]'><Button title='Add Product' className='h-10 ' onPress={onOpen} /></li>
+                        <li className='xs:w-auto w-[48%]'><InventoryFilterModal brands={categories} /></li>
+                        <li className='xs:w-auto w-[48%]'>
+                            <Dropdown className='!rounded-lg'>
+                                <DropdownTrigger>
+                                    <TransparentButton title='Upload' className='h-10' icon='upload' />
+                                </DropdownTrigger>
+                                <DropdownMenu aria-label="Dropdown menu with description" variant="faded">
+                                    <DropdownItem
+                                        key="new"
+                                        className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
+                                        startContent={<Icon name='upload' stroke='#acacac' />}>
+                                        Upload
+                                    </DropdownItem>
+                                    <DropdownItem
+                                        key="new"
+                                        className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
+                                        startContent={<Icon name='upload' stroke='#acacac' className=' rotate-180' />}>
+                                        Download
+                                    </DropdownItem>
+                                </DropdownMenu>
+                            </Dropdown>
+                        </li>
+                        {/* <li className='md:w-auto w-[32%]'><TransparentButton isDisabled={!product} onPress={onOpen} title='Edit' className='h-10' icon='edit' /></li> */}
+                        <li className='xs:w-auto w-[48%]'><Button title='Generate Invoice' className='h-10 lg:px-5 !px-3' icon='download' /></li>
                     </ul>
                 </div>
                 <div className='pt-3'>
@@ -161,7 +209,8 @@ const Inventory = () => {
                                                 <div className={clsx("first-letter:uppercase whitespace-nowrap px-4")}>{col?.replaceAll("_", " ")}</div>
                                             </th> : null
                                     ))}
-                                    <th className="px-4 rounded-tr-lg rounded-br-lg text-sm font-medium py-3 px-4 ">Availability</th>
+                                    <th className="px-4 text-sm font-medium py-3">Availability</th>
+                                    <th className="px-4 rounded-tr-lg rounded-br-lg text-sm font-medium py-3">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -176,7 +225,7 @@ const Inventory = () => {
                                             >
                                                 <td>
                                                     <div>
-                                                        <Checkbox value={row?.id} onChange={(e) => setProduct(row)}
+                                                        <Checkbox value={row?.id}
                                                             checked={product?.id === row?.id}
                                                         />
                                                     </div>
@@ -197,16 +246,41 @@ const Inventory = () => {
                                                 ))}
 
                                                 <td className={clsx("first-letter:capitalize text-center", STOCKCOLORS[row.availability])}>{row?.availability?.replaceAll("_", " ")}</td>
+                                                <td className='text-center'>
+                                                    <Dropdown className='!rounded-lg'>
+                                                        <DropdownTrigger>
+                                                            <button><Icon name='more' /></button>
+                                                        </DropdownTrigger>
+                                                        <DropdownMenu aria-label="Dropdown menu with description" variant="faded">
+                                                            <DropdownItem
+                                                                onPress={() => { onOpen(); setProduct(row) }}
+                                                                key="new"
+                                                                className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
+                                                                startContent={<Icon name='edit' stroke='#acacac' />}>
+                                                                Edit
+                                                            </DropdownItem>
+                                                            <DropdownItem
+                                                                onPress={() => handleDelete(row)}
+                                                                key="new"
+                                                                className='text-gray-180 text-sm font-medium hover:!bg-transparent hover:!border-transparent'
+                                                                startContent={<Icon name='trash' stroke='#acacac' />}>
+                                                                Delete
+                                                            </DropdownItem>
+                                                        </DropdownMenu>
+                                                    </Dropdown>
+                                                </td>
                                             </tr>
                                         ))}
                             </tbody>
                         </table>
                     </div>
-                    <Pagination
-                        totalPages={10}
-                        currentPage={currentPage}
-                        onPageChange={(page) => setCurrentPage(page)}
-                    />
+                    {
+                        products?.results?.recount > 1 ?
+                            <Pagination
+                                totalPages={10}
+                                currentPage={currentPage}
+                                onPageChange={(page) => setCurrentPage(page)}
+                            /> : null}
                 </div>
             </RoundedBox>
             <AddInventoryModal

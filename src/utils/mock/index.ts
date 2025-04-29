@@ -209,7 +209,10 @@ export const LoginFormFields = [
 export const InventoryFormSchema = z.object({
     product_name: z.string().min(1, "Product name is required"),
     product_id: z.string().min(1, "Product ID is required"),
-    category: z.string({ required_error: "Category is required" }),
+    category: z.union([
+        z.string().min(1, "Category is required"),
+        z.number({ required_error: "Category is required" }),
+    ]),
     buying_price: z.string().min(1, "Buying price is required"),
     shipping_price: z.string().min(1, "Shipping price is required"),
     repair_cost: z.string().min(1, "Repair cost is required"),
@@ -220,10 +223,16 @@ export const InventoryFormSchema = z.object({
     website_price: z.string().min(1, "Website price is required"),
     sold_price: z.string().min(1, "Sold price is required"),
     profit_margin: z.string().min(1, "Profit margin is required"),
-    quantity: z.string().min(1, "Quantity is required"),
+    quantity:z.union([
+        z.string().min(1, "Quantity is required"),
+        z.number({ required_error: "Quantity is required" }),
+    ]),
     unit: z.string().min(1, "Unit is required"),
     date_purchased: z.string().min(1, "Date purchased is required"),
-    hold_time: z.string().min(1, "Hold time is required"),
+    hold_time:z.union([
+        z.string().min(1, "Hold time is required"),
+        z.number({ required_error: "Hold time is required" }),
+    ]),
     purchased_from: z.string().min(1, "Purchased from is required"),
     listed_on: z.string().min(1, "Listed on is required"),
     sold_source: z.string().min(1, "Sold source is required"),
@@ -275,37 +284,42 @@ export const SidebarItems = [
     {
         "href": "/dashboard",
         "label": "Dashboard",
-        "icon": "/Home.svg"
+        "icon": "home"
     },
     {
         "href": "/inventory",
         "label": "Inventory",
-        "icon": "/Inventory.svg"
+        "icon": "inventory"
     },
     {
         "href": "/reports",
         "label": "Reports",
-        "icon": "/Report.svg"
+        "icon": "report"
     },
     {
         "href": "/customers",
         "label": "Customers",
-        "icon": "/customer-class-line-svgrepo-com 1.svg"
+        "icon": "user"
     },
     {
         "href": "/shipping",
         "label": "Shipping",
-        "icon": "/hugeicons_shipment-tracking.svg"
+        "icon": "shipping"
     },
     {
-        "href": "/invoices",
-        "label": "Invoices",
-        "icon": "/hugeicons_invoice-04.svg"
+        "href": "/trade",
+        "label": "Trade",
+        "icon": "trade"
     },
+    // {
+    //     "href": "/invoices",
+    //     "label": "Invoices",
+    //     "icon": "/hugeicons_invoice-04.svg"
+    // },
     {
         "href": "#",
         "label": "Log Out",
-        "icon": "/Log Out.svg"
+        "icon": "logout"
     },
 ]
 export const Filters: string[] = ["brand", "date", "range", "watch conditon", "buyer", "seller"]

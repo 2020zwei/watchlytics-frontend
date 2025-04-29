@@ -36,7 +36,7 @@
 // }
 
 import type { Metadata } from "next";
-import { Archivo, Inter } from "next/font/google";
+import { Archivo, Inter, Poppins } from "next/font/google";
 import { Providers } from "../providers/providers";
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
@@ -54,6 +54,11 @@ const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
+const poppins = Poppins({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 
 export const metadata: Metadata = {
   title: "Watchlytics",
@@ -68,7 +73,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="light" style={{ colorScheme: "light" }}>
       <body
-        className={clsx("antialiased", archivo.variable,inter.variable)}
+        className={clsx("antialiased", archivo.variable, inter.variable, poppins.variable)}
       >
         <Providers>{children}</Providers>
         <ToastContainer />

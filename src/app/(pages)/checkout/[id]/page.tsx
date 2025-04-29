@@ -24,7 +24,7 @@ const page = () => {
     const getSubscriptions = () => {
         setLoading(true)
         sendRequest({ url: `/plans/${id}/`, method: "GET" }).then(res => {
-            setPlan(res)
+            setPlan(res?.data)
             setLoading(false)
         }).finally(() => {
             setLoading(false)

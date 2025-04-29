@@ -81,10 +81,8 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
 
             sendRequest({ url: "/subscribe/", method: "POST", payload: PAYLOAD })
                 .then(async (res) => {
-                    console.log(res)
-                    if (res?.success) {
-                        toast.success(res.data.message);
-                        console.log(localStorage.getItem("isLoggedin"), 'localStorage.getItem("isLoggedin")')
+                    if (res?.data?.success) {
+                        toast.success(res?.message);
                         const isLoggedIn = JSON.parse(localStorage.getItem("isLoggedin") || "false");
                         if (isLoggedIn) {
                             navigate.push("/profile");
@@ -94,8 +92,8 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                             navigate.push("/login")
                         }
                     } else {
-                        if (res?.response) {
-                            toast.error(res?.response?.errors?.error || res?.response?.message);
+                        if (res?.data?.response) {
+                            toast.error(res?.data?.response?.errors?.error || res?.data?.response?.message);
                         }
                     }
                 })

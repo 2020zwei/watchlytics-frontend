@@ -49,16 +49,17 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({ isOpen, onOpenCha
             let value = data[key];
             formData.append(key, value);
         });
-        if(!fileMeta?.file){
+        if (!fileMeta?.file) {
             formData.delete("image")
         }
         const PAYLOAD = {
-            url: defaultData ? URLS.UPDATEPRODUT + defaultData?.id+"/" : URLS.ADDPRODUCT,
+            url: defaultData ? URLS.UPDATEPRODUT + defaultData?.id + "/" : URLS.ADDPRODUCT,
             method: defaultData ? METHODS.PATCH : METHODS.POST,
             payload: formData
         }
         sendRequest(PAYLOAD).then((res) => {
-            if (res?.status === 201 ||res?.status === 200) {
+            console.log(res, 'add product')
+            if (res?.status === 201 || res?.status === 200) {
                 toast.success(defaultData ? "Product successfully updated" : "Product successfully added");
                 setFileMeta(null);
                 onOpenChange(false)
@@ -100,8 +101,9 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({ isOpen, onOpenCha
     useEffect(() => {
         if (defaultData) {
             reset(defaultData)
+            trigger();
         }
-    }, [defaultData])
+    }, [defaultData, reset, trigger])
 
     return (
         <>
@@ -130,8 +132,8 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({ isOpen, onOpenCha
                                                 trigger("image");
                                             }}
                                         >
-                                            <div className="flex items-center gap-5 w-fit -ms-0Pagination">
-                                                <RoundedBox className={clsx("w-20 h-20 outline-gray-180 overflow-hidden", !fileMeta || !defaultData?.image && "outline-dashed")}>
+                                            <div className="flex items-center xs:flex-row flex-col gap-5 w-fit -ms-0 Pagination">
+                                                <RoundedBox className={clsx("w-20 h-20 outline-gray-180 overflow-hidden", fileMeta?.url ? "" : " outline-dashed")}>
                                                     {fileMeta?.url || defaultData?.image ? (
                                                         <img
                                                             width={80}

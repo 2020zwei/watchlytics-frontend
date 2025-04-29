@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-html{
+html {
   background: #f9f9f9 !important;
 }
 
@@ -49,7 +49,35 @@ select::after {
 }
 
 .border-gradient {
-  background:linear-gradient(180deg, #092CA2 0%, #003BFF 100%)
+  background: linear-gradient(180deg, #092CA2 0%, #003BFF 100%)
+}
 
+/* React select box library style */
+body .searchbale-select__control {
+  @apply w-full max-w-[320px] border-gray-70 rounded-lg min-h-[34px] max-h-[34px] ps-6
+}
 
+.searchbale-select__indicator-separator {
+  @apply hidden
+}
+.searchbale-select__value-container{
+  @apply pt-0
+}
+.searchbale-select__placeholder,.searchbale-select__value-container{
+  @apply text-sm font-normal !mt-0
+}
+.searchbale-select__placeholder{
+  @apply !text-gray-180
+}
+.searchbale-select__input-container {
+  @apply !m-0 !p-0 text-dark-800
+}
+body .searchbale-select__control--is-focused{
+  @apply !border-gray-70 !shadow-none
+}
+@media(max-width:500px){
+
+  .inventory-btns li button{
+    @apply !w-full
+  }
 }

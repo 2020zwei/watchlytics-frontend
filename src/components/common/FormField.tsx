@@ -58,7 +58,7 @@ const FormField: React.FC<FormFieldProps> = ({
 
     return (
         <div className={clsx("", containerClass)}>
-            <label htmlFor={name} className={clsx("min-w-[120px] text-base font-medium text-dark-300 pt-3",
+            <label htmlFor={name} className={clsx("min-w-[130px] text-base font-medium text-dark-300 pt-3 ",
                 errors[name] && errors[name] && "text-red-800", labelClass
             )}>
                 {label}

@@ -32,7 +32,7 @@ export const sendRequest = async ({ url, payload, method = "GET", headers = {} }
         break;
     }
 
-    return res?.data
+    return res
 
   } catch (err: any) {
     return err

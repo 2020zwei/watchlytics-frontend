@@ -13,10 +13,11 @@ const config = {
   theme: {
     extend: {
       screens: {
-        "xs": "576px",
+        "xs": "500px",
         sm: "768px",
         md: "992px",
-        lg: "1280px",
+        lg: "1200px",
+        // lg: "1280px",
         xl: "1440px",
       },
       container: {
@@ -46,12 +47,12 @@ const config = {
         dark: {
           800: "#1C274C",
           700: "#808080",
-          600:"#555555",
-          500:"#667085",
+          600: "#555555",
+          500: "#667085",
           300: "#48505E"
         },
         gray: {
-          650:"#808080",
+          650: "#808080",
           600: "#5D6679",
           400: "#48505E",
           500: "#858D9D",
@@ -64,12 +65,12 @@ const config = {
           30: "#f8f8f8",
           25: "#CCCCCC",
           20: "#EEEEEE",
-          10:"#F0F1F3"
+          10: "#F0F1F3"
 
         },
         orange: {
           800: "#E19133",
-          700:"#DBA362"
+          700: "#DBA362"
         },
         pink: {
           500: "#845EBC"
@@ -77,15 +78,16 @@ const config = {
         red: {
           700: "#F36960"
         },
-        green:{
-          600:"#39AD79",
-          500:"#10A760"
+        green: {
+          600: "#39AD79",
+          500: "#10A760"
         }
       },
       fontFamily: {
         manrope: ["Manrope", "sans-serif"],
         archivo: "var(--font-archivo)",
         inter: "var(--font-inter)",
+        poppins: "var(--font-poppins)",
       },
       boxShadow: {
         md: "0px 1px 2px 0px #1018280D"

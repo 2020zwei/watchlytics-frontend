@@ -4,6 +4,8 @@ import Heading from '@/components/common/heading'
 import { REPORTFILTEROPTIONS } from '@/utils/mock'
 import { useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
+import Pagination from './common/Pagination'
+import { useAppContext } from '@/providers/AppContextProvider'
 
 const Reports = () => {
     const router = useRouter();
@@ -15,10 +17,10 @@ const Reports = () => {
     };
 
     return (
-        <div>
-            <div className='flex items-center justify-between'>
-                <Heading as='h3' className=' md:text-2xl text-lg'>Inventory Valuation Report</Heading>
-                <div className='border rounded-lg border-gray-200 md:px-5 px-3'>
+        <div className='flex flex-col gap-5'>
+            <div className='flex sm:flex-row flex-col items-center sm:justify-between'>
+                <Heading as='h3' className=' md:text-2xl text-lg w-full'>Inventory Valuation Report</Heading>
+                <div className='border rounded-lg border-gray-200 md:px-5 px-3 ms-auto text-end'>
                     <select onChange={(e) => handleFilter(e.target.value)} className="bg-transparent outline-none text-sm text-gray-650 min-h-10 md:pe-6 pe-3 md:min-w-[290px] p-3">
                         {REPORTFILTEROPTIONS.map((opt) => (
                             <option key={opt} value={opt}>
@@ -28,7 +30,8 @@ const Reports = () => {
                     </select>
                 </div>
             </div>
-            <div className='grid grid-cols-2 gap-5 mt-4'>
+            <div className='grid md:grid-cols-2 gap-5 mt-4 report-cards'>
+                {/* cards */}
                 <RoundedBox className='!bg-white'>
                     <div className='px-3 pt-4 border-b text-gray-650 pb-5 mb-5'>
                         <Heading as='h3'>Overview</Heading>
@@ -66,6 +69,7 @@ const Reports = () => {
                         </div>
                     </div>
                 </RoundedBox>
+                {/* table */}
                 <RoundedBox className='!bg-white'>
                     <div className=''>
                         <Heading as='h3' className='px-4 pt-4'>Expense Report</Heading>
@@ -94,6 +98,50 @@ const Reports = () => {
                         </div>
                     </div>
                 </RoundedBox>
+            </div>
+            <div>
+                <div>
+                    <RoundedBox className='pb-4'>
+                        <Heading className='p-3'>Best selling product</Heading>
+                        <div className=" overflow-x-auto">
+                            <table className='w-full min-w-[1200px]'>
+                                <thead className='h-12'>
+                                    <tr className='text-white text-sm font-medium bg-blue-gradient'>
+                                        <th className='text-start ps-4 first:rounded-s-lg  overflow-hidden'>
+                                            Product
+                                        </th>
+                                        <th className='text-start'>Product ID</th>
+                                        <th className='text-start'>Category</th>
+                                        <th className='text-start'>Remaining Quantity</th>
+                                        <th className='text-start'>Turn Over</th>
+                                        <th className='text-start pe-4 last:rounded-e-lg overflow-hidden'>
+                                            Increase By
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {Array.from({ length: 5 }).map(() => (
+                                        <tr className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
+                                            <td className=' text-start py-3 px-4'>TAG Heuer</td>
+                                            <td>TAG 658.0314.3.031</td>
+                                            <td>Automatic Watches</td>
+                                            <td>43 Watches</td>
+                                            <td>$9,000</td>
+                                            <td className=' text-green-500'>2.3%</td>
+                                        </tr>))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </RoundedBox>
+                </div>
+                <div>
+                    <Pagination
+                        totalPages={10}
+                        currentPage={12}
+                        onPageChange={(page) => { }}
+                    />
+                </div>
             </div>
         </div>
     )
