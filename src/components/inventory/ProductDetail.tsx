@@ -31,46 +31,49 @@ const ProductDetail = () => {
             </div>
 
             {/* Primary & Stats Section */}
-            <div className="grid grid-cols-12 md:grid-cols-3 gap-6">
+            <div className="flex justify-between lg:ps-11 md:ps-6 sm:ps-4 xs:ps-2 xs:flex-col lg:flex-row gap-8 items-start">
                 {/* Left - Primary & Supplier Details */}
-                <div className="md:col-span-2 space-y-6">
+                <div className="w-max min-w-[400px]">
                     <div>
-                        <h3 className="font-semibold text-dark-300 mb-2">Primary Details</h3>
-                        <div className="grid grid-cols-1 gap-4 text-sm">
-                            <div className='col-span-7 flex items-center justify-between'>
-                                <div>Product name</div>
-                                <div>Franck Muller</div>
+                        <h3 className="font-semibold text-dark-300 mb-4">Primary Details</h3>
+                        <div className="grid grid-cols-1 gap-y-8 gap-x-4 text-sm">
+                            <div className='flex items-center justify-between gap-4'>
+                                <div className='text-start flex-1'>Product name</div>
+                                <div className='text-start flex-1'>Franck Muller</div>
                             </div>
 
-                            <div>
-                                <div className="text-gray-500">Product ID</div>
-                                <div className="text-gray-900">FRA 658.0314.3.031</div>
+                            <div className='flex items-center justify-between gap-4'>
+                                <div className=' text-start flex-1'>Product ID</div>
+                                <div className=' text-start flex-1'>FRA 658.0314.3.031</div>
                             </div>
-                            <div>
-                                <div className="text-gray-500">Product category</div>
-                                <div className="text-gray-900">Sports Watch</div>
+
+                            <div className='flex items-center justify-between gap-4'>
+                                <div className=' text-start flex-1'>Product category</div>
+                                <div className=' text-start flex-1'>Sports Watch</div>
                             </div>
-                            <div>
-                                <div className="text-gray-500">Availability</div>
-                                <div className="text-green-600 font-medium">In-stock</div>
+
+                            <div className='flex items-center justify-between gap-4'>
+                                <div className=' text-start flex-1'>Availability</div>
+                                <div className="text-green-600 font-medium text-start flex-1 ">In-stock</div>
                             </div>
-                            <div>
-                                <div className="text-gray-500">Impact</div>
-                                <div className="text-gray-900">3.2%</div>
+
+                            <div className='flex items-center justify-between gap-4'>
+                                <div className=' text-start flex-1'>Impact</div>
+                                <div className=' text-start flex-1'>3.2%</div>
                             </div>
                         </div>
                     </div>
 
-                    <div>
-                        <h3 className="font-semibold text-dark-300 mb-2">Supplier Details</h3>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <div className="text-gray-500">Supplier name</div>
-                                <div className="text-gray-900">Ronald Martin</div>
+                    <div className="pt-11">
+                        <h3 className="font-semibold text-dark-300 mb-4">Supplier Details</h3>
+                        <div className="grid grid-cols-1 gap-y-8 gap-x-4 text-sm">
+                            <div className='flex items-center justify-between gap-4'>
+                                <div className=' text-start flex-1'>Supplier name</div>
+                                <div className=' text-start flex-1'>Ronald Martin</div>
                             </div>
-                            <div>
-                                <div className="text-gray-500">Contact Number</div>
-                                <div className="text-gray-900">98789 86757</div>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div className=' text-start flex-1'>Contact Number</div>
+                                <div className=' text-start flex-1'>98789 86757</div>
                             </div>
                         </div>
                     </div>
@@ -103,8 +106,8 @@ const ProductDetail = () => {
             </div>
 
             {/* Stock Locations */}
-            <div className="mt-8">
-                <h3 className="font-semibold text-dark-300 mb-2">Stock Locations</h3>
+            <div className="mt-8 max-w-[690px]">
+                <h3 className="font-semibold text-dark-300 mb-4">Stock Locations</h3>
                 <div className="border rounded-lg overflow-hidden text-sm">
                     <div className="grid grid-cols-2 bg-gray-100 text-gray-600 font-medium px-4 py-2">
                         <div>Store Name</div>

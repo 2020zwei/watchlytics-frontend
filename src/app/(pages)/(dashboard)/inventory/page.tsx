@@ -1,14 +1,17 @@
+'use client'
 
-import Inventory from '@/components/inventory/Inventory';
+import dynamic from 'next/dynamic';
 import { Spinner } from '@heroui/react';
-import React from 'react'
-import { Suspense } from 'react';
-const page = () => {
-    return (
-        <Suspense fallback={<Spinner />}>
-            <Inventory/>
-        </Suspense>
-    )
-}
+import React from 'react';
+const Inventory = dynamic(() => import('@/components/inventory/Inventory'), {
+    ssr: false,
+    loading: () => <Spinner />
+});
 
-export default page
+const Page = () => {
+    return (
+        <Inventory />
+    );
+};
+
+export default Page;
