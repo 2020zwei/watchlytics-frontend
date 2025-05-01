@@ -30,6 +30,7 @@ export const URLS = {
   PRODUTDETAIL: "/v1/inventory/products/",
   UPDATEPRODUT: "/v1/inventory/products/",
   DELETEPRODUCT: "/v1/inventory/products",
+  UPLOADPORODUCTS: "/v1/inventory/upload-products/",
   STATS: "/v1/inventory/stats/",
 };
 

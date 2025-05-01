@@ -4,7 +4,7 @@ import { SidebarItems } from '@/utils/mock'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
-import React, { useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import Icon from './Icon'
 

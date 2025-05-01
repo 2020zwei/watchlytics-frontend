@@ -32,7 +32,7 @@ const page = () => {
                             <td className=' text-start py-3 px-4'>Trade 1</td>
                             <td className='text-end py-3 px-4'>
                                 <div className='flex items-center justify-end gap-3 text-[#808080]'>
-                                    <button><Icon name='edit' size='1.7rem' /></button>
+                                    <Link href={`/add-trading/?id=${1}`}><Icon name='edit' size='1.7rem' /></Link>
                                     <TradingModal modalTile="Trade 1" data={[]} />
                                 </div>
                             </td>
@@ -41,7 +41,7 @@ const page = () => {
                             <td className=' text-start py-3 px-4'>Trade 1</td>
                             <td className='text-end py-3 px-4'>
                                 <div className='flex items-center justify-end gap-3 text-[#808080]'>
-                                    <button><Icon name='edit' size='1.7rem' /></button>
+                                    <Link href={`/add-trading/?id=${2}`}><Icon name='edit' size='1.7rem' /></Link>
                                     <TradingModal modalTile="Trade 1" data={[]} />
                                 </div>
                             </td>

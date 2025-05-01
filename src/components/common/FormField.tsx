@@ -13,8 +13,8 @@ interface StyleProps {
     fill?: string,
     iconClass?: ""
     iconSize?: string,
-    isDisabled?:boolean
-    onPasswordToggle?: (value:string) => void
+    isDisabled?: boolean
+    onPasswordToggle?: (value: string) => void
 }
 interface Option {
     label: string;
@@ -30,7 +30,7 @@ interface FormFieldProps extends StyleProps {
     type?: string;
     fieldType?: "input" | "textarea" | "select" | string;
     options?: Option[];
-    
+
 }
 
 const FormField: React.FC<FormFieldProps> = ({
@@ -51,9 +51,9 @@ const FormField: React.FC<FormFieldProps> = ({
     iconClass = "",
     fill = "#48505e",
     iconSize = "1.2rem",
-    onPasswordToggle=()=>{},
+    onPasswordToggle = () => { },
     options = [],
-    isDisabled=false
+    isDisabled = false
 }) => {
 
     return (
@@ -92,7 +92,7 @@ const FormField: React.FC<FormFieldProps> = ({
                                                     errors[name] && errors[name] ? "border-red-800" : field.value ? "border-green-600" : !field.value ? "text-gray-170" : ""
                                                 )}
                                             >
-                                                <option value="" className="text-gray-170" disabled>{placeholder}</option>
+                                                <option value="" className="text-gray-170" disabled>Select {label}</option>
                                                 {options.map((opt) => (
                                                     <option key={opt.value} value={opt.value} className="text-dark-300">
                                                         {opt.label}
@@ -104,23 +104,45 @@ const FormField: React.FC<FormFieldProps> = ({
                                     );
                                 default:
                                     return (
-                                        <input
-                                            {...field}
-                                            type={type}
-                                            placeholder={placeholder}
-                                            disabled={isDisabled}
-                                            className={clsx(
-                                                "text-base focus-within:outline-blue-500 text-dark-300 placeholder:text-gray-170 border border-gray-70 shadow-md rounded-lg px-3 min-h-11 w-full", inputClass,
-                                                errors[name] && errors[name] ? "border-red-800" : field.value ? "border-green-600" : ""
+                                        <>
+                                            <input
+                                                {...field}
+                                                type={type}
+                                                ref={field.ref}
+                                                placeholder={placeholder}
+                                                disabled={isDisabled}
+                                                
+                                                onClick={(e) => {
+                                                    if (type === "date") {
+                                                        try {
+                                                            (e.target as HTMLInputElement).showPicker?.();
+                                                        } catch (_) {
+                                                        }
+                                                    }
+                                                }}
+                                                className={clsx(
+                                                    "text-base focus-within:outline-blue-500 text-dark-300 placeholder:text-gray-170 border border-gray-70 shadow-md rounded-lg px-3 min-h-11 w-full",
+                                                    inputClass,
+                                                    errors[name] ? "border-red-800" : field.value ? "border-green-600" : ""
+                                                )}
+                                            />
+                                            {type === "date" && (
+                                                <button
+                                                    type="button"
+                                                    className="absolute right-3 bg-white"
+                                                >
+                                                    <Icon name="calender" />
+                                                </button>
                                             )}
-                                        />
+                                        </>
+
                                     );
                             }
                         }}
                     />
-                    
+
                     {icon ?
-                        <button type="button" onClick={icon ? ()=>onPasswordToggle(name) : undefined} className=" absolute right-3"><Icon name={icon} stroke={stroke} fill={fill} className={iconClass} size={iconSize} /></button> : null}
+                        <button type="button" onClick={icon ? () => onPasswordToggle(name) : undefined} className=" absolute right-3"><Icon name={icon} stroke={stroke} fill={fill} className={iconClass} size={iconSize} /></button> : null}
                 </div>
                 {errors[name] && (
                     <p className="text-sm text-red-800">{errors[name]?.message as string}</p>

@@ -4,7 +4,7 @@ import RoundedBox from '@/components/common/baseButton/RoundedBox'
 import Heading from '@/components/common/heading'
 import clsx from 'clsx'
 import React, { useEffect, useState } from 'react'
-import { Checkbox, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, useDisclosure } from "@heroui/react";
+import { Checkbox, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner, useDisclosure } from "@heroui/react";
 import { TransparentButton } from '@/components/common/baseButton/TransparentButton'
 import Pagination from '@/components/common/Pagination'
 import { METHODS, URLS } from '@/utils/constants'
@@ -15,6 +15,9 @@ import AddInventoryModal from "@/components/inventory/AddInventoryModal"
 import Icon from '../common/Icon'
 import { toast } from 'react-toastify'
 import { useSearchParams } from 'next/navigation'
+import Notfound from '../common/Notfound'
+import Link from 'next/link'
+import UploadFileModal from '../common/UploadFileModal'
 
 
 const Inventory = () => {
@@ -24,10 +27,13 @@ const Inventory = () => {
     const [categories, setCategories] = useState<DROPDWONOPTION[]>([]);
     const [products, setProducts] = useState<any>([])
     const [columns, setColumns] = useState<string[]>([])
-    const [product, setProduct] = useState<RequestTypes | null>()
+    const [product, setProduct] = useState<any>()
     const [stats, setStats] = useState<STATETYPES>()
     const searchParams = useSearchParams();
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const STOCKCOLORS: any = { "in_stock": "text-green-600" }
+    const params = searchParams?.toString()
+
     const fetchCategories = async () => {
         const PAYLOAD: RequestTypes = {
             url: URLS.CATEGORES,
@@ -42,21 +48,25 @@ const Inventory = () => {
     }
     const fetchStats = async () => {
         sendRequest({ url: URLS.STATS }).then((res) => {
-            console.log(res, "stats")
             setStats(res?.data)
         })
     }
-    const fetchData = async (payload: any = null) => {
+    const fetchData = async (payload: any = null, page_number = 1) => {
         setApiLoading(true)
         // @ts-ignore
         const PAYLOAD: RequestTypes = {
-            url: URLS.PRODUCTS,
+            url: `${URLS.PRODUCTS}/?page_number=${currentPage}&${params}&page_size=30/`,
             method: METHODS.GET,
         }
-        sendRequest(payload || PAYLOAD).then((res) => {
+        sendRequest(PAYLOAD).then((res) => {
             if (res?.data?.results?.length) {
                 setColumns(Object.keys(res?.data?.results[0]))
+                console.log(res, 'res')
                 setProducts(res?.data)
+            }
+            else {
+                setProducts([])
+
             }
         }).finally(() => {
             setApiLoading(false)
@@ -68,11 +78,36 @@ const Inventory = () => {
             method: METHODS.DELETE,
         }
         sendRequest(PAYLOAD).then((res) => {
-            console.log(res, "delete")
             if (res?.data?.stats) {
                 toast.success("fsfsdfs")
                 fetchData()
             }
+        })
+    }
+    const handleUploadClick = () => {
+        setIsUploadModalOpen(true);
+    };
+    const closeUploadModal = () => {
+        setIsUploadModalOpen(false);
+        setApiLoading(false)
+    };
+    const handleUploadFile = async (file: File) => {
+        setApiLoading(true)
+        const formData = new FormData();
+        formData.append("excel_file", file);
+        const PAYLOAD: RequestTypes = {
+            url: URLS.UPLOADPORODUCTS,
+            method: METHODS.POST,
+            payload: formData,
+        }
+        sendRequest(PAYLOAD).then((res) => {
+            if (res?.status === 201) {
+                setIsUploadModalOpen(false);
+                toast.success("File uploaded successfully")
+                fetchData()
+            }
+        }).finally(() => {
+            setApiLoading(false)
         })
     }
     // const buildQueryParams = () => {
@@ -103,18 +138,23 @@ const Inventory = () => {
     }, [isOpen])
 
     useEffect(() => {
-        const params = searchParams.toString()
-        const PAYLOAD: RequestTypes = {
-            url: `${URLS.PRODUCTS}/?${params}&page_size=30`,
-            method: METHODS.GET,
-        }
-        fetchData(PAYLOAD)
+        currentPage > 1 && fetchData()
+    }, [currentPage])
+    useEffect(() => {
+        fetchData()
+    }, [])
+
+    useEffect(() => {
+        params && fetchData()
     }, [searchParams])
 
 
     return (
 
-        <div className="pt-5">
+        <div>
+            {apiLoading && <div className=' fixed z-40 top-0 left-0 right-0 bottom-0 m-auto flex justify-center items-center bg-black/40'>
+                <Spinner className="" size="lg" color="white" /></div>}
+
             <RoundedBox as='section' className="lg:px-4 lg:py-5 gap-3 mb-0.5 lg:!bg-white !bg-transparent">
                 <Heading as="h1" className="col-span-12 pb-4">Overall Inventory</Heading>
                 <div className='flex justify-between lg:flex-nowrap flex-wrap lg:gap-0 gap-y-3'>
@@ -160,6 +200,7 @@ const Inventory = () => {
             </RoundedBox>
 
             {/* table section */}
+
             <RoundedBox as='section' className="px-4 py-5 gap-3 mt-5">
                 <div className='flex items-center justify-between md:flex-row flex-col'>
                     <Heading className='text-start md:w-auto w-full md:-order-1 order-1'>Products</Heading>
@@ -175,49 +216,49 @@ const Inventory = () => {
                                     <DropdownItem
                                         key="new"
                                         className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
-                                        startContent={<Icon name='upload' stroke='#acacac' />}>
+                                        startContent={<Icon name='upload' stroke='#acacac' />}
+                                        onPress={handleUploadClick}                                   >
                                         Upload
                                     </DropdownItem>
                                     <DropdownItem
                                         key="new"
                                         className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
                                         startContent={<Icon name='upload' stroke='#acacac' className=' rotate-180' />}>
-                                        Download
+                                        <Link href="/files/download-template.xlsx" passHref legacyBehavior>
+                                            <a download="sample.pdf">Download</a>
+                                        </Link>
                                     </DropdownItem>
                                 </DropdownMenu>
                             </Dropdown>
                         </li>
-                        {/* <li className='md:w-auto w-[32%]'><TransparentButton isDisabled={!product} onPress={onOpen} title='Edit' className='h-10' icon='edit' /></li> */}
                         <li className='xs:w-auto w-[48%]'><Button title='Generate Invoice' className='h-10 lg:px-5 !px-3' icon='download' /></li>
                     </ul>
                 </div>
-                <div className='pt-3'>
-                    <div className=" overflow-x-auto">
-                        <table className="border-collapse min-w-[1200px] w-full text-start">
-                            <thead className="bg-blue-gradient text-white">
-                                <tr>
-                                    <th className="rounded-tl-lg rounded-bl-lg w-7"></th>
-                                    <th className="w-7">Image</th>
-                                    {columns?.map((col, index) => (
-                                        col !== 'id' && col !== "image" && col !== "category" && col !== "availability" ?
-                                            <th
-                                                key={index}
-                                                className={clsx(
-                                                    "text-sm font-medium py-3 px-4"
-                                                )}
-                                            >
-                                                <div className={clsx("first-letter:uppercase whitespace-nowrap px-4")}>{col?.replaceAll("_", " ")}</div>
-                                            </th> : null
-                                    ))}
-                                    <th className="px-4 text-sm font-medium py-3">Availability</th>
-                                    <th className="px-4 rounded-tr-lg rounded-br-lg text-sm font-medium py-3">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    !products?.results?.length ?
-                                        <tr><td colSpan={12} className='text-center py-5'>Data not found</td></tr>
-                                        :
+                {
+                    !products?.results?.length && !apiLoading ? <Notfound label='No Products Found' /> :
+                        <div className='pt-3'>
+                            <div className=" overflow-x-auto">
+                                <table className="border-collapse min-w-[1200px] w-full text-start">
+                                    <thead className="bg-blue-gradient text-white">
+                                        <tr>
+                                            <th className="rounded-tl-lg rounded-bl-lg w-7"></th>
+                                            <th className="w-7">Image</th>
+                                            {columns?.map((col, index) => (
+                                                col !== 'id' && col !== "image" && col !== "category" && col !== "availability" && col !== "owner" ?
+                                                    <th
+                                                        key={index}
+                                                        className={clsx(
+                                                            "text-sm font-medium py-3 px-4"
+                                                        )}
+                                                    >
+                                                        <div className={clsx("first-letter:uppercase whitespace-nowrap px-4")}>{col?.replaceAll("_", " ")}</div>
+                                                    </th> : null
+                                            ))}
+                                            <th className="px-4 text-sm font-medium py-3">Availability</th>
+                                            <th className="px-4 rounded-tr-lg rounded-br-lg text-sm font-medium py-3">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>{
                                         products?.results?.map((row: any, rowIndex: number) => (
                                             <tr
                                                 key={rowIndex}
@@ -231,17 +272,17 @@ const Inventory = () => {
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <RoundedBox className="relative  my-2 !bg-gray-80 p-2 h-14 w-14">
-                                                        <img src={row?.image} width={48} alt="image" className='w-full h-full rounded-md' />
+                                                    <RoundedBox className="relative items-center justify-center flex  my-2 !bg-gray-80 p-2 h-14 w-14">
+                                                        {row?.image?<img src={row?.image} width={48} alt="image" className='w-full h-full rounded-md' />:"N/A"}
                                                     </RoundedBox>
                                                 </td>
                                                 {columns.map((col, colIndex) => (
-                                                    col !== 'id' && col !== "image" && col !== "category" && col !== "availability" ?
+                                                    col !== 'id' && col !== "image" && col !== "category" && col !== "availability" && col !== "owner" ?
                                                         <td
                                                             key={colIndex}
                                                             className={clsx("py-5", colIndex === 0 && "w-14")}
                                                         >
-                                                            <div className={clsx("whitespace-nowrap px-4 text-center")}>{row?.[col] || "-"}</div>
+                                                            <div className={clsx("whitespace-nowrap px-4 text-center")}>{col == "profit_margin" ? `${row?.[col]}%` : row?.[col] || "-"}</div>
                                                         </td> : null
                                                 ))}
 
@@ -249,7 +290,7 @@ const Inventory = () => {
                                                 <td className='text-center'>
                                                     <Dropdown className='!rounded-lg'>
                                                         <DropdownTrigger>
-                                                            <button><Icon name='more' /></button>
+                                                            <button className='p-3'><Icon name='more' /></button>
                                                         </DropdownTrigger>
                                                         <DropdownMenu aria-label="Dropdown menu with description" variant="faded">
                                                             <DropdownItem
@@ -271,25 +312,29 @@ const Inventory = () => {
                                                 </td>
                                             </tr>
                                         ))}
-                            </tbody>
-                        </table>
-                    </div>
-                    {
-                        products?.results?.recount > 1 ?
-                            <Pagination
-                                totalPages={10}
-                                currentPage={currentPage}
-                                onPageChange={(page) => setCurrentPage(page)}
-                            /> : null}
-                </div>
+                                    </tbody>
+                                </table>
+                            </div>
+                            {
+                                products?.count > 30 ?
+                                    <Pagination
+                                        totalPages={Math.ceil(products?.count / 30)}
+                                        currentPage={currentPage}
+                                        onPageChange={(page) => setCurrentPage(page)}
+                                    /> : null}
+                        </div>}
             </RoundedBox>
             <AddInventoryModal
                 options={categories}
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
+                callBack={() => {
+                    fetchData()
+                }}
                 defaultData={product}
                 formTitle={product ? "Update Product" : "New Product"}
             />
+            <UploadFileModal isOpen={isUploadModalOpen} onOpen={closeUploadModal} callBack={handleUploadFile} isLoading={apiLoading} />
         </div >
     )
 }
