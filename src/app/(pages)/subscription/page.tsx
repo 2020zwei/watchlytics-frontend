@@ -10,6 +10,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
 const planIcons = {
     "FREE": "freePlan",
     "BASIC": "basicPlan",
@@ -19,19 +20,41 @@ const planIcons = {
 const page = () => {
     const [plansTypes, setPlansTypes] = useState<Plans[]>([])
     const [loading, setLoading] = useState(false)
-    const navegate = useRouter()
+    const navigate = useRouter()
     const getSubscriptions = () => {
         setLoading(true)
         sendRequest({ url: "/plans/", method: "GET" }).then(res => {
-            setPlansTypes(res.data.plans)
+            setPlansTypes(res?.data.plans)
+            setLoading(false)
+        }).finally(() => {
             setLoading(false)
         })
     }
     const handleFree = async (e: any) => {
-        await fetch('/api/logout')
-        navegate.push("/login")
+        sendRequest({ url: "/subscribe/", method: "POST", payload: { plan_name: "free" } })
+            .then(async (res) => {
+                if (res?.status === 400) {
+                    toast.info(res?.response?.data?.message);
+                }
+                if (res?.status === 200 || res?.status === 201) {
+                    toast.success(res?.message);
+                    const isLoggedIn = JSON.parse(localStorage.getItem("isLoggedin") || "false");
+                    if (isLoggedIn) {
+                        navigate.push("/profile");
+                    }
+                    else {
+                        await fetch('/api/logout')
+                        navigate.push("/login")
+                    }
+                } else {
+                    if (res?.data?.response) {
+                        toast.error(res?.data?.response?.errors?.error || res?.data?.response?.message);
+                    }
+                }
+            })
     }
     useEffect(() => {
+        navigate.push("/subscription")
         getSubscriptions()
     }, [])
 
@@ -50,7 +73,7 @@ const page = () => {
                     : <RoundedBox className='!bg-blue-100'>
                         <div className='grid lg:grid-cols-4 md:grid-cols-4 sm:grid-cols-2 md:gap-4 gap-8 sm:p-10 p-4 mt-10'>
                             {
-                                plansTypes.map((item, index) => (
+                                plansTypes?.map((item, index) => (
                                     <div key={item.name} className={clsx(" min-h-[700px] plan-card relative !bg-transparent flex flex-col justify-between", index === 1 || index === 3 ? "sm:mt-24" : "", item.name?.toLowerCase())}>
                                         <div className={clsx("border border-blue-150 rounded-lg px-4 py-7", [1, 3].includes(index) ? "h-full" : " h-[calc(100%-100px)]")}>
                                             <div className='h-[calc(100%-170px)]'>
@@ -81,10 +104,10 @@ const page = () => {
                                                 </div>
                                                 <div className="relative p-[2px] w-full bg-blue-gradient rounded-[10px] overflow-hidden transition-all duration-300">
                                                     <Link
-                                                        href={item.name?.toLowerCase() === "free" ? "#" : `/subscription/${item.id}`}
+                                                        href={item.name?.toLowerCase() === "free" ? "#" : `/checkout/${item.id}`}
                                                         onClick={(e) => {
-                                                            if (item.name?.toLowerCase() === "free") {
-                                                                e.preventDefault(); // prevent navigating to '#'
+                                                            if (item?.name?.toLowerCase() === "free") {
+                                                                e.preventDefault();
                                                                 handleFree(e);
                                                             }
                                                         }}

@@ -6,6 +6,7 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 interface AppState {
     isSidebarOpen: boolean;
     user: USER | null;
+    toggleSidebar: (value: boolean) => void;
     setIsSidebarOpen: (value: boolean) => void;
     setCurrentUser: (value: USER | null) => void;
 }
@@ -16,6 +17,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [user, setCurrentUser] = useState<USER | null>(null);
 
+    const toggleSidebar = (value: boolean) => {
+        setIsSidebarOpen(value);
+    };
+
     return (
         <AppContext.Provider
             value={{
@@ -23,6 +28,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
                 setIsSidebarOpen,
                 user,
                 setCurrentUser,
+                toggleSidebar,
             }}
         >
             {children}

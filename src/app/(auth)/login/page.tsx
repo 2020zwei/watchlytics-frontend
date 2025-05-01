@@ -323,7 +323,6 @@ export default function SignIn() {
       });
       localStorage.setItem("isLoggedin", "true")
       if (!result?.is_subscribed) {
-        logout()
         router.push("/subscription");
       }
       else {
@@ -353,7 +352,7 @@ export default function SignIn() {
     await fetch('/api/logout/')
   }
   useEffect(() => {
-    logout()
+    // logout()
   }, [])
 
   return (

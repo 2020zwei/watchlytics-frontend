@@ -1,4 +1,4 @@
-import { sendRequest } from "./apis"
+import baseInstance from "./axios"
 import { METHODS, URLS } from "./constants"
 
 export const getProfileInfo = async () => {
@@ -7,9 +7,7 @@ export const getProfileInfo = async () => {
         url: URLS.ME,
         method: METHODS.GET,
     }
-    sendRequest(PAYLOAD).then((res) => {
-        if (res?.data) {
-            console.log(res, 'middleware')
-        }
-    })
+    const res = await baseInstance.get(PAYLOAD)
+    console.log(res, "Bilal")
+    return res
 }

@@ -86,9 +86,7 @@ export default function ProfilePage() {
       fileMeta?.file && setFileMeta((prev) => ({ ...prev, file: null }))
       // @ts-ignore
       formData.get("confirm_password") && setValue("confirm_password", formData.get("confirm_password"))
-      // @ts-ignore
-      localStorage.setItem("profile_picture", fileMeta?.url)
-      setCurrentUser({ image: fileMeta?.url })
+      fileMeta?.url && setCurrentUser({ image: fileMeta?.url })
 
       formData.get("confirm_password") && navigate.push("/login")
     }
@@ -106,12 +104,14 @@ export default function ProfilePage() {
     setFileMeta(getValues("profile_picture"))
   }
   useEffect(() => {
+
     const getProfileInfo = async () => {
       // @ts-ignore
       const PAYLOAD: RequestTypes = {
         url: URLS.ME,
         method: METHODS.GET,
       }
+
       sendRequest(PAYLOAD).then((res) => {
         if (res?.data) {
           setFileMeta(res?.data?.data?.profile_picture)
@@ -127,9 +127,12 @@ export default function ProfilePage() {
       }).finally(() => {
         setApiLoading(false)
       })
+
     }
+
     getProfileInfo()
   }, [])
+
 
   const password = watch("password");
   const confirmPassword = watch("confirm_password");
@@ -176,7 +179,7 @@ export default function ProfilePage() {
                     className="w-full h-full object-cover"
                   />
                 ) : <div>
-                  <Icon name="camera" size="2rem" fill="#808080"/>
+                  <Icon name="camera" size="2rem" fill="#808080" />
                 </div>}
               </RoundedBox>
             </FileUploader>

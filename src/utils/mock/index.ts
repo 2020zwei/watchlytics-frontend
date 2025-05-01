@@ -20,6 +20,18 @@ export const InventoryFormFields = [
         "fieldType": "select"
     },
     {
+        "label": "Availability",
+        "name": "availability",
+        "placeholder": "Select product availability",
+        "fieldType": "select"
+    },
+    {
+        "label": "Condition",
+        "name": "condition",
+        "placeholder": "Select product condition",
+        "fieldType": "select"
+    },
+    {
         "label": "Buying Price",
         "name": "buying_price",
         "placeholder": "Enter Buying Price",
@@ -32,6 +44,20 @@ export const InventoryFormFields = [
         "placeholder": "Enter Quantity",
         "fieldType": "input",
         "type": "number"
+    },
+    {
+        "label": "Date Purchased",
+        "name": "date_purchased",
+        "placeholder": "Enter Date Purchased",
+        "fieldType": "input",
+        "type": "date"
+    },
+    {
+        "label": "Date Sold",
+        "name": "date_sold",
+        "placeholder": "Enter Date Sold",
+        "fieldType": "input",
+        "type": "date"
     },
     {
         "label": "Shipping Price",
@@ -60,51 +86,6 @@ export const InventoryFormFields = [
         "placeholder": "Enter Commission",
         "fieldType": "input",
         "type": "number"
-    },
-    {
-        "label": "Unit",
-        "name": "unit",
-        "placeholder": "Enter Unit",
-        "fieldType": "input"
-    },
-    {
-        "label": "Date Purchased",
-        "name": "date_purchased",
-        "placeholder": "Enter Date Purchased",
-        "fieldType": "input",
-        "type": "date"
-    },
-    {
-        "label": "Date Sold",
-        "name": "date_sold",
-        "placeholder": "Enter Date Sold",
-        "fieldType": "input",
-        "type": "date"
-    },
-    {
-        "label": "Hold Time",
-        "name": "hold_time",
-        "placeholder": "Enter Hold Time",
-        "fieldType": "input",
-        "type": "number"
-    },
-    {
-        "label": "Source of Sale",
-        "name": "source_of_sale",
-        "placeholder": "Enter Source of Sale",
-        "fieldType": "input"
-    },
-    {
-        "label": "Purchased From",
-        "name": "purchased_from",
-        "placeholder": "Enter Purchased From",
-        "fieldType": "input"
-    },
-    {
-        "label": "Listed On:",
-        "name": "listed_on",
-        "placeholder": "Enter Listed On",
-        "fieldType": "input"
     },
     {
         "label": "MSRP",
@@ -140,11 +121,57 @@ export const InventoryFormFields = [
         "type": "number"
     },
     {
+        "label": "Profit",
+        "name": "profit",
+        "placeholder": "Enter profit",
+        "fieldType": "input",
+        "type": "number"
+    },
+    {
+        "label": "Unit",
+        "name": "unit",
+        "placeholder": "Enter Unit",
+        "fieldType": "input"
+    },
+
+    {
+        "label": "Hold Time",
+        "name": "hold_time",
+        "placeholder": "Enter Hold Time",
+        "fieldType": "input",
+        "type": "number"
+    },
+    {
+        "label": "Source of Sale",
+        "name": "source_of_sale",
+        "placeholder": "Enter Source of Sale",
+        "fieldType": "input"
+    },
+    {
+        "label": "Purchased From",
+        "name": "purchased_from",
+        "placeholder": "Enter Purchased From",
+        "fieldType": "input"
+    },
+    {
         "label": "Sold Source",
         "name": "sold_source",
         "placeholder": "Enter Sold Source",
         "fieldType": "input"
     },
+    {
+        "label": "Listed On:",
+        "name": "listed_on",
+        "placeholder": "Enter Listed On",
+        "fieldType": "input"
+    },
+    {
+        "label": "Serial Number:",
+        "name": "serial_number",
+        "placeholder": "Enter serial number",
+        "fieldType": "input"
+    },
+
 ]
 const email = {
     label: "Email",
@@ -206,32 +233,48 @@ export const LoginFormFields = [
     password
 ]
 
-export const InventoryFormSchema = z.object({
-    product_name: z.string().min(1, "Product name is required"),
-    product_id: z.string().min(1, "Product ID is required"),
-    category: z.string({ required_error: "Category is required" }),
-    buying_price: z.string().min(1, "Buying price is required"),
-    shipping_price: z.string().min(1, "Shipping price is required"),
-    repair_cost: z.string().min(1, "Repair cost is required"),
-    fees: z.string().min(1, "Fees are required"),
-    commission: z.string().min(1, "Commission is required"),
-    msrp: z.string().min(1, "MSRP is required"),
-    whole_price: z.string().min(1, "Wholesale price is required"),
-    website_price: z.string().min(1, "Website price is required"),
-    sold_price: z.string().min(1, "Sold price is required"),
-    profit_margin: z.string().min(1, "Profit margin is required"),
-    quantity: z.string().min(1, "Quantity is required"),
-    unit: z.string().min(1, "Unit is required"),
-    date_purchased: z.string().min(1, "Date purchased is required"),
-    hold_time: z.string().min(1, "Hold time is required"),
-    purchased_from: z.string().min(1, "Purchased from is required"),
-    listed_on: z.string().min(1, "Listed on is required"),
-    sold_source: z.string().min(1, "Sold source is required"),
-    source_of_sale: z.string().min(1, "Source of sale is required"),
-    date_sold: z.string().min(1, "Sold date on is required"),
-    image: z.any().optional().nullable(),
-});
 
+const availabilityEnum = z.enum(["in_stock", "sold", "reserved", "in_repair"]);
+const conditionEnum = z.enum(["new", "used"]);
+
+export const InventoryFormSchema = z.object({
+    product_name: z.string().max(200, "Max 200 characters"),
+    product_id: z.string().max(50, "Max 50 characters"),
+    category: z.union([z.string(), z.number()]),
+    availability: availabilityEnum.default("in_stock"),
+    buying_price: z.coerce.number(),
+    quantity: z.coerce.number().int().default(1),
+    date_purchased: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    shipping_price: z.coerce.number().nullable().optional(),
+    repair_cost: z.coerce.number().nullable().optional(),
+    hold_time: z.coerce.number().int().min(1, "Hold time is required"),
+    fees: z.coerce.number().min(1, "Fees is required"),
+    commission: z.coerce.number().min(1, "Commission is required"),
+    msrp: z.coerce.number().min(1, "MSRP is required"),
+    website_price: z.coerce.number().min(1, "Whole price is required"),
+    sold_price: z.coerce.number().nullable().optional(),
+    whole_price: z.coerce.number().nullable().optional(),
+    profit_margin: z.coerce.number().nullable().optional(),
+    profit: z.coerce.number().nullable().optional(),
+    unit: z.string().nullable().optional(),
+    date_sold: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+    source_of_sale: z.string().nullable().optional(),
+    delivery_content: z.string().nullable().optional(),
+    condition: conditionEnum.default("new").nullable().optional(),
+    purchased_from: z.string().nullable().optional(),
+    sold_source: z.string().nullable().optional(),
+    listed_on: z.string().nullable().optional(),
+    image: z
+        .union([
+            z.instanceof(File),
+            z.string().url().min(1),
+        ])
+        .refine((val) => {
+            if (val instanceof File) return val.size > 0;
+            return typeof val === "string" && val.length > 0;
+        }, { message: "Image is required" }),
+    serial_number: z.string().nullable().optional(),
+});
 
 export const ProfileFormSchema = z.object({
     first_name: z.string().min(1, "Name is required"),
@@ -275,40 +318,51 @@ export const SidebarItems = [
     {
         "href": "/dashboard",
         "label": "Dashboard",
-        "icon": "/Home.svg"
+        "icon": "home"
     },
     {
         "href": "/inventory",
         "label": "Inventory",
-        "icon": "/Inventory.svg"
+        "icon": "inventory"
     },
     {
         "href": "/reports",
         "label": "Reports",
-        "icon": "/Report.svg"
+        "icon": "report"
     },
     {
         "href": "/customers",
         "label": "Customers",
-        "icon": "/customer-class-line-svgrepo-com 1.svg"
+        "icon": "user"
     },
     {
         "href": "/shipping",
         "label": "Shipping",
-        "icon": "/hugeicons_shipment-tracking.svg"
+        "icon": "shipping"
     },
     {
-        "href": "/invoices",
-        "label": "Invoices",
-        "icon": "/hugeicons_invoice-04.svg"
+        "href": "/trade",
+        "label": "Trade",
+        "icon": "trade",
+        "matchPaths": ["/trading", "/add-trading", "/edit-trading"]
+    },
+    // {
+    //     "href": "/invoices",
+    //     "label": "Invoices",
+    //     "icon": "/hugeicons_invoice-04.svg"
+    // },
+    {
+        "href": "/profile",
+        "label": "Settings",
+        "icon": "setting"
     },
     {
         "href": "#",
         "label": "Log Out",
-        "icon": "/Log Out.svg"
+        "icon": "logout"
     },
 ]
-export const Filters: string[] = ["brand", "date", "range", "watch", "conditon", "buyer", "seller"]
+export const Filters: string[] = ["brand", "date", "range", "watch conditon", "buyer", "seller"]
 export const REPORTFILTEROPTIONS = [
     "Inventory Valuation Report",
     "Purchase & Sales Report",
@@ -320,4 +374,15 @@ export const REPORTFILTEROPTIONS = [
     "Stock Turnover Analysis",
     "Live Inventory Dashboard"
 ]
+export const availabilities = [
+    { "value": "in_stock", "label": "In stock" },
+    { "value": "sold", "label": "Sold" },
+    { "value": "reserved", "label": "Reserved" },
+    { "value": "in_repair", "label": "Rn repair" },
+];
+export const conditions = [
+    { "value": "new", "label": "New" },
+    { "value": "used", "label": "Used" }
+];
+
 

@@ -5,7 +5,8 @@ export interface AddInventoryModalTypes {
     onOpenChange: any;
     options: DROPDWONOPTION[]
     defaultData?: any,
-    formTitle: string
+    formTitle: string,
+    callBack?: () => void
 }
 export interface FileMetaTypes {
     url: string;
@@ -44,8 +45,8 @@ export type USER = {
     image?: string
 }
 export type DROPDWONOPTION = {
-    value?: string,
-    label?: string
+    value: string,
+    label: string
 }
 
 export type CATEGORES = {
