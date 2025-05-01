@@ -32,7 +32,7 @@ const Header = () => {
   return (
 
     <div className="flex items-center justify-between w-full pe-4 ">
-      <div className='flex items-center border rounded-lg flex-1 mx-3 max-w-[320px] ps-4 border-[#F0F1F3] font-normal'>
+      <div className='flex items-center border rounded-lg flex-1 me-3 max-w-[320px] ps-4 border-[#F0F1F3] font-normal'>
         <SearchBar placeholder='Search product, supplier, order' icon='search'
           inputClass='order-1'
           placeholderClass='placeholder:text-[#858D9D] sm:placeholder:text-base placeholder:text-xs'

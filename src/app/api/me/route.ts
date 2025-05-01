@@ -20,12 +20,8 @@ export async function GET(req: NextRequest) {
         });
         const data = await res.json()
         if (!res.ok) {
-            console.log(res)
             return NextResponse.json({ isSubscribed: false });
         }
-   
-
-        console.log(data,"Ali")
 
         return NextResponse.json({ isSubscribed: data?.is_subscribed });
     } catch (error: any) {

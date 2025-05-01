@@ -21,7 +21,7 @@ const Reports = () => {
             <div className='flex sm:flex-row flex-col items-center sm:justify-between'>
                 <Heading as='h3' className=' md:text-2xl text-lg w-full'>Inventory Valuation Report</Heading>
                 <div className='border rounded-lg border-gray-200 md:px-5 px-3 ms-auto text-end'>
-                    <select onChange={(e) => handleFilter(e.target.value)} className="bg-transparent outline-none text-sm text-gray-650 min-h-10 md:pe-6 pe-3 md:min-w-[290px] p-3">
+                    <select onChange={(e) => handleFilter(e.target.value)} className="bg-transparent outline-none text-sm text-center text-gray-650 min-h-10 md:pe-6 pe-3 md:min-w-[290px] p-3">
                         {REPORTFILTEROPTIONS.map((opt) => (
                             <option key={opt} value={opt}>
                                 {opt}

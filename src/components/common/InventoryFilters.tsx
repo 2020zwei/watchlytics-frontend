@@ -157,12 +157,14 @@ const InventoryFilterModal: React.FC<InventoryFilterModalTypes> = ({
                                                     ref={staetDateRef}
                                                     type="date"
                                                     className={clsx(
-                                                        "border rounded-lg px-3 py-2 w-full text-gray-180 text-xs border-gray-70"
+                                                        "border rounded-lg px-3 h-9 w-full text-gray-180 text-xs border-gray-70"
+                                                         ,startDate?"!text-dark-800 !text-base":"text-gray-180"
                                                     )}
                                                     value={startDate || ""}
                                                     onChange={(e) =>
                                                         handleDateFilter("start_date", e.target.value)
                                                     }
+                                                    max={endDate || undefined}
                                                 />
                                                 <span className="absolute right-3 bg-white">
                                                     <Icon name="calender" />
@@ -181,12 +183,14 @@ const InventoryFilterModal: React.FC<InventoryFilterModalTypes> = ({
                                                     ref={endDateRef}
                                                     type="date"
                                                     className={clsx(
-                                                        "border rounded-lg px-3 py-2 w-full text-gray-180 text-xs border-gray-70"
+                                                        "border rounded-lg px-3 h-9 w-full  text-xs border-gray-70"
+                                                        ,endDate?"!text-dark-800 !text-base":"text-gray-180"
                                                     )}
                                                     value={endDate || ""}
                                                     onChange={(e) =>
                                                         handleDateFilter("end_date", e.target.value)
                                                     }
+                                                    min={startDate || undefined}
                                                 />
                                                 <span className="absolute right-3 bg-white">
                                                     <Icon name="calender" />
@@ -259,6 +263,7 @@ const InventoryFilterModal: React.FC<InventoryFilterModalTypes> = ({
                                         applyFilters();
                                         onClose();
                                     }}
+                                    isDisabled={((startDate && !endDate) || (startDate! > endDate!)) ? true : false}
                                 >
                                     Apply
                                 </Button>

@@ -54,14 +54,15 @@ const Inventory = () => {
     const fetchData = async (payload: any = null, page_number = 1) => {
         setApiLoading(true)
         // @ts-ignore
+
         const PAYLOAD: RequestTypes = {
-            url: `${URLS.PRODUCTS}/?page_number=${currentPage}&${params}&page_size=30/`,
+            url: `${URLS.PRODUCTS}/?page_number=${currentPage}&${params?.replace(/\+/g, "%20")}&page_size=30/`,
             method: METHODS.GET,
         }
         sendRequest(PAYLOAD).then((res) => {
+            console.log('res')
             if (res?.data?.results?.length) {
                 setColumns(Object.keys(res?.data?.results[0]))
-                console.log(res, 'res')
                 setProducts(res?.data)
             }
             else {
@@ -110,21 +111,6 @@ const Inventory = () => {
             setApiLoading(false)
         })
     }
-    // const buildQueryParams = () => {
-    //     const params = new URLSearchParams(searchParams.toString());
-    //     const queryObject: Record<string, string | string[]> = {};
-    //     for (const [key, value] of params.entries()) {
-    //         if (queryObject[key]) {
-    //             queryObject[key] = Array.isArray(queryObject[key])
-    //                 ? [...queryObject[key] as string[], value]
-    //                 : [queryObject[key] as string, value];
-    //         } else {
-    //             queryObject[key] = value;
-    //         }
-    //     }
-    //     return queryObject;
-    // };
-
 
     useEffect(() => {
         fetchCategories()
@@ -138,15 +124,13 @@ const Inventory = () => {
     }, [isOpen])
 
     useEffect(() => {
-        currentPage > 1 && fetchData()
-    }, [currentPage])
-    useEffect(() => {
-        fetchData()
-    }, [])
+        fetchCategories();
+        fetchStats();
+    }, []);
 
     useEffect(() => {
-        params && fetchData()
-    }, [searchParams])
+        fetchData();
+    }, [searchParams, currentPage]);
 
 
     return (
@@ -273,7 +257,7 @@ const Inventory = () => {
                                                 </td>
                                                 <td>
                                                     <RoundedBox className="relative items-center justify-center flex  my-2 !bg-gray-80 p-2 h-14 w-14">
-                                                        {row?.image?<img src={row?.image} width={48} alt="image" className='w-full h-full rounded-md' />:"N/A"}
+                                                        {row?.image ? <img src={row?.image} width={48} alt="image" className='w-full h-full rounded-md' /> : "N/A"}
                                                     </RoundedBox>
                                                 </td>
                                                 {columns.map((col, colIndex) => (

@@ -343,7 +343,8 @@ export const SidebarItems = [
     {
         "href": "/trade",
         "label": "Trade",
-        "icon": "trade"
+        "icon": "trade",
+        "matchPaths": ["/trading", "/add-trading", "/edit-trading"]
     },
     // {
     //     "href": "/invoices",

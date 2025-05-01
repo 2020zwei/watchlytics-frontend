@@ -10,6 +10,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
 const planIcons = {
     "FREE": "freePlan",
     "BASIC": "basicPlan",
@@ -19,7 +20,7 @@ const planIcons = {
 const page = () => {
     const [plansTypes, setPlansTypes] = useState<Plans[]>([])
     const [loading, setLoading] = useState(false)
-    const navegate = useRouter()
+    const navigate = useRouter()
     const getSubscriptions = () => {
         setLoading(true)
         sendRequest({ url: "/plans/", method: "GET" }).then(res => {
@@ -30,11 +31,30 @@ const page = () => {
         })
     }
     const handleFree = async (e: any) => {
-        await fetch('/api/logout')
-        navegate.push("/login")
+        sendRequest({ url: "/subscribe/", method: "POST", payload: { plan_name: "free" } })
+            .then(async (res) => {
+                if (res?.status === 400) {
+                    toast.info(res?.response?.data?.message);
+                }
+                if (res?.status === 200 || res?.status === 201) {
+                    toast.success(res?.message);
+                    const isLoggedIn = JSON.parse(localStorage.getItem("isLoggedin") || "false");
+                    if (isLoggedIn) {
+                        navigate.push("/profile");
+                    }
+                    else {
+                        await fetch('/api/logout')
+                        navigate.push("/login")
+                    }
+                } else {
+                    if (res?.data?.response) {
+                        toast.error(res?.data?.response?.errors?.error || res?.data?.response?.message);
+                    }
+                }
+            })
     }
     useEffect(() => {
-        navegate.push("/subscription")
+        navigate.push("/subscription")
         getSubscriptions()
     }, [])
 
@@ -87,7 +107,7 @@ const page = () => {
                                                         href={item.name?.toLowerCase() === "free" ? "#" : `/checkout/${item.id}`}
                                                         onClick={(e) => {
                                                             if (item?.name?.toLowerCase() === "free") {
-                                                                e.preventDefault(); // prevent navigating to '#'
+                                                                e.preventDefault();
                                                                 handleFree(e);
                                                             }
                                                         }}

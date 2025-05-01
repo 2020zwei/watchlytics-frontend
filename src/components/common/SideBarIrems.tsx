@@ -26,7 +26,12 @@ const SideBarItems = () => {
                 <span>Watchlytics</span>
             </li>
             {SidebarItems.map((item) => {
-                const isActive = pathname === item.href
+                const isActive =
+                    (item.matchPaths?.some((p) => pathname === p || pathname.startsWith(`${p}/`)) ||
+                        pathname === item.href ||
+                        pathname.startsWith(`${item.href}/`)) &&
+                    item.href !== '#';
+
 
                 return (
                     <li
