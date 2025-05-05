@@ -1,11 +1,40 @@
+"use client"
+
 import RoundedBox from '@/components/common/baseButton/RoundedBox'
 import Heading from '@/components/common/heading'
 import Icon from '@/components/common/Icon'
+import LoaderWidget from '@/components/common/LoaderWidget'
 import TradingModal from '@/components/common/TradingModal'
+import { RequestTypes } from '@/types'
+import { sendRequest } from '@/utils/apis'
+import { METHODS, URLS } from '@/utils/constants'
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect } from 'react'
 
 const page = () => {
+
+    const [apiLoading, setApiLoading] = React.useState(false)
+
+    const PAYLOAD: RequestTypes = {
+        url: `${URLS.TRANSACTIONS}`,
+        method: METHODS.GET,
+    }
+    const fetchTradeDetails = async () => {
+        setApiLoading(true)
+        try {
+            const response = await sendRequest(PAYLOAD)
+            console.log('Trade Details:', response)
+        } catch (error) {
+            console.error('Error fetching trade details:', error)
+        } finally {
+            setApiLoading(false)
+        }
+    }
+    useEffect(() => {
+        fetchTradeDetails()
+    },
+        [])
+    if (apiLoading) return <LoaderWidget />
     return (
         <RoundedBox>
             <div className='flex items-center justify-between px-5 pt-7 pb-3'>

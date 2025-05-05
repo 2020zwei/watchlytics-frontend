@@ -25,13 +25,15 @@ export const URLS = {
   ME: "/auth/me/",
   UPDATE_PROFILE: "/auth/update/",
   CATEGORES: "/v1/inventory/categories/",
-  ADDPRODUCT: "/v1/inventory/products/",
+  ADD_PRODUCT: "/v1/inventory/products/",
   PRODUCTS: "/v1/inventory/products",
-  PRODUTDETAIL: "/v1/inventory/products/",
-  UPDATEPRODUT: "/v1/inventory/products/",
-  DELETEPRODUCT: "/v1/inventory/products",
-  UPLOADPORODUCTS: "/v1/inventory/upload-products/",
+  PRODUT_DETAIL: "/v1/inventory/products/",
+  UPDATE_PRODUCT: "/v1/inventory/products/",
+  DELETE_PRODUCT: "/v1/inventory/products",
+  UPLOAD_PORODUCTS: "/v1/inventory/upload-products/",
   STATS: "/v1/inventory/stats/",
+  TRANSACTIONS: "/v1/transactions/",
+  TRANSACTIONS_SUMMARY: "/v1/transactions/summary/",
 };
 
 export const METHODS = {

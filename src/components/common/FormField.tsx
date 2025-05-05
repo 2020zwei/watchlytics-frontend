@@ -57,14 +57,21 @@ const FormField: React.FC<FormFieldProps> = ({
 }) => {
 
     return (
-        <div className={clsx("", containerClass)}>
+        <div className={clsx("", containerClass)} id={name}>
             <label htmlFor={name} className={clsx("min-w-[130px] text-base font-medium text-dark-300 pt-3 ",
                 errors[name] && errors[name] && "text-red-800", labelClass
             )}>
                 {label}
             </label>
             <div className={inputContainer}>
-                <div className=" relative flex items-center justify-between">
+                <div className=" relative flex items-center justify-between"
+                    onClick={type === "date" ? () => {
+                        if (type === "date") {
+                            const input = document.getElementsByName(name)?.[0] as HTMLInputElement;
+                            input?.showPicker();
+                        }
+                    } : undefined}
+                >
                     <Controller
                         name={name}
                         control={control}
@@ -111,20 +118,12 @@ const FormField: React.FC<FormFieldProps> = ({
                                                 ref={field.ref}
                                                 placeholder={placeholder}
                                                 disabled={isDisabled}
-                                                
-                                                onClick={(e) => {
-                                                    if (type === "date") {
-                                                        try {
-                                                            (e.target as HTMLInputElement).showPicker?.();
-                                                        } catch (_) {
-                                                        }
-                                                    }
-                                                }}
                                                 className={clsx(
                                                     "text-base focus-within:outline-blue-500 text-dark-300 placeholder:text-gray-170 border border-gray-70 shadow-md rounded-lg px-3 min-h-11 w-full",
                                                     inputClass,
                                                     errors[name] ? "border-red-800" : field.value ? "border-green-600" : ""
                                                 )}
+                                            
                                             />
                                             {type === "date" && (
                                                 <button

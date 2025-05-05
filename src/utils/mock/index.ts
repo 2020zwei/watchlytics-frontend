@@ -274,7 +274,14 @@ export const InventoryFormSchema = z.object({
             return typeof val === "string" && val.length > 0;
         }, { message: "Image is required" }),
     serial_number: z.string().nullable().optional(),
+}).refine((data) => {
+    if (!data.date_sold) return true; // allow if date_sold is not provided
+    return new Date(data.date_purchased) < new Date(data.date_sold);
+}, {
+    message: "Date Purchased must be less than Date Sold",
+    path: ["date_sold"], // target field for the error
 });
+
 
 export const ProfileFormSchema = z.object({
     first_name: z.string().min(1, "Name is required"),
@@ -330,11 +337,11 @@ export const SidebarItems = [
         "label": "Reports",
         "icon": "report"
     },
-    {
-        "href": "/customers",
-        "label": "Customers",
-        "icon": "user"
-    },
+    // {
+    //     "href": "/customers",
+    //     "label": "Customers",
+    //     "icon": "user"
+    // },
     {
         "href": "/shipping",
         "label": "Shipping",
