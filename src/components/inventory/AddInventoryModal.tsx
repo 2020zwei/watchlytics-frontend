@@ -68,7 +68,7 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
         }
 
         const PAYLOAD = {
-            url: defaultData ? URLS.UPDATEPRODUT + defaultData?.id + "/" : URLS.ADDPRODUCT,
+            url: defaultData ? URLS.UPDATE_PRODUCT + defaultData?.id + "/" : URLS.ADD_PRODUCT,
             method: defaultData ? METHODS.PATCH : METHODS.POST,
             payload: formData
         };
@@ -84,7 +84,7 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
             const errors = res?.response?.data?.errors;
             if (errors) {
                 Object.keys(errors).forEach((key) => {
-                    toast.error(errors[key]);
+                    toast.error(`${key?.replaceAll("_", " ")}: ${errors[key]}`);
                 });
             }
         }).finally(() => {
@@ -94,10 +94,17 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
 
     useEffect(() => {
         if (defaultData) {
-            reset(defaultData);
+            // reset(defaultData);
+
+            const formattedDateSold = defaultData?.date_sold
+                ? defaultData.date_sold.slice(0, 10)
+                : new Date().toISOString().slice(0, 10);
+
+            setValue("date_sold", "02/05/2025");
             trigger();
         }
-    }, [defaultData, reset, trigger]);
+    }, [defaultData, reset, trigger, setValue]);
+
 
     const resetAll = () => {
         if (defaultData) {

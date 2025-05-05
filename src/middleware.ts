@@ -45,9 +45,9 @@ export async function middleware(request: NextRequest, response: NextResponse) {
 
     const res = await meResponse.json();
 
-    if (!res.isSubscribed && !pathname.startsWith("/checkout")) {
-      return NextResponse.rewrite(new URL('/subscription/', request.url));
-    }
+    // if (!res.isSubscribed && !pathname.startsWith("/checkout")) {
+    //   return NextResponse.rewrite(new URL('/subscription/', request.url));
+    // }
 
     return NextResponse.next();
   }

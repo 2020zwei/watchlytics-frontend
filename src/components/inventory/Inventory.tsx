@@ -75,7 +75,7 @@ const Inventory = () => {
     }
     const handleDelete = (row: any) => {
         const PAYLOAD: RequestTypes = {
-            url: `${URLS.DELETEPRODUCT}/${row?.id}/`,
+            url: `${URLS.DELETE_PRODUCT}/${row?.id}/`,
             method: METHODS.DELETE,
         }
         sendRequest(PAYLOAD).then((res) => {
@@ -97,7 +97,7 @@ const Inventory = () => {
         const formData = new FormData();
         formData.append("excel_file", file);
         const PAYLOAD: RequestTypes = {
-            url: URLS.UPLOADPORODUCTS,
+            url: URLS.UPLOAD_PORODUCTS,
             method: METHODS.POST,
             payload: formData,
         }

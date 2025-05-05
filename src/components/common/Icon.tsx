@@ -32,7 +32,7 @@ const Icon: React.FC<PropsTypes> = ({ name, fill, className, stroke, size = "2em
             </svg>
         ),
         caret: (
-            <svg height="20" width="20" viewBox="0 0 20 20" focusable="false" className={`min-w-5 mx-2 transition-transform ${className} `}>
+            <svg height="20" width="20" viewBox="0 0 20 20" focusable="false" className={`min-w-5 transition-transform ${className} `}>
                 <path d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z" fill={fill}></path>
             </svg>
         ),
@@ -242,6 +242,12 @@ const Icon: React.FC<PropsTypes> = ({ name, fill, className, stroke, size = "2em
                         <rect width="20" height="20" fill="white" transform="translate(2 2)" />
                     </clipPath>
                 </defs>
+            </svg>
+
+        ),
+        notes: (
+            <svg width="14" height="18" viewBox="0 0 14 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 10.5H10M4 7.5H5.5M4 13.5H7M5.5 2.25H2.5C2.10218 2.25 1.72064 2.40804 1.43934 2.68934C1.15804 2.97064 1 3.35218 1 3.75V15C1 15.3978 1.15804 15.7794 1.43934 16.0607C1.72064 16.342 2.10218 16.5 2.5 16.5H11.5C11.8978 16.5 12.2794 16.342 12.5607 16.0607C12.842 15.7794 13 15.3978 13 15V3.75C13 3.35218 12.842 2.97064 12.5607 2.68934C12.2794 2.40804 11.8978 2.25 11.5 2.25H8.875M5.5 2.25V0.75M5.5 2.25V3.75" stroke="#ACACAC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
 
         ),

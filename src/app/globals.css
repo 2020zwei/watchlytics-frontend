@@ -75,6 +75,18 @@ body .searchbale-select__control {
 body .searchbale-select__control--is-focused{
   @apply !border-gray-70 !shadow-none
 }
+.filter-option1{
+  @apply min-w-[122px]
+}
+.filter-option2{
+  @apply min-w-[145px]
+}
+.filter-option3{
+  @apply min-w-[130px]
+}
+.filter-option4{
+  @apply min-w-[124px]
+}
 @media(max-width:500px){
 
   .inventory-btns li button{

@@ -11,9 +11,9 @@ interface PrimaryButtonProps extends ButtonProps {
     icon?: string,
     iconPosition?: "left" | "right",
     iconClass?: string,
-    iconFill?: "",
-    iconStroke?: "",
-    iconSize?: "",
+    iconFill?:string,
+    iconStroke?:string,
+    iconSize?: string,
 }
 
 export const TransparentButton = ({ title, className = "text-white", radius = "sm", size = "lg", color = "primary",
