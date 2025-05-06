@@ -30,6 +30,8 @@ interface FormFieldProps extends StyleProps {
     type?: string;
     fieldType?: "input" | "textarea" | "select" | string;
     options?: Option[];
+    min?:any,
+    max?:any
 
 }
 
@@ -53,7 +55,8 @@ const FormField: React.FC<FormFieldProps> = ({
     iconSize = "1.2rem",
     onPasswordToggle = () => { },
     options = [],
-    isDisabled = false
+    isDisabled = false,
+    ...rest
 }) => {
 
     return (
@@ -77,6 +80,7 @@ const FormField: React.FC<FormFieldProps> = ({
                         control={control}
                         defaultValue=""
                         render={({ field }) => {
+                            console.log(field)
                             switch (fieldType) {
                                 case "textarea":
                                     return (
@@ -118,12 +122,13 @@ const FormField: React.FC<FormFieldProps> = ({
                                                 ref={field.ref}
                                                 placeholder={placeholder}
                                                 disabled={isDisabled}
+                                                {...rest}
                                                 className={clsx(
                                                     "text-base focus-within:outline-blue-500 text-dark-300 placeholder:text-gray-170 border border-gray-70 shadow-md rounded-lg px-3 min-h-11 w-full",
-                                                    inputClass,
+                                                    inputClass, type === "date" && !field.value ? "text-gray-170" : "",
                                                     errors[name] ? "border-red-800" : field.value ? "border-green-600" : ""
                                                 )}
-                                            
+
                                             />
                                             {type === "date" && (
                                                 <button
