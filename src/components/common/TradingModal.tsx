@@ -8,7 +8,7 @@ import Heading from "./heading";
 
 interface TradingModalTypes {
     modalTile: string,
-    data: []
+    data: any
 }
 
 const TradingModal: React.FC<TradingModalTypes> = ({ modalTile, data }) => {
@@ -39,19 +39,24 @@ const TradingModal: React.FC<TradingModalTypes> = ({ modalTile, data }) => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr className="text-gray-650 font-medium text-sm border-b border-r-gray-200">
-                                                <td className="text-start py-4">
-                                                    <div className="flex items-center">
-                                                        <div>image</div>
-                                                        <span>Panerai</span>
-                                                    </div>
-                                                </td>
-                                                <td className="py-4">Carter Press</td>
-                                                <td className="py-4">05</td>
-                                                <td className="py-4">$72,700</td>
-                                                <td className="py-4">$14,540</td>
-                                                <td className="text-end py-4">$15,840</td>
-                                            </tr>
+                                            {
+                                                data?.map((item: any) => (
+                                                    <tr className="text-gray-650 font-medium text-sm border-b border-r-gray-200">
+                                                        <td className="text-start py-4">
+                                                            <div className="flex items-center gap-1 ">
+                                                                <div className="w-8 h-8 p-[3px] !bg-gray-80">
+                                                                    <img src={item?.product_details?.image} alt="image" className="rounded w-full h-full" />
+                                                                </div>
+                                                                <span>{item?.product_details?.product_name}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="py-4">{item?.buyer_name}</td>
+                                                        <td className="py-4">{item?.quantity}</td>
+                                                        <td className="py-4">{item?.purchase_price}</td>
+                                                        <td className="py-4">{item?.sale_price}</td>
+                                                        <td className="text-end py-4">{item?.sale_price}</td>
+                                                    </tr>
+                                                ))}
                                         </tbody>
                                     </table>
                                 </div>

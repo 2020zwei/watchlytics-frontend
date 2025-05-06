@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { isTokenValid } from "./utils/isTokenValid";
-const baseUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/me/`
+const baseURL = process.env.NEXT_PUBLIC_FRONTEND_BASE_URL
 const publicRoutes = [
   "/login",
   "/sign-up",
@@ -20,24 +20,23 @@ export async function middleware(request: NextRequest, response: NextResponse) {
 
   const isInvalidToken = token && !isTokenValid(token);
 
-  // Allow public routes if token is valid or not
+  if (token && isPublicRoute) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
   if (!isInvalidToken && isPublicRoute) {
     return NextResponse.next();
   }
 
-  // Redirect unauthenticated or invalid token to login
   if ((isInvalidToken || (!token && isPrivateRoute)) && !isLoginPage) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Redirect logged-in users from "/" to "/dashboard"
   if (token && isRootPath) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  // Handle subscription check for authenticated private routes
   if (token && isPrivateRoute) {
-    const meResponse = await fetch('http://localhost:3000/api/me', {
+    const meResponse = await fetch(`${baseURL}/api/me`, {
       headers: {
         Cookie: `access_token=${token}`,
       },
@@ -45,9 +44,9 @@ export async function middleware(request: NextRequest, response: NextResponse) {
 
     const res = await meResponse.json();
 
-    // if (!res.isSubscribed && !pathname.startsWith("/checkout")) {
-    //   return NextResponse.rewrite(new URL('/subscription/', request.url));
-    // }
+    if (!res.isSubscribed && !pathname.startsWith("/checkout")) {
+      return NextResponse.rewrite(new URL('/subscription/', request.url));
+    }
 
     return NextResponse.next();
   }

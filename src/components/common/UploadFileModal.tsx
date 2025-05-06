@@ -46,9 +46,11 @@ export default function UploadFileModal({
                                 <input
                                     id="file-upload"
                                     type="file"
+                                    accept=".xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                                     className="hidden"
                                     onChange={(e) => setFile(e.target.files?.[0])}
                                 />
+
                             </label>
                         </ModalBody>
 
