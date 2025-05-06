@@ -1,9 +1,10 @@
 import AddTrading from '@/components/AddTrading'
+import LoaderWidget from '@/components/common/LoaderWidget'
 import React, { Suspense } from 'react'
 
 const page = () => {
     return (
-        <Suspense fallback={<div className='h-screen w-full flex items-center justify-center'>Loading...</div>}>
+        <Suspense fallback={<LoaderWidget/>}>
             <AddTrading />
         </Suspense>
     )

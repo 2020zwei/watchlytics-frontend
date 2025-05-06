@@ -87,6 +87,9 @@ body .searchbale-select__control--is-focused{
 .filter-option4{
   @apply min-w-[124px]
 }
+.searchbale-select__value-container--is-multi{
+  @apply !flex-nowrap
+}
 @media(max-width:500px){
 
   .inventory-btns li button{

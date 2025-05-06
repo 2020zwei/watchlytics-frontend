@@ -21,6 +21,8 @@ import clsx from "clsx";
 import { sendRequest } from "@/utils/apis";
 import { METHODS, URLS } from "@/utils/constants";
 import { toast } from "react-toastify";
+import { formatDate } from "@/utils/dateFormater";
+
 
 type FormSchemaType = z.infer<typeof InventoryFormSchema>;
 
@@ -57,11 +59,19 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
     const onFormSubmit = (data: FormSchemaType) => {
         setSubmitting(true);
         const formData = new FormData();
+
+
         Object.keys(data).forEach((key) => {
+            let value = data[key as keyof typeof data];
+
+            if (key === "date_sold" || key === "date_purchased") {
+                value = formatDate(value);
+            }
+
             // @ts-ignore
-            let value = data[key];
             formData.append(key, value);
         });
+
 
         if (!fileMeta?.file) {
             formData.delete("image");
@@ -94,16 +104,19 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
 
     useEffect(() => {
         if (defaultData) {
-            // reset(defaultData);
+            const prefill = {
+                ...defaultData,
+                availability: defaultData.availability || "in_stock",
+                condition: defaultData.condition || "new",
+            };
 
-            const formattedDateSold = defaultData?.date_sold
-                ? defaultData.date_sold.slice(0, 10)
-                : new Date().toISOString().slice(0, 10);
+            Object.entries(prefill).forEach(([key, value]) => {
+                setValue(key as keyof FormSchemaType, value);
+            });
 
-            setValue("date_sold", "02/05/2025");
             trigger();
         }
-    }, [defaultData, reset, trigger, setValue]);
+    }, [defaultData, setValue, trigger]);
 
 
     const resetAll = () => {
