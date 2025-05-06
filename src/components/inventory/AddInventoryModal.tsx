@@ -186,20 +186,36 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
 
                                     <div className="pt-4">
                                         <fieldset className="flex flex-col gap-6">
-                                            {InventoryFormFields.map((field) => (
-                                                <FormField
-                                                    fieldType={field.fieldType}
-                                                    key={field.label}
-                                                    type={field?.type}
-                                                    label={field.label}
-                                                    name={field.name}
-                                                    control={control}
-                                                    placeholder={field.placeholder}
-                                                    errors={errors}
-                                                    // @ts-ignore
-                                                    options={field.fieldType === "select" ? dropdwonOptions?.[field?.name] : undefined}
-                                                />
-                                            ))}
+                                            {InventoryFormFields.map((field) => {
+                                                const purchaseDate = watch("date_purchased");
+
+                                                return (
+                                                    <FormField
+                                                        fieldType={field.fieldType}
+                                                        key={field.label}
+                                                        type={field?.type}
+                                                        label={field.label}
+                                                        name={field.name}
+                                                        control={control}
+                                                        placeholder={field.placeholder}
+                                                        min={
+                                                            field.name === "date_sold" && purchaseDate
+                                                                ? purchaseDate
+                                                                : field.name === "date_purchased"
+                                                                    ? undefined
+                                                                    : undefined
+                                                        }
+                                                        errors={errors}
+                                                        options={
+                                                            field.fieldType === "select"
+                                                                // @ts-ignore
+                                                                ? dropdwonOptions?.[field?.name]
+                                                                : undefined
+                                                        }
+                                                    />
+                                                );
+                                            })}
+
                                         </fieldset>
                                     </div>
                                 </RoundedBox>

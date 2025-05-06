@@ -238,13 +238,12 @@ const availabilityEnum = z.enum(["in_stock", "sold", "reserved", "in_repair"]);
 const conditionEnum = z.enum(["new", "used"]);
 
 export const InventoryFormSchema = z.object({
-    product_name: z.string().max(200, "Max 200 characters"),
+    product_name: z.string().min(3, "Product name is required").max(200, "Max 200 characters"),
     product_id: z.string().max(50, "Max 50 characters"),
     category: z.union([z.string(), z.number()]),
     availability: availabilityEnum.default("in_stock"),
     buying_price: z.coerce.number(),
     quantity: z.coerce.number().int().default(1),
-    // date_purchased: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     date_purchased: z.preprocess(
         (val) => (typeof val === "string" ? new Date(val) : val),
         z.date({ required_error: "Purchase date is required" })
@@ -262,12 +261,11 @@ export const InventoryFormSchema = z.object({
     profit_margin: z.coerce.number().nullable().optional(),
     profit: z.coerce.number().nullable().optional(),
     unit: z.string().nullable().optional(),
-    // date_sold: z.date({ required_error: "Sale date is required" }),
     date_sold: z.preprocess(
         (val) => (typeof val === "string" ? new Date(val) : val),
         z.date({ required_error: "Sale date is required" })
-      ),
-      
+    ),
+
     source_of_sale: z.string().nullable().optional(),
     delivery_content: z.string().nullable().optional(),
     condition: conditionEnum.default("new").nullable().optional(),
@@ -285,11 +283,11 @@ export const InventoryFormSchema = z.object({
         }, { message: "Image is required" }),
     serial_number: z.string().nullable().optional(),
 }).refine((data) => {
-    if (!data.date_sold) return true; // allow if date_sold is not provided
+    if (!data.date_sold) return true;
     return new Date(data.date_purchased) < new Date(data.date_sold);
 }, {
     message: "Date Purchased must be less than Date Sold",
-    path: ["date_sold"], // target field for the error
+    path: ["date_sold"],
 });
 
 

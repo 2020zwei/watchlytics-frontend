@@ -300,9 +300,9 @@ const Inventory = () => {
                                 </table>
                             </div>
                             {
-                                products?.count > 30 ?
+                                products?.count > 20 ?
                                     <Pagination
-                                        totalPages={Math.ceil(products?.count / 30)}
+                                        totalPages={Math.ceil(products?.count / 20)}
                                         currentPage={currentPage}
                                         onPageChange={(page) => setCurrentPage(page)}
                                     /> : null}
