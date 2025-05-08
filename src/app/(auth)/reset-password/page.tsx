@@ -102,7 +102,7 @@ export default function SignIn() {
   const handleConfirmPasswordBlur = () => setConfirmPasswordTouched(true);
 
   return (
-    <div className="w-full md:w-[56.5%] flex justify-center items-center">
+    <div className="flex justify-center items-center">
       <div className="w-full max-w-xl mx-auto">
         <div className="">
           <div className="flex items-center mb-8">

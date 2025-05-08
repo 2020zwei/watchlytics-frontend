@@ -356,7 +356,7 @@ export default function SignIn() {
   }, [])
 
   return (
-    <div className="w-full lg:w-[56.5%] flex justify-center items-center justify-center-center">
+    <div className="flex justify-center items-center justify-center-center">
       <div className="w-full max-w-xl mx-auto">
         <div className="flex items-center mb-8">
           <div className="w-6 h-6 rounded-full flex items-center justify-center mr-2">
@@ -369,7 +369,6 @@ export default function SignIn() {
         <h1 className="text-[2.5rem] font-bold mb-8 text-[#1E293B]">Sign In</h1>
 
         <Form
-          className="space-y-4"
           validationErrors={errors}
           // onReset={() => setSubmitted(null)}
           onSubmit={onSubmit}
@@ -456,7 +455,7 @@ export default function SignIn() {
               Sign In
             </Button>
 
-            <div className="text-center mt-6 text-sm text-gray-600">
+            <div className="text-center w-full text-sm text-gray-600">
               Don’t have an account?{" "}
               <Link
                 href="/sign-up"

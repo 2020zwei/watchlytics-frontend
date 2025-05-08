@@ -239,7 +239,7 @@ export default function SignIn() {
   };
 
   return (
-    <div className="w-full md:w-[56.5%] flex justify-center items-center">
+    <div className="flex justify-center items-center">
       <div className="w-full max-w-xl mx-auto">
         <div className="">
           {/* Logo and brand */}
