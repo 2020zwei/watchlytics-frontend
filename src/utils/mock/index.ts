@@ -10,7 +10,7 @@ export const InventoryFormFields = [
     {
         "label": "Reference Number",
         "name": "product_id",
-        "placeholder": "Enter product category",
+        "placeholder": "Enter reference number",
         "fieldType": "input"
     },
     {
