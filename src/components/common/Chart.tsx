@@ -10,24 +10,21 @@ import {
     Legend,
     ResponsiveContainer,
 } from "recharts";
-import React, {useState } from "react";
+import React, { useEffect, useState } from "react";
 import RoundedBox from "./baseButton/RoundedBox";
 import Heading from "./heading";
 import Icon from "./Icon";
+import ReportFilters from "./ReportFilters";
+import { usePathname } from "next/navigation";
 
 const data = [
-    { month: "Jan", purchase: 4000, sale: 2400 },
-    { month: "Feb", purchase: 3000, sale: 1398 },
-    { month: "Mar", purchase: 2000, sale: 9800 },
-    { month: "Apr", purchase: 2780, sale: 3908 },
-    { month: "May", purchase: 1890, sale: 4800 },
-    { month: "Jun", purchase: 2390, sale: 3800 },
-    { month: "Jul", purchase: 3490, sale: 4300 },
-    { month: "Aug", purchase: 4000, sale: 2400 },
-    { month: "Sep", purchase: 3000, sale: 1398 },
-    { month: "Oct", purchase: 2000, sale: 9800 },
-    { month: "Nov", purchase: 2780, sale: 3908 },
-    { month: "Dec", purchase: 1890, sale: 4800 },
+    { month: "Sep", sales: 125000, purchase: 1000 },
+    { month: "Oct", sales: 125000, purchase: 10300 },
+    { month: "Nov", sales: 12400, purchase: 100000 },
+    { month: "Dec", sales: 125000, purchase: 100000 },
+    { month: "Jan", sales: 125000, purchase: 120000 },
+    { month: "Feb", sales: 125000, purchase: 1300 },
+    { month: "Mar", sales: 100, purchase: 1500 },
 ];
 
 const COLORS: Record<string, string> = {
@@ -45,6 +42,8 @@ interface ChartProps {
 
 const Chart: React.FC<ChartProps> = () => {
     const [isProfitChart, setIsProfitChart] = useState<boolean>(true)
+    const [selected, setSelected] = useState("Inventory Valuation Report")
+    const pathname = usePathname();
     const [visibleLines, setVisibleLines] = useState({
         purchase: true,
         sale: true,
@@ -57,8 +56,18 @@ const Chart: React.FC<ChartProps> = () => {
         }));
     };
 
+    useEffect(() => {
+        const match = pathname.startsWith("/reports/");
+        if (match) {
+            const slug = pathname.split("/reports/")[1]?.replaceAll("-", " ");
+            if (slug) {
+                setSelected(slug);
+            }
+        }
+    }, [pathname]);
+
     const renderCustomLegend = () => (
-        <div className="flex gap-6 px-4 pb-2  justify-center">
+        <div className="flex gap-6 px-4 pb-2  justify-center pt-5">
             {Object.entries(isProfitChart ? LOSTCHARTCOLORS : COLORS).map(([key, color]) => (
                 <div
                     key={key}
@@ -87,34 +96,30 @@ const Chart: React.FC<ChartProps> = () => {
         <div>
             <div className='flex items-center justify-between mb-4'>
                 <Heading as='h3' className=' md:text-2xl text-lg'>
-                    {isProfitChart ? "Purchase & Sales Report" : "Profit & Loss Report"}
+                    {/* {isProfitChart ? "Purchase & Sales Report" : "Profit & Loss Report"} */}
+                    {selected}
                 </Heading>
-                <div className='border rounded-lg border-gray-200 md:px-5 px-3'>
-                    <select onChange={(e) => setIsProfitChart(e.target.value === "1")}className=' bg-transparent outline-none text-sm text-gray-650 min-h-10 md:pe-6 pe-3 md:min-w-[290px]'>
-                        <option value="1">Purchase & Sales Report</option>
-                        <option value="0">Monthly Profit & Loss Chart</option>
-                    </select>
-                </div>
+                <ReportFilters />
             </div>
             <RoundedBox className="w-full h-[calc(100vh-170px)] pb-5">
                 <div className="flex items-center justify-between px-4 pb-10 pt-4">
-                    <Heading>{isProfitChart ? "Purchase  & Sale" : "Profit & Losss"}</Heading>
+                    <Heading>{selected}</Heading>
                     <div className="min-w-[140px] min-h-8 px-4 gap-3 border rounded-xl flex items-center justify-between">
                         <span><Icon name="calener" /></span>
-                        <select name="" id="" className=" outline-none flex-1 text-sm font-medium text-dark-700">
+                        <select onChange={() => setIsProfitChart(!isProfitChart)} name="" id="" className=" outline-none flex-1 text-sm font-medium text-dark-700">
                             <option value="weekly">Weekly</option>
                             <option value="monthly">Monthly</option>
                         </select>
                     </div>
                 </div>
-                <ResponsiveContainer width="100%" height="80%">
+                <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                         data={data}
-                        margin={{ top: 10, right: 20, left: 10, bottom: 10 }}
+                        margin={{ top: 10, right: 30, left: 0, bottom: 90 }}
                     >
                         <CartesianGrid strokeDasharray="0 0" vertical={false} strokeOpacity={0.4} />
-                        <XAxis dataKey="month" tick={{ fontSize: 14, fill: "#858D9D" }} axisLine={false} tickLine={false} />
-                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 14, fill: "#858D9D" }} />
+                        <XAxis dataKey="month" tick={{ fontSize: 14, fill: "#858D9D" }} padding={{ right: 0, left: 0 }} tickMargin={20} axisLine={false} tickLine={false} />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 14, fill: "#858D9D" }} domain={['dataMin - 100', 'dataMax']} />
                         <Tooltip />
                         <Legend content={renderCustomLegend} />
                         {visibleLines.purchase && (

@@ -1,34 +1,17 @@
 "use client"
 import RoundedBox from '@/components/common/baseButton/RoundedBox'
 import Heading from '@/components/common/heading'
-import { REPORTFILTEROPTIONS } from '@/utils/mock'
-import { useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
 import Pagination from './common/Pagination'
-import { useAppContext } from '@/providers/AppContextProvider'
+import ReportFilters from './common/ReportFilters'
 
 const Reports = () => {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const handleFilter = (value: string) => {
-        const currentParams = new URLSearchParams(searchParams.toString());
-        currentParams.set('filter', value);
-        router.push(`/reports?${currentParams.toString().replace(/ /g, '-')}`);
-    };
 
     return (
         <div className='flex flex-col gap-5'>
             <div className='flex sm:flex-row flex-col items-center sm:justify-between'>
                 <Heading as='h3' className=' md:text-2xl text-lg w-full'>Inventory Valuation Report</Heading>
-                <div className='border rounded-lg border-gray-200 md:px-5 px-3 ms-auto text-end'>
-                    <select onChange={(e) => handleFilter(e.target.value)} className="bg-transparent outline-none text-sm text-center text-gray-650 min-h-10 md:pe-6 pe-3 md:min-w-[290px] p-3">
-                        {REPORTFILTEROPTIONS.map((opt) => (
-                            <option key={opt} value={opt}>
-                                {opt}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                <ReportFilters />
             </div>
             <div className='grid md:grid-cols-2 gap-5 mt-4 report-cards'>
                 {/* cards */}

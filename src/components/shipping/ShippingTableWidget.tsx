@@ -11,7 +11,7 @@ const ShippingTableWidget = () => {
         <RoundedBox>
             <div className='flex items-center justify-between px-5 pt-7 pb-3'>
                 <Heading>Shipping Activities</Heading>
-                <Link href="/add-trading"
+                <Link href="/add-shipping"
                     className="h-10 px-3 text-sm font-medium flex items-center justify-between text-white rounded-lg bg-blue-gradient"
                 >Add New Shipping</Link>
             </div>

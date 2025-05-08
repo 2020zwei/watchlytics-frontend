@@ -8,7 +8,7 @@ export const InventoryFormFields = [
         "fieldType": "input"
     },
     {
-        "label": "Product ID",
+        "label": "Reference Number",
         "name": "product_id",
         "placeholder": "Enter product category",
         "fieldType": "input"
@@ -133,14 +133,6 @@ export const InventoryFormFields = [
         "placeholder": "Enter Unit",
         "fieldType": "input"
     },
-
-    {
-        "label": "Hold Time",
-        "name": "hold_time",
-        "placeholder": "Enter Hold Time",
-        "fieldType": "input",
-        "type": "number"
-    },
     {
         "label": "Source of Sale",
         "name": "source_of_sale",
@@ -238,12 +230,28 @@ const availabilityEnum = z.enum(["in_stock", "sold", "reserved", "in_repair"]);
 const conditionEnum = z.enum(["new", "used"]);
 
 export const InventoryFormSchema = z.object({
-    product_name: z.string().min(3, "Product name is required").max(200, "Max 200 characters"),
-    product_id: z.string().max(50, "Max 50 characters"),
+    product_name: z
+        .string()
+        .nonempty("Product name is required")
+        .min(3, "Product name must be at least 3 characters")
+        .max(200, "Max 200 characters"),
+
+    product_id: z
+        .string()
+        .nonempty("Reference number is required")
+        .min(3, "Reference ID must be at least 3 characters")
+        .max(50, "Max 50 characters"),
+
     category: z.union([z.string(), z.number()]),
+
     availability: availabilityEnum.default("in_stock"),
-    buying_price: z.coerce.number(),
+
+    buying_price: z
+        .coerce.number()
+        .min(0.01, "Buying price is required"),
+
     quantity: z.coerce.number().int().default(1),
+
     date_purchased: z.preprocess(
         (val) => (typeof val === "string" ? new Date(val) : val),
         z.date({ required_error: "Purchase date is required" })
@@ -251,16 +259,34 @@ export const InventoryFormSchema = z.object({
 
     shipping_price: z.coerce.number().nullable().optional(),
     repair_cost: z.coerce.number().nullable().optional(),
-    hold_time: z.coerce.number().int().min(1, "Hold time is required"),
-    fees: z.coerce.number().min(1, "Fees is required"),
-    commission: z.coerce.number().min(1, "Commission is required"),
-    msrp: z.coerce.number().min(1, "MSRP is required"),
-    website_price: z.coerce.number().min(1, "Whole price is required"),
+
+    hold_time: z
+        .coerce.number()
+        .int()
+        .min(1, "Hold time is required"),
+
+    fees: z
+        .coerce.number()
+        .min(1, "Fees is required"),
+
+    commission: z
+        .coerce.number()
+        .min(1, "Commission is required"),
+
+    msrp: z
+        .coerce.number()
+        .min(1, "MSRP is required"),
+
+    website_price: z
+        .coerce.number()
+        .min(1, "Whole price is required"),
+
     sold_price: z.coerce.number().nullable().optional(),
     whole_price: z.coerce.number().nullable().optional(),
     profit_margin: z.coerce.number().nullable().optional(),
     profit: z.coerce.number().nullable().optional(),
     unit: z.string().nullable().optional(),
+
     date_sold: z.preprocess(
         (val) => (typeof val === "string" ? new Date(val) : val),
         z.date({ required_error: "Sale date is required" })
@@ -272,6 +298,7 @@ export const InventoryFormSchema = z.object({
     purchased_from: z.string().nullable().optional(),
     sold_source: z.string().nullable().optional(),
     listed_on: z.string().nullable().optional(),
+
     image: z
         .union([
             z.instanceof(File),
@@ -281,6 +308,7 @@ export const InventoryFormSchema = z.object({
             if (val instanceof File) return val.size > 0;
             return typeof val === "string" && val.length > 0;
         }, { message: "Image is required" }),
+
     serial_number: z.string().nullable().optional(),
 }).refine((data) => {
     if (!data.date_sold) return true;
@@ -289,6 +317,7 @@ export const InventoryFormSchema = z.object({
     message: "Date Purchased must be less than Date Sold",
     path: ["date_sold"],
 });
+
 
 
 export const ProfileFormSchema = z.object({
@@ -345,11 +374,11 @@ export const SidebarItems = [
         "label": "Reports",
         "icon": "report"
     },
-    // {
-    //     "href": "/customers",
-    //     "label": "Customers",
-    //     "icon": "user"
-    // },
+    {
+        "href": "/customers",
+        "label": "Customers",
+        "icon": "user"
+    },
     {
         "href": "/shipping",
         "label": "Shipping",
@@ -361,11 +390,11 @@ export const SidebarItems = [
         "icon": "trade",
         "matchPaths": ["/trading", "/add-trading", "/edit-trading"]
     },
-    // {
-    //     "href": "/invoices",
-    //     "label": "Invoices",
-    //     "icon": "/hugeicons_invoice-04.svg"
-    // },
+    {
+        "href": "/invoices",
+        "label": "Invoices",
+        "icon": "trade"
+    },
     {
         "href": "/profile",
         "label": "Settings",
@@ -399,5 +428,281 @@ export const conditions = [
     { "value": "new", "label": "New" },
     { "value": "used", "label": "Used" }
 ];
+
+
+export const RecipientInformationFields = [
+    {
+        "label": "Search:",
+        "name": "search",
+        "placeholder": "Search...",
+        "fieldType": "input",
+        "type": "text",
+        "isSearch":true
+    },
+    {
+        "label": "Contact name:",
+        "name": "contact_name",
+        "placeholder": "Enter contact name",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "Address:",
+        "name": "address",
+        "placeholder": "Enter Address",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "Suite, Apt or FL#:",
+        "name": "suite_apt_or_fL",
+        "placeholder": "Enter Suite, Apt or FL",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "Zip:",
+        "name": "zip",
+        "placeholder": "Enter Zip",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "City:",
+        "name": "city",
+        "placeholder": "Enter City",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "State:",
+        "name": "state",
+        "placeholder": "Select State",
+        "fieldType": "select"
+    },
+    {
+        "label": "Country:",
+        "name": "country",
+        "placeholder": "Select Country",
+        "fieldType": "select"
+    },
+    {
+        "label": "Phone:",
+        "name": "phone",
+        "placeholder": "Enter Phone",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "",
+        "name": "",
+        "placeholder": "Enter",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "Email:",
+        "name": "email",
+        "placeholder": "Enter Email",
+        "fieldType": "input",
+        "type": "email"
+    },
+]
+export const PackageFields = [
+    {
+        "label": "Packaging type:",
+        "name": "packaging_type",
+        "placeholder": "Select Packaging Pype",
+        "fieldType": "select"
+    },
+    {
+        "label": "Type of Service:",
+        "name": "type_of_service",
+        "placeholder": "Select Type of Service",
+        "fieldType": "select"
+    },
+    {
+        "label": "Payment Type:",
+        "name": "payment_type",
+        "placeholder": "Select Payment Type",
+        "fieldType": "select"
+    },
+    {
+        "label": "Pickup Date:",
+        "name": "pickup_date",
+        "placeholder": "Enter Pickup Date",
+        "fieldType": "input",
+        "type": "date"
+    },
+    {
+        "label": "Issued Value:",
+        "name": "issued_value:",
+        "placeholder": "Issued Value",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "Package Weight:",
+        "name": "package_weight",
+        "placeholder": "Enter Package Weight",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "Signature Options:",
+        "name": "signature_options",
+        "placeholder": "Select Signature Options",
+        "fieldType": "select"
+    },
+    {
+        "label": "Hold for Pickup?",
+        "name": "hold_for_pickup",
+        "placeholder": "HAL",
+        "fieldType": "input",
+        "type": "checkbox"
+    },
+    {
+        "label": "Residential?",
+        "name": "residential",
+        "placeholder": "HAL",
+        "fieldType": "input",
+        "type": "checkbox"
+    },
+    {
+        "label": "Estimated Cost:",
+        "name": "estimated_cost",
+        "placeholder": "Enter Estimated Cost",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "Reference:",
+        "name": "reference",
+        "placeholder": "Enter Reference",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "Label Format Type:",
+        "name": "label_format_type",
+        "placeholder": "Enter Label Format Type",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "Generate Label on Save?",
+        "name": "generate_label_on_save",
+        "placeholder": "",
+        "fieldType": "input",
+        "type": "checkbox"
+    },
+    {
+        "label": "Display Receipt?",
+        "name": "display_receipt",
+        "placeholder": "",
+        "fieldType": "input",
+        "type": "checkbox"
+    },
+    {
+        "label": "Schedule a pickup?",
+        "name": "schedule_pickup",
+        "placeholder": "",
+        "fieldType": "input",
+        "type": "checkbox"
+    },
+]
+export const SenderFields = [
+    {
+        "label": "Search:",
+        "name": "sender_search",
+        "placeholder": "Search...",
+        "fieldType": "input",
+        "type": "text",
+        "isSearch":true
+    },
+    {
+        "label": "Select Address:",
+        "name": "sender_address",
+        "placeholder": "Select Address",
+        "fieldType": "select"
+    },
+    {
+        "label": "Company Name:",
+        "name": "sender_company_name",
+        "placeholder": "Enter Company Name",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "Name of Label:",
+        "name": "sender_name_of_label",
+        "placeholder": "Enter Name of Label",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "Your Name:",
+        "name": "sender_name",
+        "placeholder": "Enter Your Name",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "Address:",
+        "name": "sender_secondary_address",
+        "placeholder": "Enter Address",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "Suite, Apt or FL#:",
+        "name": "sender_suite_apt_or_fL",
+        "placeholder": "Enter Suite, Apt or FL",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "Zip:",
+        "name": "sender_zip",
+        "placeholder": "Enter Zip",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "City:",
+        "name": "sender_city",
+        "placeholder": "Enter City",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "State:",
+        "name": "sender_state",
+        "placeholder": "Select State",
+        "fieldType": "select"
+    },
+    {
+        "label": "Country:",
+        "name": "sender_country",
+        "placeholder": "Select Country",
+        "fieldType": "select"
+    },
+    {
+        "label": "Phone:",
+        "name": "sender_phone",
+        "placeholder": "Enter Phone",
+        "fieldType": "input",
+        "type": "text"
+    },
+    {
+        "label": "Email:",
+        "name": "sender_Email",
+        "placeholder": "Enter Email",
+        "fieldType": "input",
+        "type": "email"
+    },
+
+    
+]
 
 
