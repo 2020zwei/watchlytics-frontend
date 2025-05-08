@@ -107,6 +107,13 @@ export const InventoryFormFields = [
         "fieldType": "input"
     },
     {
+        "label": "Year",
+        "name": "year",
+        "placeholder": "Enter Year",
+        "fieldType": "input",
+        "type": "number"
+    },
+    {
         "label": "Website Price",
         "name": "website_price",
         "placeholder": "Enter Website Price",
@@ -235,6 +242,10 @@ export const InventoryFormSchema = z.object({
         .nonempty("Product name is required")
         .min(3, "Product name must be at least 3 characters")
         .max(200, "Max 200 characters"),
+    year: z
+        .string()
+        .min(1, "Year is required")
+        .max(200, "Max 10 characters"),
 
     product_id: z
         .string()
@@ -244,57 +255,72 @@ export const InventoryFormSchema = z.object({
 
     category: z.union([z.string(), z.number()]),
 
-    availability: availabilityEnum.default("in_stock"),
+    availability: z.preprocess(
+        (val) => (val === "" ? undefined : val),
+        availabilityEnum.optional().default("in_stock")
+    ),
 
     buying_price: z
         .coerce.number()
         .min(0.01, "Buying price is required"),
 
-    quantity: z.coerce.number().int().default(1),
+    quantity: z.coerce.number().int().default(1).nullable().optional(),
 
     date_purchased: z.preprocess(
-        (val) => (typeof val === "string" ? new Date(val) : val),
-        z.date({ required_error: "Purchase date is required" })
+        (val) => {
+            if (typeof val === "string") {
+                const date = new Date(val);
+                return isNaN(date.getTime()) ? undefined : date;
+            }
+            return val;
+        },
+        z.date({
+            required_error: "Purchase date is required",
+            invalid_type_error: "Invalid date format",
+        })
     ),
 
     shipping_price: z.coerce.number().nullable().optional(),
     repair_cost: z.coerce.number().nullable().optional(),
 
-    hold_time: z
-        .coerce.number()
-        .int()
-        .min(1, "Hold time is required"),
+
 
     fees: z
-        .coerce.number()
-        .min(1, "Fees is required"),
+        .coerce.number().optional(),
 
     commission: z
-        .coerce.number()
-        .min(1, "Commission is required"),
+        .coerce.number().optional(),
 
     msrp: z
-        .coerce.number()
-        .min(1, "MSRP is required"),
+        .coerce.number().optional(),
 
     website_price: z
-        .coerce.number()
-        .min(1, "Whole price is required"),
+        .coerce.number().optional(),
 
     sold_price: z.coerce.number().nullable().optional(),
     whole_price: z.coerce.number().nullable().optional(),
     profit_margin: z.coerce.number().nullable().optional(),
     profit: z.coerce.number().nullable().optional(),
     unit: z.string().nullable().optional(),
-
     date_sold: z.preprocess(
-        (val) => (typeof val === "string" ? new Date(val) : val),
-        z.date({ required_error: "Sale date is required" })
+        (val) => {
+            if (typeof val === "string") {
+                const date = new Date(val);
+                return isNaN(date.getTime()) ? undefined : date;
+            }
+            return val;
+        },
+        z.date({
+            required_error: "Sale date is required",
+            invalid_type_error: "Invalid date format",
+        })
     ),
-
     source_of_sale: z.string().nullable().optional(),
     delivery_content: z.string().nullable().optional(),
-    condition: conditionEnum.default("new").nullable().optional(),
+    condition: z.preprocess(
+        (val) => (val === "" ? undefined : val),
+        conditionEnum.optional().default("new")
+    ),
     purchased_from: z.string().nullable().optional(),
     sold_source: z.string().nullable().optional(),
     listed_on: z.string().nullable().optional(),
@@ -437,7 +463,7 @@ export const RecipientInformationFields = [
         "placeholder": "Search...",
         "fieldType": "input",
         "type": "text",
-        "isSearch":true
+        "isSearch": true
     },
     {
         "label": "Contact name:",
@@ -618,7 +644,7 @@ export const SenderFields = [
         "placeholder": "Search...",
         "fieldType": "input",
         "type": "text",
-        "isSearch":true
+        "isSearch": true
     },
     {
         "label": "Select Address:",
@@ -702,7 +728,7 @@ export const SenderFields = [
         "type": "email"
     },
 
-    
+
 ]
 
 

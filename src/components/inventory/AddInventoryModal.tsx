@@ -132,6 +132,8 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
         setFileMeta(null);
         onOpenChange(false);
     };
+
+    console.log(errors,'errors')
     return (
         <Modal
             isDismissable={true}
@@ -229,7 +231,7 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
                                     type="submit"
                                     title={defaultData ? "Update Product" : "Add Product"}
                                     className="h-10"
-                                    isDisabled={!isValid}
+                                    // isDisabled={!isValid}
                                     isLoading={submitting}
                                 />
                             </ModalFooter>

@@ -3,7 +3,7 @@
 import { Button, Input, Form } from "@heroui/react";
 import axios from "axios";
 import Image from "next/image";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { EyeFilledIcon } from "../../../components/icon/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "../../../components/icon/EyeSlashFilledIcon";
@@ -81,7 +81,7 @@ export default function Signup() {
       toast.success("Signup Successful!", { position: "top-right" });
       router.push("/subscription");
     } catch (error: any) {
-      toast.error("Signup failed!", { position: "top-right" });
+
       if (axios.isAxiosError(error)) {
         setErrors(error?.response?.data?.errors);
       }
@@ -89,6 +89,10 @@ export default function Signup() {
       setLoading(false);
     }
   };
+
+  useEffect(()=>{
+    console.log(errors,"Bilal")
+  },[errors])
 
   return (
     <div className="w-full md:w-[56.5%] flex justify-center items-center">
@@ -118,13 +122,13 @@ export default function Signup() {
               name="email"
               placeholder="Enter your email"
               label="Email"
-              
+
               labelPlacement="outside"
               type="email"
               variant="bordered"
               radius="sm"
               size="lg"
-              errorMessage={() => errors.email?.message}
+              errorMessage={() => errors.email}
             />
 
             <Input
