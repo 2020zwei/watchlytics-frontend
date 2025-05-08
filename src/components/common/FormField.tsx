@@ -5,6 +5,7 @@ import Icon from "./Icon";
 interface StyleProps {
     containerClass?: string,
     inputClass?: string,
+    placeholderClass?: string,
     labelClass?: string,
     inputContainer?: string,
     icon?: string,
@@ -30,8 +31,9 @@ interface FormFieldProps extends StyleProps {
     type?: string;
     fieldType?: "input" | "textarea" | "select" | string;
     options?: Option[];
-    min?:any,
-    max?:any
+    min?: any,
+    max?: any,
+    isSearch?: boolean
 
 }
 
@@ -56,6 +58,8 @@ const FormField: React.FC<FormFieldProps> = ({
     onPasswordToggle = () => { },
     options = [],
     isDisabled = false,
+    placeholderClass = "",
+    isSearch = false,
     ...rest
 }) => {
 
@@ -67,7 +71,7 @@ const FormField: React.FC<FormFieldProps> = ({
                 {label}
             </label>
             <div className={inputContainer}>
-                <div className=" relative flex items-center justify-between"
+                <div className={clsx("relative flex items-center", type === "checkbox" ? "gap-2" : "justify-between")}
                     onClick={type === "date" ? () => {
                         if (type === "date") {
                             const input = document.getElementsByName(name)?.[0] as HTMLInputElement;
@@ -78,9 +82,8 @@ const FormField: React.FC<FormFieldProps> = ({
                     <Controller
                         name={name}
                         control={control}
-                        defaultValue=""
+                        // defaultValue=""
                         render={({ field }) => {
-                            console.log(field)
                             switch (fieldType) {
                                 case "textarea":
                                     return (
@@ -99,45 +102,69 @@ const FormField: React.FC<FormFieldProps> = ({
                                             <select
                                                 {...field}
                                                 className={clsx(
-                                                    "text-base focus-within:outline-blue-500 text-dark-300 border appearance-none border-gray-70 shadow-md rounded-lg px-3 min-h-11 w-full",
-                                                    errors[name] && errors[name] ? "border-red-800" : field.value ? "border-green-600" : !field.value ? "text-gray-170" : ""
+                                                    "text-base focus-within:outline-blue-500 text-dark-300 border appearance-none border-gray-70 shadow-md rounded-lg px-3 min-h-11 w-full", inputClass,
+                                                    errors[name] && errors[name] ? "border-red-800" : field.value ? "border-green-600" : !field.value ? `text-gray-170 ${placeholderClass}` : ""
                                                 )}
                                             >
-                                                <option value="" className="text-gray-170" disabled>Select {label}</option>
+                                                <option value="" className={clsx("text-gray-170")} disabled>{placeholder}</option>
                                                 {options.map((opt) => (
                                                     <option key={opt.value} value={opt.value} className="text-dark-300">
                                                         {opt.label}
                                                     </option>
                                                 ))}
                                             </select>
-                                            <span className=" absolute right-0"><Icon name="caret" fill="#d9d9d9" /></span>
+                                            <span className=" absolute right-2"><Icon name="caret" fill="#d9d9d9" /></span>
                                         </div>
                                     );
                                 default:
                                     return (
                                         <>
-                                            <input
-                                                {...field}
-                                                type={type}
-                                                ref={field.ref}
-                                                placeholder={placeholder}
-                                                disabled={isDisabled}
-                                                {...rest}
-                                                className={clsx(
-                                                    "text-base focus-within:outline-blue-500 text-dark-300 placeholder:text-gray-170 border border-gray-70 shadow-md rounded-lg px-3 min-h-11 w-full",
-                                                    inputClass, type === "date" && !field.value ? "text-gray-170" : "",
-                                                    errors[name] ? "border-red-800" : field.value ? "border-green-600" : ""
-                                                )}
-
-                                            />
-                                            {type === "date" && (
-                                                <button
-                                                    type="button"
-                                                    className="absolute right-3 bg-white"
-                                                >
-                                                    <Icon name="calender" />
-                                                </button>
+                                            {type === "checkbox" ? (
+                                                <input
+                                                    type="checkbox"
+                                                    checked={field.value}
+                                                    onChange={(e) => field.onChange(e.target.checked)}
+                                                    ref={field.ref}
+                                                    disabled={isDisabled}
+                                                    {...rest}
+                                                    className={clsx(
+                                                        "text-base focus-within:outline-blue-500 text-dark-300 placeholder:text-gray-170 border border-gray-70",
+                                                        inputClass,
+                                                        errors[name] ? "border-red-800" : field.value ? "border-green-600" : "",
+                                                        "w-5 h-5"
+                                                    )}
+                                                />
+                                            ) : (
+                                                <>
+                                                    {isSearch && (
+                                                        <span className="absolute start-3 bg-white">
+                                                            <Icon name="search" size="1.2rem" stroke="#d9d9d9" />
+                                                        </span>
+                                                    )}
+                                                    <input
+                                                        {...field}
+                                                        type={type}
+                                                        ref={field.ref}
+                                                        placeholder={placeholder}
+                                                        disabled={isDisabled}
+                                                        {...rest}
+                                                        className={clsx(
+                                                            "text-base focus-within:outline-blue-500 text-dark-300 placeholder:text-gray-170 border border-gray-70",
+                                                            inputClass,
+                                                            type === "date" && !field.value ? "text-gray-170" : "",
+                                                            errors[name] ? "border-red-800" : field.value ? "border-green-600" : "",
+                                                            "shadow-md rounded-lg min-h-11 w-full",
+                                                            isSearch ? "ps-10 pe-3" : "px-3"
+                                                        )}
+                                                    />
+                                                    {type === "date" && (
+                                                        <button type="button" className="absolute right-3 bg-white">
+                                                            <Icon name="calender" />
+                                                        </button>
+                                                    )}
+                                                </>
                                             )}
+
                                         </>
 
                                     );

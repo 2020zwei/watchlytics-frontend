@@ -40,9 +40,10 @@ const config = {
       colors: {
         blue: {
           800: "#0047FF",
+          700:"#3460E3",
           850: "#003BFF",
           150: "#003BFF26",
-          100: "#003BFF0D"
+          100: "#003BFF0D",
         },
         dark: {
           800: "#1C274C",
@@ -70,13 +71,15 @@ const config = {
         },
         orange: {
           800: "#E19133",
-          700: "#DBA362"
+          700: "#DBA362",
+          600: "#DAA621"
         },
         pink: {
           500: "#845EBC"
         },
         red: {
-          700: "#F36960"
+          700: "#F36960",
+          600:"#E22C69"
         },
         green: {
           600: "#39AD79",
@@ -90,7 +93,8 @@ const config = {
         poppins: "var(--font-poppins)",
       },
       boxShadow: {
-        md: "0px 1px 2px 0px #1018280D"
+        md: "0px 1px 2px 0px #1018280D",
+        lg:"0px 4px 25px 0px #0000000D"
       }
     },
   },

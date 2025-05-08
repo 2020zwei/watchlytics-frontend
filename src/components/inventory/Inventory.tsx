@@ -225,7 +225,8 @@ const Inventory = () => {
                                 <table className="border-collapse min-w-[1200px] w-full text-start">
                                     <thead className="bg-blue-gradient text-white">
                                         <tr>
-                                            <th className="rounded-tl-lg rounded-bl-lg w-7"></th>
+                                            <th className="px-4 rounded-tl-lg rounded-bl-lg text-sm font-medium py-3">Actions</th>
+                                            <th className="w-7"></th>
                                             <th className="w-7">Image</th>
                                             {columns?.map((col, index) => (
                                                 col !== 'id' && col !== "image" && col !== "category" && col !== "availability" && col !== "owner" ?
@@ -239,7 +240,7 @@ const Inventory = () => {
                                                     </th> : null
                                             ))}
                                             <th className="px-4 text-sm font-medium py-3">Availability</th>
-                                            <th className="px-4 rounded-tr-lg rounded-br-lg text-sm font-medium py-3">Actions</th>
+
                                         </tr>
                                     </thead>
                                     <tbody>{
@@ -248,29 +249,6 @@ const Inventory = () => {
                                                 key={rowIndex}
                                                 className="border-b border-gray-200 last:border-b-0 text-sm font-medium text-dark-700"
                                             >
-                                                <td>
-                                                    <div>
-                                                        <Checkbox value={row?.id}
-                                                            checked={product?.id === row?.id}
-                                                        />
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <RoundedBox className="relative items-center justify-center flex  my-2 !bg-gray-80 p-2 h-14 w-14">
-                                                        {row?.image ? <img src={row?.image} width={48} alt="image" className='w-full h-full rounded-md' /> : "N/A"}
-                                                    </RoundedBox>
-                                                </td>
-                                                {columns.map((col, colIndex) => (
-                                                    col !== 'id' && col !== "image" && col !== "category" && col !== "availability" && col !== "owner" ?
-                                                        <td
-                                                            key={colIndex}
-                                                            className={clsx("py-5", colIndex === 0 && "w-14")}
-                                                        >
-                                                            <div className={clsx("whitespace-nowrap px-4 text-center")}>{col == "profit_margin" ? `${row?.[col]}%` : row?.[col] || "-"}</div>
-                                                        </td> : null
-                                                ))}
-
-                                                <td className={clsx("first-letter:capitalize text-center", STOCKCOLORS[row.availability])}>{row?.availability?.replaceAll("_", " ")}</td>
                                                 <td className='text-center'>
                                                     <Dropdown className='!rounded-lg'>
                                                         <DropdownTrigger>
@@ -294,6 +272,31 @@ const Inventory = () => {
                                                         </DropdownMenu>
                                                     </Dropdown>
                                                 </td>
+                                                <td>
+                                                    <div>
+                                                        <Checkbox value={row?.id}
+                                                            checked={product?.id === row?.id}
+                                                        />
+                                                    </div>
+                                                </td>
+
+                                                <td>
+                                                    <RoundedBox className="relative items-center justify-center flex  my-2 !bg-gray-80 p-2 h-14 w-14">
+                                                        {row?.image ? <img src={row?.image} width={48} alt="image" className='w-full h-full rounded-md' /> : "N/A"}
+                                                    </RoundedBox>
+                                                </td>
+
+                                                {columns.map((col, colIndex) => (
+                                                    col !== 'id' && col !== "image" && col !== "category" && col !== "availability" && col !== "owner" ?
+                                                        <td
+                                                            key={colIndex}
+                                                            className={clsx("py-5", colIndex === 0 && "w-14")}
+                                                        >
+                                                            <div className={clsx("whitespace-nowrap px-4 text-center")}>{col == "profit_margin" ? `${row?.[col]}%` : row?.[col] || "-"}</div>
+                                                        </td> : null
+                                                ))}
+
+                                                <td className={clsx("first-letter:capitalize text-center", STOCKCOLORS[row.availability])}>{row?.availability?.replaceAll("_", " ")}</td>
                                             </tr>
                                         ))}
                                     </tbody>

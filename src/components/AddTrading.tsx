@@ -44,7 +44,6 @@ const AddTrading = () => {
     const [quantities, setQuantities] = useState<any[]>([]);
     const [product, setProduct] = useState<any[]>([]);
     const id = useSearchParams().get('id');
-    const [date, setDate] = useState<any>();
     const dateRef = React.useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState(false)
     const navigate = useRouter()
@@ -105,12 +104,8 @@ const AddTrading = () => {
                     sale_price: Number(data.total_sale_price) || 0,
                     customer: data.customer || '',
                     product: data.product || [],
-                    date:data.date
+                    date: data.date
                 });
-                // const [day, month, year] = data.date.split("-")
-                // const inputDate = `${year}-${month}-${day}`;
-                // @ts-ignore
-                // setValue("date", dateFormater(data.date.split("-")));
                 const selectedProducts = data?.items.map((el: any) => ({
                     id: el?.product,
                     image: el?.product_details?.image,
@@ -267,7 +262,7 @@ const AddTrading = () => {
                             <div className='sm:min-w-[140px] min-w-[130px] text-sm font-medium text-dark-700'>Quantity:</div>
                             <div className='w-full flex flex-col gap-3'>
                                 {product.map((item, i) => (
-                                    <div key={item.id} className="flex items-center justify-between w-full max-w-[320px]">
+                                    <div key={item?.id} className=" flex items-center justify-between w-full max-w-[320px]">
                                         <div className="flex items-center gap-3 text-dark-800 font-normal text-sm">
                                             <div className="w-8 h-8 rounded py-1 bg-[#f9f9f9]">
                                                 <img src={item?.image} alt="" className="w-full h-full rounded" />
@@ -277,7 +272,6 @@ const AddTrading = () => {
                                         <div className="w-[77px] flex items-center justify-between px-2 h-7 rounded-3xl border border-[#F0F1F3]">
                                             <button disabled={item?.quantity < 2} type="button" onClick={() => handleDecrement(i, item)} className="text-[#ACACAC] text-lg">-</button>
                                             <span className="font-poppins">{item?.quantity}</span>
-                                            {/* <span className="font-poppins">{quantities[i]}</span> */}
                                             <button type="button" onClick={() => handleIncrement(i, item)} className="text-[#ACACAC] text-lg">+</button>
                                         </div>
                                         <div className="font-medium"><span>$</span>{item?.quantity * item?.buying_price}</div>

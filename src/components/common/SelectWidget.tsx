@@ -21,12 +21,11 @@ export default function SelectWidget({
     options = [],
     ...rest
 }: SelectWidgetProps) {
-    // const [internalSelected, setInternalSelected] = useState<string>("");
-    // const selectedValue = externalSelected ?? internalSelected;
-
+    const [internalSelected, setInternalSelected] = useState<string>("");
+    const selectedValue = externalSelected ?? internalSelected;
     const handleSelectionChange = (keys: Selection) => {
         const selectedKey: any = typeof keys === "string" ? keys : Array.from(keys)[0];
-        console.log(selectedKey)
+        setInternalSelected(selectedKey)
         onValueChange?.(selectedKey);
     };
 
@@ -34,7 +33,7 @@ export default function SelectWidget({
         <Select
             placeholder={placeholder}
             aria-label={placeholder}
-            // selectedKeys={selectedValue ? [selectedValue] : []}
+            selectedKeys={selectedValue ? [selectedValue] : []}
             onSelectionChange={handleSelectionChange}
             {...rest}
         >
