@@ -90,143 +90,141 @@ export default function Signup() {
     }
   };
 
-  useEffect(()=>{
-    console.log(errors,"Bilal")
-  },[errors])
+  useEffect(() => {
+    console.log(errors, "Bilal")
+  }, [errors])
 
   return (
-    <div className="w-full md:w-[56.5%] flex justify-center items-center">
-      <div className="w-full max-w-xl mx-auto">
-        <div className="flex items-center mb-8">
-          <Image src="/clock.svg" alt="clock" width={48} height={48} />
-          <span className="text-[#003BFF] font-medium tracking-wide text-lg ml-2">Watchlytics</span>
-        </div>
-        <div className="w-full max-w-lg ms-5">
-          <h1 className="text-[32px] font-bold mb-8 text-[#1E293B]">Create Account</h1>
-          <Form onSubmit={onSubmit} validationErrors={errors} className="space-y-4 gap-8">
-            <Input
-              isRequired
-              name="name"
-              placeholder="Enter your full name"
-              label="Full Name"
-              labelPlacement="outside"
-              type="text"
-              variant="bordered"
-              radius="sm"
-              size="lg"
-              errorMessage={() => errors.name?.message}
-            />
-
-            <Input
-              isRequired
-              name="email"
-              placeholder="Enter your email"
-              label="Email"
-
-              labelPlacement="outside"
-              type="email"
-              variant="bordered"
-              radius="sm"
-              size="lg"
-              errorMessage={() => errors.email}
-            />
-
-            <Input
-              isRequired
-              name="password"
-              placeholder="Enter your password"
-              label="Password"
-              labelPlacement="outside"
-              type={isPasswordVisible ? "text" : "password"}
-              value={password}
-              onValueChange={setPassword}
-              onBlur={() => setPasswordTouched(true)}
-              variant="bordered"
-              radius="sm"
-              size="lg"
-              isInvalid={passwordTouched && (!!getPasswordError(password) || !!errors.password)}
-              errorMessage={() =>
-                passwordTouched && (errors.password?.message || getPasswordError(password))
-              }
-              endContent={
-                <button type="button" onClick={togglePasswordVisibility} className="focus:outline-none">
-                  {isPasswordVisible ? (
-                    <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-                  ) : (
-                    <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-                  )}
-                </button>
-              }
-            />
-
-            <Input
-              isRequired
-              name="confirmPassword"
-              placeholder="Re-enter your password"
-              label="Confirm Password"
-              labelPlacement="outside"
-              type={isConfirmPasswordVisible ? "text" : "password"}
-              value={confirmPassword}
-              onValueChange={setConfirmPassword}
-              onBlur={() => setConfirmPasswordTouched(true)}
-              variant="bordered"
-              radius="sm"
-              size="lg"
-              isInvalid={confirmPasswordTouched && confirmPassword !== password}
-              errorMessage={() =>
-                confirmPasswordTouched && confirmPassword !== password
-                  ? "Passwords do not match"
-                  : ""
-              }
-              endContent={
-                <button type="button" onClick={toggleConfirmPasswordVisibility} className="focus:outline-none">
-                  {isConfirmPasswordVisible ? (
-                    <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-                  ) : (
-                    <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-                  )}
-                </button>
-              }
-            />
-
-            <Input
-              name="clientId"
-              value={clientId}
-              onValueChange={setClientId}
-              label={
-                <div className="flex justify-between items-center">
-                  <span>IFS Client ID</span>
-                  <Image src="/i.svg" alt="Client ID Icon" width={17} height={13} />
-                </div>
-              }
-              labelPlacement="outside"
-              placeholder="Enter your client id"
-              type="number"
-              variant="bordered"
-              radius="sm"
-              size="lg"
-            />
-
-            <Button
-              type="submit"
-              isLoading={loading}
-              className="w-full text-white bg-[linear-gradient(180deg,_#092CA2_0%,_#003BFF_100%)] hover:opacity-90"
-              radius="sm"
-              size="lg"
-              color="primary"
-            >
-              Create Account
-            </Button>
-
-            <div className="text-center mt-6 text-sm text-gray-600">
-              Already have an account?{" "}
-              <Link href="/login" className="text-[#0047FF] font-medium underline">
-                Sign In
-              </Link>
-            </div>
-          </Form>
-        </div>
+    <>
+      <div className="flex items-center mb-8">
+        <Image src="/clock.svg" alt="clock" width={48} height={48} />
+        <span className="text-[#003BFF] font-medium tracking-wide text-lg ml-2">Watchlytics</span>
       </div>
-    </div>
+      <>
+        <h1 className="text-[32px] font-bold mb-8 text-[#1E293B]">Create Account</h1>
+        <Form onSubmit={onSubmit} validationErrors={errors} className="pb-10">
+          <Input
+            isRequired
+            name="name"
+            placeholder="Enter your full name"
+            label="Full Name"
+            labelPlacement="outside"
+            type="text"
+            variant="bordered"
+            radius="sm"
+            size="lg"
+            errorMessage={() => errors.name?.message}
+          />
+
+          <Input
+            isRequired
+            name="email"
+            placeholder="Enter your email"
+            label="Email"
+
+            labelPlacement="outside"
+            type="email"
+            variant="bordered"
+            radius="sm"
+            size="lg"
+            errorMessage={() => errors.email}
+          />
+
+          <Input
+            isRequired
+            name="password"
+            placeholder="Enter your password"
+            label="Password"
+            labelPlacement="outside"
+            type={isPasswordVisible ? "text" : "password"}
+            value={password}
+            onValueChange={setPassword}
+            onBlur={() => setPasswordTouched(true)}
+            variant="bordered"
+            radius="sm"
+            size="lg"
+            isInvalid={passwordTouched && (!!getPasswordError(password) || !!errors.password)}
+            errorMessage={() =>
+              passwordTouched && (errors.password?.message || getPasswordError(password))
+            }
+            endContent={
+              <button type="button" onClick={togglePasswordVisibility} className="focus:outline-none">
+                {isPasswordVisible ? (
+                  <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                ) : (
+                  <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                )}
+              </button>
+            }
+          />
+
+          <Input
+            isRequired
+            name="confirmPassword"
+            placeholder="Re-enter your password"
+            label="Confirm Password"
+            labelPlacement="outside"
+            type={isConfirmPasswordVisible ? "text" : "password"}
+            value={confirmPassword}
+            onValueChange={setConfirmPassword}
+            onBlur={() => setConfirmPasswordTouched(true)}
+            variant="bordered"
+            radius="sm"
+            size="lg"
+            isInvalid={confirmPasswordTouched && confirmPassword !== password}
+            errorMessage={() =>
+              confirmPasswordTouched && confirmPassword !== password
+                ? "Passwords do not match"
+                : ""
+            }
+            endContent={
+              <button type="button" onClick={toggleConfirmPasswordVisibility} className="focus:outline-none">
+                {isConfirmPasswordVisible ? (
+                  <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                ) : (
+                  <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                )}
+              </button>
+            }
+          />
+
+          <Input
+            name="clientId"
+            value={clientId}
+            onValueChange={setClientId}
+            label={
+              <div className="flex justify-between items-center">
+                <span>IFS Client ID</span>
+                <Image src="/i.svg" alt="Client ID Icon" width={17} height={13} />
+              </div>
+            }
+            labelPlacement="outside"
+            placeholder="Enter your client id"
+            type="number"
+            variant="bordered"
+            radius="sm"
+            size="lg"
+          />
+
+          <Button
+            type="submit"
+            isLoading={loading}
+            className="w-full text-white bg-[linear-gradient(180deg,_#092CA2_0%,_#003BFF_100%)] hover:opacity-90"
+            radius="sm"
+            size="lg"
+            color="primary"
+          >
+            Create Account
+          </Button>
+
+          <div className="text-center text-sm w-full text-gray-600">
+            Already have an account?{" "}
+            <Link href="/login" className="text-[#0047FF] font-medium underline">
+              Sign In
+            </Link>
+          </div>
+        </Form>
+      </>
+    </>
   );
 }
