@@ -81,6 +81,8 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
 
             sendRequest({ url: "/subscribe/", method: "POST", payload: PAYLOAD })
                 .then(async (res) => {
+                    // console.log(res,res.status)
+                    console.log(res?.response)
                     if (res?.data?.success) {
                         toast.success(res?.message);
                         const isLoggedIn = JSON.parse(localStorage.getItem("isLoggedin") || "false");
@@ -92,10 +94,16 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                             navigate.push("/login")
                         }
                     } else {
+                        if (!res?.response?.data?.card_declined) {
+                            toast.error(res?.response?.data?.message);
+                        }
                         if (res?.data?.response) {
-                            toast.error(res?.data?.response?.errors?.error || res?.data?.response?.message);
+                            toast.error(res?.data?.response?.errors?.error || "Something went wrong");
                         }
                     }
+                }).catch((err) => {
+                    console.log(err)
+                    toast.error("Something went wrong")
                 })
                 .finally(() => {
                     setIsSubmitting(false);

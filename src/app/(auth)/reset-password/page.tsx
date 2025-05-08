@@ -81,12 +81,11 @@ export default function SignIn() {
           confrim_password: confirmPassword,
         }
       );
-      console.log(res);
       toast.success("Password reset successfully!");
       router.push("/login");
     } catch (error: any) {
-      console.error("API error:", error?.response?.data);
-      toast.error("Failed to reset password. Please try again.");
+      console.error("API error:", error?.response?.data?.password[0]);
+      toast.error(error?.response?.data?.password[0]);
       setErrors({
         api: {
           message:

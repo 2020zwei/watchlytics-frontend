@@ -19,6 +19,14 @@ import Notfound from '../common/Notfound'
 import Link from 'next/link'
 import UploadFileModal from '../common/UploadFileModal'
 
+const holdTimeColors = {
+    "94": "#DA3E33", // hold time greter then 94 then use this color
+    "70": "#EDED25", // hold time greter then then 50 and less then 94 use this color
+    "50": "#FFA500",// hold time greter then then 50 or equal and less then 70 use this color
+    "49": "#10A760",// hold time greter less then 50 use this color
+}
+const STOCKCOLORS: any = { "in_stock": "text-green-600","sold":"text-red-500" }
+
 
 const Inventory = () => {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -31,7 +39,6 @@ const Inventory = () => {
     const [stats, setStats] = useState<STATETYPES>()
     const searchParams = useSearchParams();
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-    const STOCKCOLORS: any = { "in_stock": "text-green-600" }
     const params = searchParams?.toString()
 
     const fetchCategories = async () => {
@@ -235,8 +242,9 @@ const Inventory = () => {
                                                         className={clsx(
                                                             "text-sm font-medium py-3 px-4"
                                                         )}
+
                                                     >
-                                                        <div className={clsx("first-letter:uppercase whitespace-nowrap px-4")}>{col?.replaceAll("_", " ")}</div>
+                                                        <div className={clsx("first-letter:uppercase whitespace-nowrap px-4")}>{col === "product_id" ? "Reference number" : col?.replaceAll("_", " ")}</div>
                                                     </th> : null
                                             ))}
                                             <th className="px-4 text-sm font-medium py-3">Availability</th>
@@ -291,8 +299,22 @@ const Inventory = () => {
                                                         <td
                                                             key={colIndex}
                                                             className={clsx("py-5", colIndex === 0 && "w-14")}
+                                                            style={
+                                                                col === "hold_time"
+                                                                    ? {
+                                                                        color:
+                                                                            row.hold_time > 94
+                                                                                ? holdTimeColors["94"]
+                                                                                : row.hold_time > 70
+                                                                                    ? holdTimeColors["70"]
+                                                                                    : row.hold_time >= 50
+                                                                                        ? holdTimeColors["50"]
+                                                                                        : holdTimeColors["49"],
+                                                                    }
+                                                                    : {}
+                                                            }
                                                         >
-                                                            <div className={clsx("whitespace-nowrap px-4 text-center")}>{col == "profit_margin" ? `${row?.[col]}%` : row?.[col] || "-"}</div>
+                                                            <div className={clsx("whitespace-nowrap px-4 text-center")}>{col == "profit_margin" ? `${row?.[col]}%` :col == "hold_time"? `~${row?.[col]}`: row?.[col] || "-"}</div>
                                                         </td> : null
                                                 ))}
 

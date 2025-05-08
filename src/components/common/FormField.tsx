@@ -1,6 +1,7 @@
 import { Controller } from "react-hook-form";
 import clsx from "clsx";
 import Icon from "./Icon";
+import { useRef } from "react";
 
 interface StyleProps {
     containerClass?: string,
@@ -62,7 +63,7 @@ const FormField: React.FC<FormFieldProps> = ({
     isSearch = false,
     ...rest
 }) => {
-
+    const inputRef = useRef<HTMLInputElement | null>(null);
     return (
         <div className={clsx("", containerClass)} id={name}>
             <label htmlFor={name} className={clsx("min-w-[130px] text-base font-medium text-dark-300 pt-3 ",
@@ -72,17 +73,11 @@ const FormField: React.FC<FormFieldProps> = ({
             </label>
             <div className={inputContainer}>
                 <div className={clsx("relative flex items-center", type === "checkbox" ? "gap-2" : "justify-between")}
-                    onClick={type === "date" ? () => {
-                        if (type === "date") {
-                            const input = document.getElementsByName(name)?.[0] as HTMLInputElement;
-                            input?.showPicker();
-                        }
-                    } : undefined}
                 >
                     <Controller
                         name={name}
                         control={control}
-                        // defaultValue=""
+                        defaultValue=""
                         render={({ field }) => {
                             switch (fieldType) {
                                 case "textarea":
@@ -147,6 +142,7 @@ const FormField: React.FC<FormFieldProps> = ({
                                                         ref={field.ref}
                                                         placeholder={placeholder}
                                                         disabled={isDisabled}
+                                                        onClick={type === "date" ? () => inputRef.current?.showPicker() : undefined}
                                                         {...rest}
                                                         className={clsx(
                                                             "text-base focus-within:outline-blue-500 text-dark-300 placeholder:text-gray-170 border border-gray-70",
@@ -156,9 +152,17 @@ const FormField: React.FC<FormFieldProps> = ({
                                                             "shadow-md rounded-lg min-h-11 w-full",
                                                             isSearch ? "ps-10 pe-3" : "px-3"
                                                         )}
+                                                        ref={(e) => {
+                                                            field.ref(e);
+                                                            inputRef.current = e;
+                                                        }}
                                                     />
                                                     {type === "date" && (
-                                                        <button type="button" className="absolute right-3 bg-white">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => inputRef.current?.showPicker()}
+                                                            className="absolute right-3 bg-white"
+                                                        >
                                                             <Icon name="calender" />
                                                         </button>
                                                     )}

@@ -66,7 +66,7 @@ const page = () => {
             </header>
             <div className=' max-w-[500px] mx-auto text-center px-2 pt-16'>
                 <h1 className=' font-bold lg:text-3xl md:text-2xl text-xl text-blue-850'>Subscription Plan</h1>
-                <p className='text-gray-180'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In lacus facilisi donece gestas egestas pellentesque magna.</p>
+                <p className='text-gray-180'>Explore our subscription plans tailored to boost your experience.</p>
             </div>
             {
                 loading ? <div className="h-[calc(100vh-200px)] flex justify-center items-center"><Spinner /></div>
