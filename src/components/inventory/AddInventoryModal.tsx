@@ -132,8 +132,6 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
         setFileMeta(null);
         onOpenChange(false);
     };
-
-    console.log(errors,'errors')
     return (
         <Modal
             isDismissable={true}

@@ -90,10 +90,6 @@ export default function Signup() {
     }
   };
 
-  useEffect(() => {
-    console.log(errors, "Bilal")
-  }, [errors])
-
   return (
     <>
       <div className="flex items-center mb-8">

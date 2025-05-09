@@ -75,10 +75,13 @@ const page = () => {
                         {
                             <RoundedBox className={clsx("relative h-full !bg-transparent border border-gray-180 px-4 py-7 flex flex-col justify-between")}>
                                 <div className='h-full'>
-                                    {/* @ts-ignore */}
-                                    <div><Icon name={planIcons[plan.name]} /></div>
-                                    <div className='pt-10 flex flex-col h-[calc(100%-50px)] justify-between'>
-                                        <div>
+                                    <div>
+                                        {/* @ts-ignore */}
+                                        <Icon name={planIcons[plan.name]} />
+                                        <h2 className='pt-5 font-bold text-3xl text-blue-850'>{plan.name}</h2>
+                                    </div>
+                                    <div className='pt-5 flex flex-col h-[calc(100%-100px)] justify-between'>
+                                        <div className='pb-5'>
                                             <h2 className=' font-bold text-3xl text-blue-850'>{plan.heading}</h2>
                                             <h4 className='text-blue-850 font-bold'>Whats Included :</h4>
                                             <ul className='pt-3 flex flex-col gap-3'>

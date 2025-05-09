@@ -42,7 +42,7 @@ const CustomerWidget = () => {
                             return (
                                 <li key={index} className={`min-w-[103px] filter-option${index}`}>
                                     <SelectWidget
-                                        onChange={(value) => { console.log(value, "bilal") }}
+                                        onChange={(value) => {  }}
                                         placeholder={key}
                                         options={buttons[key]}
                                         classNames={{

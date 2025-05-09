@@ -210,7 +210,6 @@ export default function SignIn() {
         { email }
       );
       const result = response.data;
-      console.log("Forgot Password Response:", result);
 
       // Show a success notification
       toast.success("Reset password email sent successfully!", {

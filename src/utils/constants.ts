@@ -34,6 +34,10 @@ export const URLS = {
   STATS: "/v1/inventory/stats/",
   TRANSACTIONS: "/v1/transactions/",
   TRANSACTIONS_SUMMARY: "/v1/transactions/summary/",
+  REPORTS_EXPENSES: "/v1/reports/expenses/",
+  LIVE_INVENTORY: "v1/report/live-inventory/",
+  BEST_SELLING: "/v1/reports/best-selling/",
+  STOCK_AGING: "/v1/reports/stock-aging/",
 };
 
 export const METHODS = {

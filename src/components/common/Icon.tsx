@@ -251,6 +251,12 @@ const Icon: React.FC<PropsTypes> = ({ name, fill, className, stroke, size = "2em
             </svg>
 
         ),
+        arrow: (
+            <svg width="16" height="16" viewBox="0 0 16 16" fill={fill || "none"} className={className} xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 13.3337V2.66699M8 2.66699L12 6.66699M8 2.66699L4 6.66699" stroke={stroke || "#10A760"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+
+        )
 
     };
 

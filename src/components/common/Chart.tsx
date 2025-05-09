@@ -10,12 +10,11 @@ import {
     Legend,
     ResponsiveContainer,
 } from "recharts";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import RoundedBox from "./baseButton/RoundedBox";
 import Heading from "./heading";
 import Icon from "./Icon";
 import ReportFilters from "./ReportFilters";
-import { usePathname } from "next/navigation";
 
 const data = [
     { month: "Sep", sales: 125000, purchase: 1000 },
@@ -37,13 +36,13 @@ const LOSTCHARTCOLORS: Record<string, string> = {
 };
 
 interface ChartProps {
-    isProfitChart?: boolean
+    isProfitChart?: boolean,
+    label: string,
+    data: any
 }
 
-const Chart: React.FC<ChartProps> = () => {
+const Chart: React.FC<ChartProps> = ({ label, data }) => {
     const [isProfitChart, setIsProfitChart] = useState<boolean>(true)
-    const [selected, setSelected] = useState("Inventory Valuation Report")
-    const pathname = usePathname();
     const [visibleLines, setVisibleLines] = useState({
         purchase: true,
         sale: true,
@@ -56,15 +55,6 @@ const Chart: React.FC<ChartProps> = () => {
         }));
     };
 
-    useEffect(() => {
-        const match = pathname.startsWith("/reports/");
-        if (match) {
-            const slug = pathname.split("/reports/")[1]?.replaceAll("-", " ");
-            if (slug) {
-                setSelected(slug);
-            }
-        }
-    }, [pathname]);
 
     const renderCustomLegend = () => (
         <div className="flex gap-6 px-4 pb-2  justify-center pt-5">
@@ -96,14 +86,13 @@ const Chart: React.FC<ChartProps> = () => {
         <div>
             <div className='flex items-center justify-between mb-4'>
                 <Heading as='h3' className=' md:text-2xl text-lg'>
-                    {/* {isProfitChart ? "Purchase & Sales Report" : "Profit & Loss Report"} */}
-                    {selected}
+                    {label}
                 </Heading>
-                <ReportFilters />
+                <ReportFilters selectedReport={isProfitChart?"Profit & Loss Report":"Purchase & Sales Report"}/>
             </div>
             <RoundedBox className="w-full h-[calc(100vh-170px)] pb-5">
                 <div className="flex items-center justify-between px-4 pb-10 pt-4">
-                    <Heading>{selected}</Heading>
+                    <Heading>{label}</Heading>
                     <div className="min-w-[140px] min-h-8 px-4 gap-3 border rounded-xl flex items-center justify-between">
                         <span><Icon name="calener" /></span>
                         <select onChange={() => setIsProfitChart(!isProfitChart)} name="" id="" className=" outline-none flex-1 text-sm font-medium text-dark-700">

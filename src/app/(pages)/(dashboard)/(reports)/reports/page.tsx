@@ -1,17 +1,43 @@
 "use client"
 import RoundedBox from '@/components/common/baseButton/RoundedBox'
 import Heading from '@/components/common/heading'
-import React from 'react'
-import Pagination from './common/Pagination'
-import ReportFilters from './common/ReportFilters'
+import Icon from '@/components/common/Icon';
+import Notfound from '@/components/common/Notfound';
+import Pagination from '@/components/common/Pagination';
+import ReportFilters from '@/components/common/ReportFilters';
+import { RequestTypes } from '@/types';
+import { sendRequest } from '@/utils/apis';
+import { METHODS, URLS } from '@/utils/constants';
+import { Spinner } from '@heroui/react'
+import React, { useEffect, useState } from 'react'
 
-const Reports = () => {
+const page = () => {
+    const [reports, setReports] = useState([])
+    const [loading, setLoading] = useState(true);
+    const fetchReports = async () => {
+        setLoading(true);
+        const PAYLOAD: RequestTypes = {
+            url: URLS.BEST_SELLING,
+            method: METHODS.GET,
+        };
+        sendRequest(PAYLOAD).then((res) => {
+            if (res.status === 200) {
+                setReports(res?.data);
+            }
+        }).finally(() => { setLoading(false) });
+    };
 
+    useEffect(() => {
+        fetchReports()
+    }, [])
+    if (loading) {
+        return <Spinner />;
+    }
     return (
         <div className='flex flex-col gap-5'>
             <div className='flex sm:flex-row flex-col items-center sm:justify-between'>
                 <Heading as='h3' className=' md:text-2xl text-lg w-full'>Inventory Valuation Report</Heading>
-                <ReportFilters />
+                <ReportFilters selectedReport='Inventory Valuation Report'/>
             </div>
             <div className='grid md:grid-cols-2 gap-5 mt-4 report-cards'>
                 {/* cards */}
@@ -87,34 +113,43 @@ const Reports = () => {
                     <RoundedBox className='pb-4'>
                         <Heading className='p-3'>Best selling product</Heading>
                         <div className=" overflow-x-auto">
-                            <table className='w-full min-w-[1200px]'>
-                                <thead className='h-12'>
-                                    <tr className='text-white text-sm font-medium bg-blue-gradient'>
-                                        <th className='text-start ps-4 first:rounded-s-lg  overflow-hidden'>
-                                            Product
-                                        </th>
-                                        <th className='text-start'>Product ID</th>
-                                        <th className='text-start'>Category</th>
-                                        <th className='text-start'>Remaining Quantity</th>
-                                        <th className='text-start'>Turn Over</th>
-                                        <th className='text-start pe-4 last:rounded-e-lg overflow-hidden'>
-                                            Increase By
-                                        </th>
-                                    </tr>
-                                </thead>
+                            {
+                                reports.length ?
+                                    <table className='w-full min-w-[1200px]'>
+                                        <thead className='h-12'>
+                                            <tr className='text-white text-sm font-medium bg-blue-gradient'>
+                                                <th className='text-start ps-4 first:rounded-s-lg  overflow-hidden'>
+                                                    Product
+                                                </th>
+                                                <th className='text-start'>Reference number</th>
+                                                <th className='text-start'>Brand</th>
+                                                <th className='text-start'>Remaining Quantity</th>
+                                                <th className='text-start'>Turn Over</th>
+                                                <th className='text-start pe-4 last:rounded-e-lg overflow-hidden'>
+                                                    Increase By
+                                                </th>
+                                            </tr>
+                                        </thead>
 
-                                <tbody>
-                                    {Array.from({ length: 5 }).map(() => (
-                                        <tr className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
-                                            <td className=' text-start py-3 px-4'>TAG Heuer</td>
-                                            <td>TAG 658.0314.3.031</td>
-                                            <td>Automatic Watches</td>
-                                            <td>43 Watches</td>
-                                            <td>$9,000</td>
-                                            <td className=' text-green-500'>2.3%</td>
-                                        </tr>))}
-                                </tbody>
-                            </table>
+                                        <tbody>
+                                            {reports.map((report: any) => (
+                                                <tr key={report?.product_id} className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
+                                                    <td className=' text-start py-3 px-4 first-letter:uppercase'>{report?.product}</td>
+                                                    <td>{report?.reference_number}</td>
+                                                    <td className='first-letter:uppercase'>{report?.brand}</td>
+                                                    <td>{report?.remaining_quantity} Watches</td>
+                                                    <td>{report?.turn_over}</td>
+                                                    <td className={report?.increase_by < 0 ? "text-red-500" : "text-green-500"}>
+                                                        <div className='flex items-center'>
+                                                            <span className={report?.increase_by < 0 ? " rotate-180" : ""}><Icon name='arrow' stroke={report?.increase_by < 0 ? "#da3e33" : "#10a760"} /></span>
+                                                            {report?.increase_by}%
+                                                        </div>
+                                                    </td>
+                                                </tr>))}
+                                        </tbody>
+                                    </table>
+                                    : <Notfound label='Reports not found' />
+                            }
                         </div>
                     </RoundedBox>
                 </div>
@@ -130,4 +165,4 @@ const Reports = () => {
     )
 }
 
-export default Reports
+export default page

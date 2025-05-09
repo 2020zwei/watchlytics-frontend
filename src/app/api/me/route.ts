@@ -34,7 +34,6 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ isSubscribed: false });
         }
     } catch (error: any) {
-        console.log("Error fetching me:", error);
         return NextResponse.json({ isSubscribed: false });
     }
 }
