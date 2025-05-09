@@ -67,7 +67,6 @@ const Inventory = () => {
             method: METHODS.GET,
         }
         sendRequest(PAYLOAD).then((res) => {
-            console.log('res')
             if (res?.data?.results?.length) {
                 setColumns(Object.keys(res?.data?.results[0]))
                 setProducts(res?.data)

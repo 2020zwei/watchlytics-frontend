@@ -81,10 +81,8 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
 
             sendRequest({ url: "/subscribe/", method: "POST", payload: PAYLOAD })
                 .then(async (res) => {
-                    // console.log(res,res.status)
-                    console.log(res?.response)
                     if (res?.data?.success) {
-                        toast.success(res?.message);
+                        toast.success(res?.data?.message);
                         const isLoggedIn = JSON.parse(localStorage.getItem("isLoggedin") || "false");
                         if (isLoggedIn) {
                             navigate.push("/profile");
@@ -102,7 +100,6 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                         }
                     }
                 }).catch((err) => {
-                    console.log(err)
                     toast.error("Something went wrong")
                 })
                 .finally(() => {

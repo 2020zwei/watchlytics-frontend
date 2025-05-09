@@ -19,7 +19,6 @@ const AddNoteModalWidget: React.FC<AddNoteModalWidgetTypes> = ({
     callBack = () => { },
     isLoading = false,
 }) => {
-    console.log(isOpen)
 
     return (
         <Modal isOpen={isOpen} onOpenChange={onOpen} placement="center" className=" overflow-y-visible">

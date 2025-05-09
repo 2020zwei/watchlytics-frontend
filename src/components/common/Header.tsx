@@ -13,7 +13,6 @@ import { usePathname } from 'next/navigation';
 
 const Header = () => {
   const pathname = usePathname()
-  console.log(pathname)
   const { user, setCurrentUser } = useAppContext();
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const shouldSearch = ["/dashboard", "/inventory", "/reports", "/report-chart"];
@@ -73,7 +72,7 @@ const Header = () => {
               <Link href="/profile" className='block'>Profile</Link>
             </DropdownItem>
             <DropdownItem
-              key="new"
+              key="subscription"
               className=' text-blue-850 text-sm'
               startContent={<Icon name='card' stroke='#003BFF' />}            >
               <Link href="/subscriptions" className='block'>Subscription</Link>

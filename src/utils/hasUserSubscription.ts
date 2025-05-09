@@ -8,6 +8,5 @@ export const getProfileInfo = async () => {
         method: METHODS.GET,
     }
     const res = await baseInstance.get(PAYLOAD)
-    console.log(res, "Bilal")
     return res
 }

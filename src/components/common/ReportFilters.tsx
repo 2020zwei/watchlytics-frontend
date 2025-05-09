@@ -2,10 +2,18 @@ import { REPORTFILTEROPTIONS } from '@/utils/mock'
 import React, { useEffect, useState } from 'react'
 import SelectWidget from './SelectWidget'
 import { usePathname, useRouter } from 'next/navigation'
+const RPORTLINKS: { [key: string]: string } = {
+    "Inventory Valuation Report": "reports",
+    "Purchase & Sales Report": "purchase-sales-report",
+    "Profit & Loss Report": "profit-loss-report",
+    "Stock Aging": "stock-aging-report",
+    "Expense Report": "expense-report"
+};
 
-const ReportFilters = () => {
+
+const ReportFilters = ({ selectedReport }: { selectedReport: string }) => {
     const navigate = useRouter()
-    const [selected, setSelected] = useState("Inventory Valuation Report")
+    const [selected, setSelected] = useState(selectedReport)
     const pathname = usePathname();
     useEffect(() => {
         const match = pathname.startsWith("/reports/");
@@ -17,9 +25,13 @@ const ReportFilters = () => {
         }
     }, [pathname]);
     const onValueChange = (slug: string) => {
-        setSelected(slug)
-        navigate.push(`/reports/${slug?.replaceAll(" ", "-")}`)
-    }
+        setSelected(slug);
+        const path = RPORTLINKS[slug];
+        if (path) {
+            navigate.push(path);
+        }
+    };
+
     return (
         <div className='border rounded-lg border-gray-200 ms-auto text-end w-[300px]'>
             <SelectWidget

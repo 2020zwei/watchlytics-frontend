@@ -149,7 +149,6 @@ export default function ProfilePage() {
   // uploading the profile image (binary) as the primary image in the payload.
 
   const handleUpdateProfile = async () => {
-    console.log(originalData, formData)
     const token = getAccessToken();
     const profileImageData = new FormData()
     profileImageData.append("profile_picture", profileImage)
@@ -239,7 +238,6 @@ export default function ProfilePage() {
       payload.append("client_id", formData.clientId);
       // Check if profileImage is a File instance (binary data) and append accordingly.
       if (profileImage instanceof File) {
-        console.log("here");
         // Only append if it's a new file (updated image)
         payload.append("profile_picture", profileImage);
       } else if (
@@ -247,7 +245,6 @@ export default function ProfilePage() {
         typeof profileImage == "string" &&
         profileImage !== ""
       ) {
-        console.log("here2");
         // If it's a URL string, only append if it has a value (indicating it wasn't left empty)
         // payload.append("profile_picture", profileImage);
       }
@@ -264,7 +261,7 @@ export default function ProfilePage() {
           },
         }
       );
-      console.log("Update successful:", response.data);
+
       setIsEditing(false);
       setOriginalData({ ...formData });
       toast.success("Profile updated successfully!", { position: "top-right" });
@@ -310,7 +307,6 @@ export default function ProfilePage() {
     }
   };
 
-  console.log(profileImage, "image");
 
   return (
     <>

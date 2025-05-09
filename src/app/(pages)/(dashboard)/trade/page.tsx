@@ -26,8 +26,6 @@ const page = () => {
         setApiLoading(true)
         try {
             const res = await sendRequest(PAYLOAD)
-            console.log('Trade Details:', res)
-
             if (res?.status === 200) {
                 setTradings(res.data)
             }

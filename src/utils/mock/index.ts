@@ -436,13 +436,9 @@ export const Filters: string[] = ["brand", "date", "range", "watch conditon", "b
 export const REPORTFILTEROPTIONS = [
     "Inventory Valuation Report",
     "Purchase & Sales Report",
+    "Profit & Loss Report",
     "Stock Aging",
     "Expense Report",
-    "Market Comparison Report",
-    "Monthly Profit & Loss Chart",
-    "User-Specific Reports",
-    "Stock Turnover Analysis",
-    "Live Inventory Dashboard"
 ]
 export const availabilities = [
     { "value": "in_stock", "label": "In stock" },
