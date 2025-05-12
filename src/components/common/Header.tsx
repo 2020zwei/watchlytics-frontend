@@ -44,7 +44,7 @@ const Header = () => {
 
   return (
 
-    <div className={clsx("flex items-center w-full pe-4",showSearchBar?"justify-between":"justify-end")}>
+    <div className={clsx("flex items-center w-full pe-4", showSearchBar ? "justify-between" : "justify-end")}>
       {showSearchBar ?
         <div className='flex items-center border rounded-lg flex-1 me-3 max-w-[320px] ps-4 border-[#F0F1F3] font-normal'>
           <SearchBar placeholder='Search product, supplier, order' icon='search'
@@ -76,6 +76,12 @@ const Header = () => {
               className=' text-blue-850 text-sm'
               startContent={<Icon name='card' stroke='#003BFF' />}            >
               <Link href="/subscriptions" className='block'>Subscription</Link>
+            </DropdownItem>
+            <DropdownItem
+              key="payments"
+              className=' text-blue-850 text-sm'
+              startContent={<Icon name='card' stroke='#003BFF' />}            >
+              <Link href="/payments" className='block'>Payments</Link>
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
