@@ -84,7 +84,7 @@ const page = () => {
     fetchChartDate()
   }, [])
   if (loading) {
-    return <div className='w-full flex justify-center'><Spinner /></div>;
+    return <div className='text-center'><Spinner /></div>;
   }
 
 

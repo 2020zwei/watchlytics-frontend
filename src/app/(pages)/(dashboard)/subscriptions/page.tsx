@@ -76,7 +76,10 @@ const page = () => {
             </div>
           </div>
           <div className='flex flex-col gap-2'>
-            <Button title='Upgrade Plan' className='h-10 !min-w-[166px] max-w-[166px]' onPress={() => navigate.push(`/subscription`)}></Button>
+            {subscription?.current_subscription && subscription?.current_subscription?.toLowerCase() !== "pro" ?
+              <Button title='Upgrade Plan' className='h-10 !min-w-[166px] max-w-[166px]' onPress={() => navigate.push(`/subscription`)}></Button> :null}
+            {subscription?.current_subscription && subscription?.current_subscription?.toLowerCase() !== "basic" && subscription?.current_subscription?.toLowerCase() !=="free" ?
+              <Button title='Downgrade Plan' className='h-10 !min-w-[166px] max-w-[166px]' onPress={() => navigate.push(`/subscription`)}></Button> : null}
             {
               subscription?.current_subscription && subscription?.current_subscription?.toLowerCase() !== "free" ?
                 <TransparentButton isDisabled={subscription?.is_cancel_subscription || isDisabled} title='Cancel Subscription' className='h-10 !min-w-[166px] max-w-[166px]'

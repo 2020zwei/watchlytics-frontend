@@ -63,7 +63,7 @@ const Inventory = () => {
         // @ts-ignore
 
         const PAYLOAD: RequestTypes = {
-            url: `${URLS.PRODUCTS}/?page_number=${currentPage}&${params?.replace(/\+/g, "%20")}&page_size=30/`,
+            url: `${URLS.PRODUCTS}/?page_number=${currentPage}&${params?.replace(/\+/g, "%20")}&page_size=20/`,
             method: METHODS.GET,
         }
         sendRequest(PAYLOAD).then((res) => {

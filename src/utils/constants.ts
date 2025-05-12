@@ -38,6 +38,11 @@ export const URLS = {
   LIVE_INVENTORY: "v1/report/live-inventory/",
   BEST_SELLING: "/v1/reports/best-selling/",
   STOCK_AGING: "/v1/reports/stock-aging/",
+  PURCHASE_SALES: "/v1/reports/purchase-sales/",
+  MONTHLY_PROFIT: "/v1/reports/monthly-profit/",
+  REPORT_STATE: "/v1/reports/stats/",
+  EXPENSES: "/v1/reports/expenses/",
+  CARDS: "/v1/cards/",
 };
 
 export const METHODS = {

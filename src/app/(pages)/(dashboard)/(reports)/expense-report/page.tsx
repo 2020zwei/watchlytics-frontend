@@ -22,7 +22,6 @@ const page = () => {
         };
         sendRequest(PAYLOAD).then((res) => {
             if (res.status === 200) {
-                console.log(res)
                 setReports(res?.data);
             }
         }).finally(() => setLoading(false));
@@ -32,14 +31,13 @@ const page = () => {
         fetchReports()
     }, [])
     if (loading) {
-        return <div className=' fixed z-40 top-0 left-0 right-0 bottom-0 m-auto flex justify-center items-center'>
-            <Spinner className="" size="lg" /></div>;
+        return <div className='text-center'><Spinner /></div>;
     }
     return (
         <>
             <div className='mb-5 flex sm:flex-row flex-col items-center sm:justify-between'>
                 <Heading as='h3' className=' md:text-2xl text-lg w-full'>Expense Report</Heading>
-                <ReportFilters selectedReport='Expense Report'/>
+                <ReportFilters selectedReport='Expense Report' />
             </div>
             <RoundedBox>
                 <div className=''>
