@@ -1,11 +1,45 @@
 
 import { z } from "zod";
+
+const email = {
+    label: "Email",
+    name: "email",
+    placeholder: "Enter Email",
+    fieldType: "input",
+    type: "email"
+}
+const password = {
+    label: "Password",
+    name: "password",
+    placeholder: "Enter Password",
+    fieldType: "input",
+    type: "password"
+}
+const city = {
+    "label": "City:",
+    "name": "city",
+    "placeholder": "Enter City",
+    "fieldType": "input",
+    "type": "text"
+}
+const productName = {
+    "label": "Product Name",
+    "name": "product_name",
+    "placeholder": "Enter Product Name",
+    "fieldType": "input"
+}
+
+const quantity = {
+    "label": "Quantity",
+    "name": "quantity",
+    "placeholder": "Enter Quantity",
+    "fieldType": "input",
+    "type": "number"
+}
+
 export const InventoryFormFields = [
     {
-        "label": "Product Name",
-        "name": "product_name",
-        "placeholder": "Enter Product Name",
-        "fieldType": "input"
+        ...productName
     },
     {
         "label": "Reference Number",
@@ -39,11 +73,7 @@ export const InventoryFormFields = [
         "type": "number"
     },
     {
-        "label": "Quantity",
-        "name": "quantity",
-        "placeholder": "Enter Quantity",
-        "fieldType": "input",
-        "type": "number"
+        ...quantity
     },
     {
         "label": "Date Purchased",
@@ -172,20 +202,7 @@ export const InventoryFormFields = [
     },
 
 ]
-const email = {
-    label: "Email",
-    name: "email",
-    placeholder: "Enter Email",
-    fieldType: "input",
-    type: "email"
-}
-const password = {
-    label: "Password",
-    name: "password",
-    placeholder: "Enter Password",
-    fieldType: "input",
-    type: "password"
-}
+
 export const ProfileFormFields = [
     {
         label: "Name",
@@ -242,10 +259,12 @@ export const InventoryFormSchema = z.object({
         .nonempty("Product name is required")
         .min(3, "Product name must be at least 3 characters")
         .max(200, "Max 200 characters"),
-    year: z
-        .string()
-        .min(1, "Year is required")
-        .max(200, "Max 10 characters"),
+    year: z.preprocess(
+        (val) => typeof val === "string" ? Number(val) : val,
+        z
+            .number()
+            .min(1, "Year is required and must be greater than 0")
+    ),
 
     product_id: z
         .string()
@@ -253,7 +272,10 @@ export const InventoryFormSchema = z.object({
         .min(3, "Reference ID must be at least 3 characters")
         .max(50, "Max 50 characters"),
 
-    category: z.union([z.string(), z.number()]),
+    category: z.union([z.string(), z.number()])
+        .refine(val => val !== null && val !== undefined && val !== '', {
+            message: "Category is required",
+        }),
 
     availability: z.preprocess(
         (val) => (val === "" ? undefined : val),
@@ -325,15 +347,12 @@ export const InventoryFormSchema = z.object({
     sold_source: z.string().nullable().optional(),
     listed_on: z.string().nullable().optional(),
 
-    image: z
-        .union([
-            z.instanceof(File),
-            z.string().url().min(1),
-        ])
-        .refine((val) => {
-            if (val instanceof File) return val.size > 0;
-            return typeof val === "string" && val.length > 0;
-        }, { message: "Image is required" }),
+    image: z.any().refine(
+        (val) =>
+            (val instanceof File && val.size > 0) ||
+            (typeof val === "string" && val.length > 0),
+        { message: "Image is required" }
+    ),
 
     serial_number: z.string().nullable().optional(),
 }).refine((data) => {
@@ -490,11 +509,7 @@ export const RecipientInformationFields = [
         "type": "text"
     },
     {
-        "label": "City:",
-        "name": "city",
-        "placeholder": "Enter City",
-        "fieldType": "input",
-        "type": "text"
+        ...city
     },
     {
         "label": "State:",
@@ -726,5 +741,61 @@ export const SenderFields = [
 
 
 ]
+
+
+export const InvoiceFormFields = [
+
+    {
+        "label": "Name:",
+        "name": "name",
+        "placeholder": "Select Product name",
+        "fieldType": "select",
+        "type": "text"
+    },
+    { ...email },
+    {
+        "label": "Date:",
+        "name": "date",
+        "placeholder": "Select Date",
+        "fieldType": "input",
+        "type": "date"
+    },
+    { ...quantity },
+    {
+        "label": "Unit Price:",
+        "name": "unit_price",
+        "placeholder": "Enter Unit Price",
+        "fieldType": "input",
+        "type": "number"
+    },
+    { ...city }
+
+]
+
+
+export const InvoiceFormFieldsSchema = z.object({
+    name: z.string().min(1, "Product name is required"),
+    email: z.string().email("Invalid email").min(1, "Email is required"),
+    date: z.preprocess(
+        (val) => {
+            if (typeof val === "string") {
+                const date = new Date(val);
+                return isNaN(date.getTime()) ? undefined : date;
+            }
+            return val;
+        },
+        z.date({
+            required_error: "Date is required",
+            invalid_type_error: "Invalid date format",
+        })
+    ),
+    quantity: z
+        .number({ invalid_type_error: "Quantity must be a number" })
+        .min(1, "Quantity is required"),
+    unit_price: z
+        .number({ invalid_type_error: "Unit Price must be a number" })
+        .min(0.01, "Unit Price is required"),
+    city: z.string().min(1, "City is required"),
+});
 
 

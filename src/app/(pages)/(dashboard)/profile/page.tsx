@@ -80,15 +80,18 @@ export default function ProfilePage() {
     }
     const res = await sendRequest(PAYLOAD)
     if (res?.status === 200) {
-      toast.success(res?.data?.message)
       setIsEditing(false)
       // @ts-ignore
       fileMeta?.file && setFileMeta((prev) => ({ ...prev, file: null }))
       // @ts-ignore
       formData.get("confirm_password") && setValue("confirm_password", formData.get("confirm_password"))
       fileMeta?.url && setCurrentUser({ image: fileMeta?.url })
-
-      formData.get("confirm_password") && navigate.push("/login")
+      if (formData.get("confirm_password")) {
+        localStorage.removeItem("isLoggedin")
+        await fetch('/api/logout')
+        formData.get("confirm_password") && navigate.push("/login")
+      }
+      toast.success(res?.data?.message)
     }
     else {
       Object.keys(res.response.data).forEach(key => {

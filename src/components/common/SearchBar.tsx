@@ -30,7 +30,7 @@ const SearchBar: React.FC<PropsType> = ({ icon = "", iconClass, inputClass, rese
 
     return (
         <>
-            <input onInput={handleChange} key={resetKey} type="text" className={clsx("border-0 h-12 focus:outline-none px-3 w-full", inputClass, placeholderClass)} placeholder={placeholder} />
+            <input onInput={handleChange} key={resetKey} type="text" className={clsx("border-0 h-12 focus:outline-none px-3 w-full bg-transparent", inputClass, placeholderClass)} placeholder={placeholder} />
             <span className={iconClass}><Icon name={icon} className={clsx("ms-2", iconClass)} size={size} /></span>
         </>
     )

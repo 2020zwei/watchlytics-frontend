@@ -1,21 +1,56 @@
-import Chart from '@/components/common/Chart'
-import React from 'react'
+"use client"
 
-const page = () => {
-    const data = [
-        { month: "Sep", sales: 125000, purchase: 1000 },
-        { month: "Oct", sales: 125000, purchase: 10300 },
-        { month: "Nov", sales: 12400, purchase: 100000 },
-        { month: "Dec", sales: 125000, purchase: 100000 },
-        { month: "Jan", sales: 125000, purchase: 120000 },
-        { month: "Feb", sales: 125000, purchase: 1300 },
-        { month: "Mar", sales: 100, purchase: 1500 },
-    ];
+import Chart from '@/components/common/Chart'
+import { RequestTypes } from '@/types';
+import { sendRequest } from '@/utils/apis';
+import { METHODS, URLS } from '@/utils/constants';
+import { Spinner } from '@heroui/react';
+import React, { useEffect, useState } from 'react'
+
+const Page = () => {
+    const [reports, setReports] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchReports = async () => {
+        setLoading(true)
+        const PAYLOAD: RequestTypes = {
+            url: URLS.PURCHASE_SALES,
+            method: METHODS.GET,
+        };
+        sendRequest(PAYLOAD)
+            .then((res) => {
+                if (res.status === 200) {
+                    console.log(res)
+                    setReports(res?.data?.chart_data);
+                }
+            }).finally(() => setLoading(false))
+    };
+
+    useEffect(() => {
+        fetchReports();
+    }, []);
+
+    const normalizedData = reports?.map((item: any) => ({
+        month: item.date,
+        sales: item.sale || 0,
+        purchase: item.purchase || 0
+    }));
+    if (loading) {
+        return <div className='text-center'><Spinner /></div>;
+    }
     return (
         <div>
-            <Chart label="Purchase & Sales Report" data={data} />
+            <Chart
+                lineA="purchase"
+                lineB="sale"
+                label="Purchase & Sales Report"
+                data={normalizedData}
+                callBack={(filter) => { console.log(filter) }}
+                lineACol="#448DF2"
+                lineBCol="#DBA36247"
+            />
         </div>
-    )
-}
+    );
+};
 
-export default page
+export default Page;

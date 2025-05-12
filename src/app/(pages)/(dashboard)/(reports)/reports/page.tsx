@@ -13,7 +13,10 @@ import React, { useEffect, useState } from 'react'
 
 const page = () => {
     const [reports, setReports] = useState([])
+    const [states, setStates] = useState<any>({})
+    const [expenses, setExpenses] = useState<any>([])
     const [loading, setLoading] = useState(true);
+
     const fetchReports = async () => {
         setLoading(true);
         const PAYLOAD: RequestTypes = {
@@ -26,18 +29,44 @@ const page = () => {
             }
         }).finally(() => { setLoading(false) });
     };
+    const fetchReportState = async () => {
+        setLoading(true);
+        const PAYLOAD: RequestTypes = {
+            url: URLS.REPORT_STATE,
+            method: METHODS.GET,
+        };
+        sendRequest(PAYLOAD).then((res) => {
+            if (res.status === 200) {
+                setStates(res.data)
+            }
+        }).finally(() => { setLoading(false) });
+    };
+    const fetchExpensesState = async () => {
+        setLoading(true);
+        const PAYLOAD: RequestTypes = {
+            url: URLS.EXPENSES,
+            method: METHODS.GET,
+        };
+        sendRequest(PAYLOAD).then((res) => {
+            if (res.status === 200) {
+                setExpenses(res.data)
+            }
+        }).finally(() => { setLoading(false) });
+    };
 
     useEffect(() => {
         fetchReports()
+        fetchReportState()
+        fetchExpensesState()
     }, [])
     if (loading) {
-        return <Spinner />;
+        return <div className='text-center'><Spinner /></div>;
     }
     return (
         <div className='flex flex-col gap-5'>
             <div className='flex sm:flex-row flex-col items-center sm:justify-between'>
                 <Heading as='h3' className=' md:text-2xl text-lg w-full'>Inventory Valuation Report</Heading>
-                <ReportFilters selectedReport='Inventory Valuation Report'/>
+                <ReportFilters selectedReport='Inventory Valuation Report' />
             </div>
             <div className='grid md:grid-cols-2 gap-5 mt-4 report-cards'>
                 {/* cards */}
@@ -46,34 +75,34 @@ const page = () => {
                         <Heading as='h3'>Overview</Heading>
                         <div className=' grid grid-cols-3 pt-5'>
                             <div className=' text-sm text-gray-500'>
-                                <div>$17,432</div>
+                                <div>${states?.total_profit}</div>
                                 <div className=' text-sm font-medium text-dark-600 mt-3'>Total Profit</div>
                             </div>
                             <div className=' text-sm text-gray-500'>
-                                <div>$17,432</div>
+                                <div>${states?.revenue}</div>
                                 <div className=' text-sm font-medium text-orange-700 mt-3'>Revenue</div>
                             </div>
                             <div className=' text-sm text-gray-500'>
-                                <div>$17,432</div>
+                                <div>${states?.sales}</div>
                                 <div className=' text-sm font-medium text-pink-500 mt-3'>Sales</div>
                             </div>
                         </div>
                     </div>
                     <div className='flex justify-between px-3 pb-5 gap-3'>
                         <div className="">
-                            <div className='text-gray-600 text-sm '>$17,432</div>
+                            <div className='text-gray-600 text-sm '>${states?.total_profit}</div>
                             <div className=' text-sm font-medium text-dark-500 mt-3'>Total Profit</div>
                         </div>
                         <div className="">
-                            <div className='text-gray-600 text-sm '>$1,10,432</div>
+                            <div className='text-gray-600 text-sm '>${states?.net_sales_value}</div>
                             <div className=' text-sm font-medium text-dark-500 mt-3'>Net sales value</div>
                         </div>
                         <div className="md:pe-6">
-                            <div className='text-gray-600 text-sm '>$1,10,432</div>
+                            <div className='text-gray-600 text-sm '>${states?.mom_profit}</div>
                             <div className=' text-sm font-medium text-dark-500 mt-3'>MoM Profit</div>
                         </div>
                         <div className="md:pe-6">
-                            <div className='text-gray-600 text-sm '>$1,10,432</div>
+                            <div className='text-gray-600 text-sm '>${states?.yoy_profit}</div>
                             <div className=' text-sm font-medium text-dark-500 mt-3'>YoY Profit</div>
                         </div>
                     </div>
@@ -94,12 +123,12 @@ const page = () => {
                                 </thead>
                                 <tbody>
                                     {
-                                        Array.from({ length: 4 }).map(() => (
-                                            <tr className='border'>
-                                                <td className='text-gray-650 text-sm test-start px-4 py-2'>Rolex</td>
-                                                <td className='text-sm text text-dark-500 text-center py-2'>$26,000</td>
-                                                <td className='text-sm text text-dark-500 text-center py-2'>$26,000</td>
-                                                <td className='text-sm text text-green-500 text-center px-4 py-2'>3.2%</td>
+                                        expenses?.map((item: any) => (
+                                            <tr key={item?.product} className='border'>
+                                                <td className='text-gray-650 text-sm test-start px-4 py-2'>{item?.product}</td>
+                                                <td className='text-sm text text-dark-500 text-center py-2'>${item?.repairs}</td>
+                                                <td className='text-sm text text-dark-500 text-center py-2'>${item?.shipping}</td>
+                                                <td className='text-sm text text-green-500 text-center px-4 py-2'>{item?.impact}%</td>
                                             </tr>
                                         ))}
                                 </tbody>

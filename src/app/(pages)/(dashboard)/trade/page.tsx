@@ -4,6 +4,7 @@ import RoundedBox from '@/components/common/baseButton/RoundedBox'
 import Heading from '@/components/common/heading'
 import Icon from '@/components/common/Icon'
 import LoaderWidget from '@/components/common/LoaderWidget'
+import Notfound from '@/components/common/Notfound'
 import Pagination from '@/components/common/Pagination'
 import TradingModal from '@/components/common/TradingModal'
 import { RequestTypes } from '@/types'
@@ -15,7 +16,7 @@ import React, { useEffect, useState } from 'react'
 const page = () => {
 
     const [apiLoading, setApiLoading] = React.useState(false)
-    const [tradings, setTradings] = React.useState([])
+    const [tradings, setTradings] = React.useState<any>([])
     const [currentPage, setCurrentPage] = useState(1)
 
     const PAYLOAD: RequestTypes = {
@@ -49,33 +50,34 @@ const page = () => {
                 >Add Trade Details</Link>
             </div>
             <div className=''>
-                <table className='w-full'>
-                    <thead className='h-12'>
-                        <tr className='text-white text-sm font-medium bg-blue-gradient'>
-                            <th className='text-start ps-4 first:rounded-s-lg  overflow-hidden'>
-                                Name Of Trade
-                            </th>
-                            <th className='text-end pe-4 last:rounded-e-lg overflow-hidden'>
-                                Action
-                            </th>
-                        </tr>
-                    </thead>
+                {!tradings?.results?.length ? <Notfound label='Tradings not found' /> :
+                    <table className='w-full'>
+                        <thead className='h-12'>
+                            <tr className='text-white text-sm font-medium bg-blue-gradient'>
+                                <th className='text-start ps-4 first:rounded-s-lg  overflow-hidden'>
+                                    Name Of Trade
+                                </th>
+                                <th className='text-end pe-4 last:rounded-e-lg overflow-hidden'>
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
 
-                    <tbody>
-                        {
-                            tradings?.results?.map((trade) => (
-                                <tr key={trade?.name_of_trade} className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
-                                    <td className=' text-start py-3 px-4'>{trade?.name_of_trade}</td>
-                                    <td className='text-end py-3 px-4'>
-                                        <div className='flex items-center justify-end gap-3 text-[#808080]'>
-                                            <Link href={`/add-trading/?id=${trade?.id}`}><Icon name='edit' size='1.7rem' /></Link>
-                                            <TradingModal modalTile={trade?.name_of_trade} data={trade?.items} />
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                    </tbody>
-                </table>
+                        <tbody>
+                            {
+                                tradings?.results?.map((trade: any) => (
+                                    <tr key={trade?.name_of_trade} className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
+                                        <td className=' text-start py-3 px-4'>{trade?.name_of_trade}</td>
+                                        <td className='text-end py-3 px-4'>
+                                            <div className='flex items-center justify-end gap-3 text-[#808080]'>
+                                                <Link href={`/add-trading/?id=${trade?.id}`}><Icon name='edit' size='1.7rem' /></Link>
+                                                <TradingModal modalTile={trade?.name_of_trade} data={trade?.items} />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                        </tbody>
+                    </table>}
             </div>
             {
                 tradings?.results?.count > 30 ?

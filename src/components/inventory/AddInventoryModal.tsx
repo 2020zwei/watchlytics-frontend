@@ -132,6 +132,8 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
         setFileMeta(null);
         onOpenChange(false);
     };
+
+    console.log(errors)
     return (
         <Modal
             isDismissable={true}
@@ -182,6 +184,7 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
                                                 <div className="text-dark-800">Browse image</div>
                                             </div>
                                         </div>
+                                        {errors?.image?.message?<p className="text-sm text-red-800">{errors?.image?.message}</p>:null}
                                     </FileUploader>
 
                                     <div className="pt-4">
