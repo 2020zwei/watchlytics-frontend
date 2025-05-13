@@ -25,7 +25,7 @@ const holdTimeColors = {
     "50": "#FFA500",// hold time greter then then 50 or equal and less then 70 use this color
     "49": "#10A760",// hold time greter less then 50 use this color
 }
-const STOCKCOLORS: any = { "in_stock": "text-green-600","sold":"text-red-500" }
+const STOCKCOLORS: any = { "in_stock": "text-green-600", "sold": "text-red-500","out_of_stock":"#DA3E33" }
 
 
 const Inventory = () => {
@@ -313,7 +313,12 @@ const Inventory = () => {
                                                                     : {}
                                                             }
                                                         >
-                                                            <div className={clsx("whitespace-nowrap px-4 text-center")}>{col == "profit_margin" ? `${row?.[col]}%` :col == "hold_time"? `~${row?.[col]}`: row?.[col] || "-"}</div>
+                                                            <div className={clsx("whitespace-nowrap px-4 text-center")}>{
+                                                                col == "profit_margin" ? `${row?.[col]}%` : col == "hold_time" ? `~${row?.[col]}` : col == "is_sold" ?
+                                                                    <div className={clsx("min-w-5 mx-auto w-5 h-5 rounded border flex items-center justify-between",row?.is_sold?"bg-blue-850":"")}>
+                                                                        <Icon name='checkmark' className=' text-white text-lg'/>
+                                                                    </div> :
+                                                                    row?.[col] || "-"}</div>
                                                         </td> : null
                                                 ))}
 

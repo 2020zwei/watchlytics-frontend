@@ -37,6 +37,7 @@ const page = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [modelNames, setModelNames] = useState<any[]>([]);
+  const [filters, setFilters] = useState<any>({ barnd: "", model: "" });
 
   const transformChartData = (data: any[]) =>
     data.map((item) => ({
@@ -46,20 +47,6 @@ const page = () => {
       '60-90': item['60_to_90'],
       '90+': item['91_plus'],
     }));
-
-
-  // const fetchCategories = async () => {
-  //   const PAYLOAD: RequestTypes = {
-  //     url: `${URLS.PRODUCTS}/`,
-  //     method: METHODS.GET,
-  //   };
-  //   sendRequest(PAYLOAD).then((res) => {
-  //     if (res.status === 200) {
-  //       const options = res?.data?.results?.map((item: any) => item.product_name);
-  //       setCategories(options);
-  //     }
-  //   });
-  // };
 
   const fetchChartDate = async () => {
     setLoading(true);
@@ -78,14 +65,18 @@ const page = () => {
     }).finally(() => { setLoading(false) });
   };
 
-  const handleFilter = (filter: any) => {
-    console.log(filter)
-  }
-
   useEffect(() => {
-    // fetchCategories();
     fetchChartDate()
   }, [])
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (Object.values(filters).length) {
+      params.set("brand", filters.barnd);
+      params.set("model", filters.model);
+    }
+  }, [filters])
+
   if (loading) {
     return <div className='text-center'><Spinner /></div>;
   }
@@ -94,13 +85,14 @@ const page = () => {
   return (
     <>
       <div className='mb-4 flex sm:flex-row flex-col items-center sm:justify-between'>
+        {JSON.stringify(filters)}
         <Heading as='h3' className=' md:text-2xl text-lg w-full'>Stock Aging Report</Heading>
         <ReportFilters selectedReport='Stock Aging' />
       </div>
       <div className='flex items-center gap-3 mb-6'>
         <div className='min-w-[140px]'>
           <SelectWidget
-            onValueChange={(value) => handleFilter({ "brand": value })}
+            onValueChange={(value) => setFilters((prev: any) => ({ ...prev, "brand": value }))}
             placeholder="Brand"
             options={categories}
             classNames={{
@@ -113,7 +105,7 @@ const page = () => {
         </div>
         <div className='min-w-[140px]'>
           <SelectWidget
-            onValueChange={(value) => handleFilter({ "model": value })}
+            onValueChange={(value) => setFilters((prev: any) => ({ ...prev, "model": value }))}
             placeholder="Model Name"
             options={modelNames}
             classNames={{
