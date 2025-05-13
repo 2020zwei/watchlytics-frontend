@@ -81,6 +81,7 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
 
             sendRequest({ url: "/subscribe/", method: "POST", payload: PAYLOAD })
                 .then(async (res) => {
+                    console.log(res)
                     if (res?.data?.success) {
                         toast.success(res?.data?.message);
                         const isLoggedIn = JSON.parse(localStorage.getItem("isLoggedin") || "false");
@@ -95,7 +96,7 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                         if (!res?.response?.data?.card_declined) {
                             toast.error(res?.response?.data?.message);
                         }
-                        if (res?.status === 400) {
+                        if (res?.status === 400 || res?.status == 500) {
                             toast.error(res?.response?.data?.message || "Something went wrong");
                         }
                     }

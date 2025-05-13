@@ -37,7 +37,7 @@ const page = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [modelNames, setModelNames] = useState<any[]>([]);
-  const [filters, setFilters] = useState<any>({ barnd: "", model: "" });
+  const [filters, setFilters] = useState<any>({ brand: "", model: "" });
 
   const transformChartData = (data: any[]) =>
     data.map((item) => ({
@@ -75,6 +75,7 @@ const page = () => {
       params.set("brand", filters.barnd);
       params.set("model", filters.model);
     }
+    console.log(filters,"testing")
   }, [filters])
 
   if (loading) {
