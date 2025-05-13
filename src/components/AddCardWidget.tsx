@@ -76,11 +76,12 @@ const AddCardWidget = () => {
         } else {
             const PAYLOAD = {
                 payment_method_token: paymentMethod?.id,
-                card_holder_name:name
+                card_holder_name: name
             };
 
             sendRequest({ url: URLS.CARDS, method: METHODS.POST, payload: PAYLOAD })
                 .then(async (res) => {
+                    console.log(res, "error")
                     if (res.status === 201) {
                         toast.success(res?.data?.message);
                         navigate.push("/payments");
@@ -88,11 +89,12 @@ const AddCardWidget = () => {
                         if (!res?.response?.data?.card_declined) {
                             toast.error(res?.response?.data?.message);
                         }
-                        if (res?.data?.response) {
-                            toast.error(res?.data?.response?.errors?.error || "Something went wrong");
+                        if (res?.status === 400) {
+                            toast.error(res?.response?.data?.message || "Something went wrong");
                         }
                     }
                 }).catch((err) => {
+                    console.log(err)
                     toast.error("Something went wrong")
                 })
                 .finally(() => {

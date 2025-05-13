@@ -49,7 +49,7 @@ const Icon: React.FC<PropsTypes> = ({ name, fill, className, stroke, size = "2em
             </svg>
         ),
         checkmark: (
-            <svg stroke="currentColor" className={className} fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z"></path><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path></svg>
+            <svg stroke={stroke || "currentColor"} className={className} fill={fill || "currentColor"} strokeWidth="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill={fill || "none"} d="M0 0h24v24H0V0z"></path><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path></svg>
         ),
         paypal: (
             <svg width="60" height="15" viewBox="0 0 60 15" fill="none" xmlns="http://www.w3.org/2000/svg">
