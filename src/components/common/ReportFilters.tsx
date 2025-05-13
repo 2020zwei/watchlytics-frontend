@@ -10,8 +10,12 @@ const RPORTLINKS: { [key: string]: string } = {
     "Expense Report": "expense-report"
 };
 
+interface ReportFiltersProps {
+    selectedReport?: string
+}
 
-const ReportFilters = ({ selectedReport }: { selectedReport: string }) => {
+
+const ReportFilters = ({ selectedReport }: ReportFiltersProps) => {
     const navigate = useRouter()
     const [selected, setSelected] = useState(selectedReport)
     const pathname = usePathname();

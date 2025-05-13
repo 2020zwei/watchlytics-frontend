@@ -95,8 +95,8 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                         if (!res?.response?.data?.card_declined) {
                             toast.error(res?.response?.data?.message);
                         }
-                        if (res?.data?.response) {
-                            toast.error(res?.data?.response?.errors?.error || "Something went wrong");
+                        if (res?.status === 400) {
+                            toast.error(res?.response?.data?.message || "Something went wrong");
                         }
                     }
                 }).catch((err) => {

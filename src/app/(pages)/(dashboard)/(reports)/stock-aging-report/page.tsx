@@ -3,13 +3,13 @@ import RoundedBox from '@/components/common/baseButton/RoundedBox';
 import Heading from '@/components/common/heading';
 import ReportFilters from '@/components/common/ReportFilters';
 import SelectWidget from '@/components/common/SelectWidget';
-import { DROPDWONOPTION, RequestTypes } from '@/types';
+import { RequestTypes } from '@/types';
 import { sendRequest } from '@/utils/apis';
 import { METHODS, URLS } from '@/utils/constants';
 import { Spinner } from '@heroui/react';
 import React, { useEffect, useState } from 'react';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 
 const data = [
@@ -78,6 +78,9 @@ const page = () => {
     }).finally(() => { setLoading(false) });
   };
 
+  const handleFilter = (filter: any) => {
+    console.log(filter)
+  }
 
   useEffect(() => {
     // fetchCategories();
@@ -97,7 +100,7 @@ const page = () => {
       <div className='flex items-center gap-3 mb-6'>
         <div className='min-w-[140px]'>
           <SelectWidget
-            onChange={(value) => { }}
+            onValueChange={(value) => handleFilter({ "brand": value })}
             placeholder="Brand"
             options={categories}
             classNames={{
@@ -110,7 +113,7 @@ const page = () => {
         </div>
         <div className='min-w-[140px]'>
           <SelectWidget
-            onChange={(value) => { }}
+            onValueChange={(value) => handleFilter({ "model": value })}
             placeholder="Model Name"
             options={modelNames}
             classNames={{
