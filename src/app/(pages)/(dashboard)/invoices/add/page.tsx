@@ -65,6 +65,7 @@ const page = () => {
                                 options={products}
                                 containerClass='flex sm:flex-row flex-col items-start xl:gap-8 sm:gap-x-6'
                                 inputContainer='sm:flex-1 w-full'
+                                inputClass='!min-h-10'
                             />
                         );
                     })}

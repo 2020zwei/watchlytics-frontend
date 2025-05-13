@@ -366,7 +366,7 @@ const AddTrading = () => {
                 {/* Footer */}
                 <div className='flex gap-3 px-4 py-5 border-t border-[#F0F1F3]'>
                     <Button type="submit" className="h-10 bg-blue-gradient text-white"
-                        isDisabled={!isValid || !isDirty}
+                        isDisabled={!isValid}
                         isLoading={loading}
                     >
                         {id ? "Update" : "Add"}
