@@ -86,10 +86,7 @@ const AddCardWidget = () => {
                         toast.success(res?.data?.message);
                         navigate.push("/payments");
                     } else {
-                        if (!res?.response?.data?.card_declined) {
-                            toast.error(res?.response?.data?.message);
-                        }
-                        if (res?.status === 400) {
+                        if (res?.status === 400 || res?.status== 500) {
                             toast.error(res?.response?.data?.message || "Something went wrong");
                         }
                     }
