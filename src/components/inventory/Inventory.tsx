@@ -14,7 +14,7 @@ import InventoryFilterModal from '@/components/common/InventoryFilters'
 import AddInventoryModal from "@/components/inventory/AddInventoryModal"
 import Icon from '../common/Icon'
 import { toast } from 'react-toastify'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Notfound from '../common/Notfound'
 import Link from 'next/link'
 import UploadFileModal from '../common/UploadFileModal'
@@ -40,6 +40,7 @@ const Inventory = () => {
     const searchParams = useSearchParams();
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const params = searchParams?.toString()
+    const navigate=useRouter()
 
     const fetchCategories = async () => {
         const PAYLOAD: RequestTypes = {
@@ -262,6 +263,13 @@ const Inventory = () => {
                                                             <button className='p-3'><Icon name='more' /></button>
                                                         </DropdownTrigger>
                                                         <DropdownMenu aria-label="Dropdown menu with description" variant="faded">
+                                                            <DropdownItem
+                                                                onPress={() => navigate.push(`inventory/${row?.id}`)}
+                                                                key="eye"
+                                                                className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
+                                                                startContent={<Icon name='filledEye' size='1.1rem' stroke='#acacac' />}>
+                                                                View
+                                                            </DropdownItem>
                                                             <DropdownItem
                                                                 onPress={() => { onOpen(); setProduct(row) }}
                                                                 key="new"
