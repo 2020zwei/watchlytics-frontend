@@ -21,7 +21,6 @@ const ProductDetail = () => {
         }
         sendRequest(PAYLOAD).then((res) => {
             if (res?.status === 200) {
-                console.log(res?.data)
                 setProduct(res.data)
             }
         }).finally(() => setLoading(false))

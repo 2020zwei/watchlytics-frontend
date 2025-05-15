@@ -56,7 +56,6 @@ const CardListingWidget = () => {
                 toast.error(res?.error?.message || "Something went wrong, please try again.");
             }
         }).catch((err) => {
-            console.log(err)
             toast.error("An error occurred while deleting card.");
         })
     }

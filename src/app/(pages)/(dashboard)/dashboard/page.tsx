@@ -111,16 +111,18 @@ export default function ExpenseTrackingChart() {
               </div>
             </div>
           </div>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={lineData} margin={{ top: 10, right: 0, left: 0, bottom: 90 }}>
-              <CartesianGrid vertical={false} stroke="#f0f0f0" />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} padding={{ right: 10, left: 30 }} tickMargin={40} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} domain={['dataMin - 10000', 'dataMax']} />
-              <Tooltip formatter={(value: any) => new Intl.NumberFormat().format(value)} />
-              <Line type="monotone" dataKey="sales" stroke="#EB2F96" dot={{ r: 3 }} strokeWidth={2} />
-              <Line type="monotone" dataKey="purchase" stroke="#52C41A" dot={{ r: 3 }} strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
+          <div className="h-[430px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={lineData} margin={{ top: 10, right: 0, left: 0, bottom: 90 }}>
+                <CartesianGrid vertical={false} stroke="#f0f0f0" />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} padding={{ right: 10, left: 30 }} tickMargin={40} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} domain={['dataMin - 10000', 'dataMax']} />
+                <Tooltip formatter={(value: any) => new Intl.NumberFormat().format(value)} />
+                <Line type="monotone" dataKey="sales" stroke="#EB2F96" dot={{ r: 3 }} strokeWidth={2} />
+                <Line type="monotone" dataKey="purchase" stroke="#52C41A" dot={{ r: 3 }} strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </RoundedBox>
         <RoundedBox className="pt-5 px-4 max-h-[430px] lg:w-[270px] flex flex-col justify-between pb-4">
           <Heading>Income</Heading>
@@ -178,26 +180,26 @@ export default function ExpenseTrackingChart() {
             </div>
           </div>
         </div>
-        <div className=''>
+        <div className='overflow-x-auto'>
           <table className='w-full'>
             <thead className='h-12'>
               <tr className='text-white text-sm font-medium bg-blue-gradient'>
-                <th className='text-start ps-4 first:rounded-s-lg  overflow-hidden'>
+                <th className='text-start px-4 first:rounded-s-lg  overflow-hidden'>
                   Image
                 </th>
-                <th className='text-start ps-4 overflow-hidden'>
+                <th className='text-start px-4 whitespace-nowrap'>
                   Buying Price
                 </th>
-                <th className='text-start ps-4 overflow-hidden'>
+                <th className='text-start px-4 whitespace-nowrap'>
                   ebay
                 </th>
-                <th className='text-start ps-4 overflow-hidden'>
+                <th className='text-start px-4 whitespace-nowrap'>
                   Chrono24
                 </th>
-                <th className='text-start ps-4 overflow-hidden'>
+                <th className='text-start px-4 whitespace-nowrap'>
                   Bezel
                 </th>
-                <th className='text-end pe-4 last:rounded-e-lg overflow-hidden'>
+                <th className='text-end px-4 last:rounded-e-lg whitespace-nowrap'>
                   Grailzee
                 </th>
               </tr>

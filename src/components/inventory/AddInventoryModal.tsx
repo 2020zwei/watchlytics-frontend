@@ -91,8 +91,11 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
                 reset();
                 callBack()
             }
+            if (res.status === 500) {
+                toast.error(res?.response?.data?.message || "Something went wrong");
+            }
             const errors = res?.response?.data?.errors;
-            if (errors) {
+            if (res.status === 400) {
                 Object.keys(errors).forEach((key) => {
                     toast.error(`${key?.replaceAll("_", " ")}: ${errors[key]}`);
                 });
@@ -132,8 +135,6 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
         setFileMeta(null);
         onOpenChange(false);
     };
-
-    console.log(errors)
     return (
         <Modal
             isDismissable={true}
@@ -184,7 +185,7 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
                                                 <div className="text-dark-800">Browse image</div>
                                             </div>
                                         </div>
-                                        {errors?.image?.message?<p className="text-sm text-red-800">{errors?.image?.message}</p>:null}
+                                        {errors?.image?.message ? <p className="text-sm text-red-800">{errors?.image?.message}</p> : null}
                                     </FileUploader>
 
                                     <div className="pt-4">

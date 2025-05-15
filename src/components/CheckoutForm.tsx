@@ -81,7 +81,6 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
 
             sendRequest({ url: "/subscribe/", method: "POST", payload: PAYLOAD })
                 .then(async (res) => {
-                    console.log(res)
                     if (res?.data?.success) {
                         toast.success(res?.data?.message);
                         const isLoggedIn = JSON.parse(localStorage.getItem("isLoggedin") || "false");
