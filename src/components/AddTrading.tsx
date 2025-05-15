@@ -83,7 +83,6 @@ const AddTrading = () => {
                     label: item.model_name,
                 }));
                 setProducts(res?.data?.results);
-                console.log(options, 'setCategories')
                 setCategories(options);
             }
         });

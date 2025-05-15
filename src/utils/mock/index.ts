@@ -269,7 +269,7 @@ export const InventoryFormSchema = z.object({
         .min(3, "Reference ID must be at least 3 characters")
         .max(50, "Max 50 characters"),
 
-        category: z.union([z.string(), z.number()])
+    category: z.union([z.string(), z.number()])
         .refine(val => val !== null && val !== undefined && val !== '', {
             message: "Brand is required",
         }),
@@ -283,7 +283,10 @@ export const InventoryFormSchema = z.object({
         .coerce.number()
         .min(0.01, "Buying price is required"),
 
-    quantity: z.coerce.number().int().default(1).nullable().optional(),
+    quantity: z.coerce.number()
+        .int({ message: "Quantity must be an integer." })
+        .min(1, { message: "Quantity must be at least 1." })
+        .default(1),
 
     date_purchased: z.preprocess(
         (val) => {

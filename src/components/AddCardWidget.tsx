@@ -81,7 +81,6 @@ const AddCardWidget = () => {
 
             sendRequest({ url: URLS.CARDS, method: METHODS.POST, payload: PAYLOAD })
                 .then(async (res) => {
-                    console.log(res, "error")
                     if (res.status === 201) {
                         toast.success(res?.data?.message);
                         navigate.push("/payments");
@@ -91,7 +90,6 @@ const AddCardWidget = () => {
                         }
                     }
                 }).catch((err) => {
-                    console.log(err)
                     toast.error("Something went wrong")
                 })
                 .finally(() => {
