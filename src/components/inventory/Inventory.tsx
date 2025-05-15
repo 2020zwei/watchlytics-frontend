@@ -201,7 +201,7 @@ const Inventory = () => {
                         <li className='xs:w-auto w-[48%]'>
                             <Dropdown className='!rounded-lg'>
                                 <DropdownTrigger>
-                                    <TransparentButton title='Upload' className='h-10' icon='upload' />
+                                    <TransparentButton title='Upload' className='h-10 !text-[#1C274C] !border-[#1C274C]' icon='upload' iconFill='#1C274C'/>
                                 </DropdownTrigger>
                                 <DropdownMenu aria-label="Dropdown menu with description" variant="faded">
                                     <DropdownItem
@@ -247,7 +247,7 @@ const Inventory = () => {
                                                         <div className={clsx("first-letter:uppercase whitespace-nowrap px-4")}>{col === "product_id" ? "Reference number" : col?.replaceAll("_", " ")}</div>
                                                     </th> : null
                                             ))}
-                                            <th className="px-4 text-sm font-medium py-3">Availability</th>
+                                            <th className="px-4 text-sm font-medium py-3 rounded-tr-lg rounded-br-lg">Availability</th>
 
                                         </tr>
                                     </thead>
