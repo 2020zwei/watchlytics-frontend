@@ -80,9 +80,10 @@ const AddTrading = () => {
             if (res.status === 200) {
                 const options = res?.data?.results?.map((item: any) => ({
                     value: item.id,
-                    label: item.product_name,
+                    label: item.model_name,
                 }));
                 setProducts(res?.data?.results);
+                console.log(options, 'setCategories')
                 setCategories(options);
             }
         });
@@ -109,13 +110,13 @@ const AddTrading = () => {
                 const selectedProducts = data?.items.map((el: any) => ({
                     id: el?.product,
                     image: el?.product_details?.image,
-                    product_name: el?.product_details?.product_name,
+                    model_name: el?.product_details?.model_name,
                     sold_price: Number(el?.sale_price),
                     buying_price: Number(el?.purchase_price),
                     quantity: Number(el?.quantity),
                 }));
                 const selectedOptions = selectedProducts.map((p: any) => ({
-                    label: p.product_name,
+                    label: p.model_name,
                     value: p.id,
                 }));
 
@@ -128,11 +129,46 @@ const AddTrading = () => {
             }
         });
     };
+    const handleIncrement1 = (index: number, item: any) => {
+        const updatedProducts = products.map((el) => {
+            if (el.id === item.id) {
+                const maxQty = item.maxQuantity ?? Infinity;
+                if (el.quantity < maxQty) {
+                    return { ...el, quantity: el.quantity + 1 };
+                }
+            }
+            return el;
+        });
+        setProduct(updatedProducts);
+    };
 
     const handleIncrement = (index: number, item: any) => {
-        const products = product.map(el => el.id === item.id ? { ...el, quantity: el.quantity + 1 } : el)
-        setProduct(products)
+        const matched = products.find((el) => el.id === item.id);
+
+        if (!matched) {
+            toast.error(`Product ${item.name || item.id} not found in available stock!`);
+            return;
+        }
+
+        const currentProduct = product.find((el) => el.id === item.id);
+
+        if (!currentProduct) {
+            toast.error(`Selected product ${item.name || item.id} not found!`);
+            return;
+        }
+
+        if (currentProduct.quantity >= matched.quantity) {
+            toast.info(`Only ${matched.quantity} units available`);
+            return;
+        }
+
+        // ✅ Safe to increment
+        const updatedProducts = product.map(el =>
+            el.id === item.id ? { ...el, quantity: el.quantity + 1 } : el
+        );
+        setProduct(updatedProducts);
     };
+
 
     const handleDecrement = (index: number, item: any) => {
         const products = product.map(el => el.id === item.id ? { ...el, quantity: el.quantity - 1 } : el)
@@ -149,7 +185,7 @@ const AddTrading = () => {
             return existing || {
                 id: prod.id,
                 image: prod.image,
-                product_name: prod?.product_name,
+                model_name: prod?.model_name,
                 sold_price: prod?.sold_price || 0,
                 buying_price: prod?.buying_price || 0,
                 quantity: 1,
@@ -178,7 +214,7 @@ const AddTrading = () => {
         sendRequest(PAYLOAD).then((res) => {
             if (res.status === 201 || res.status === 200) {
                 toast.success(`Trade successfully ${id ? "updated" : "created"}`)
-                navigate.push("/trade")
+                navigate.push("/transaction")
             }
             else {
                 toast.error("Something went wrong")
@@ -207,7 +243,7 @@ const AddTrading = () => {
     return (
         <RoundedBox>
             <div className='flex items-center justify-between px-4 pt-7 pb-3 border-b border-[#F0F1F3]'>
-                <Heading>{id ? 'Edit' : 'Add'} Trade Details</Heading>
+                <Heading>{id ? 'Edit' : 'Add'} Transaction Details</Heading>
             </div>
             {/* @ts-ignore */}
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -215,12 +251,12 @@ const AddTrading = () => {
 
                     {/* Name of Trade */}
                     <div className='flex items-center'>
-                        <label className='sm:min-w-[140px] min-w-[130px] text-sm font-medium text-dark-700'>Name Of Trade:</label>
+                        <label className='min-w-[160px] text-sm font-medium text-dark-700'>Name Of Transaction:</label>
                         <div className="flex-1 max-w-[320px]">
                             <input
                                 {...register("name_of_trade")}
                                 type="text"
-                                placeholder='Name Of Trade'
+                                placeholder='Name Of Transaction'
                                 className='w-full outline-none font-normal border text-sm placeholder:text-gray-180 rounded-lg px-3 h-[34px] border-gray-70 text-dark-800'
                             />
                             {errors.name_of_trade && <p className="text-red-500 text-xs mt-1">{errors.name_of_trade.message}</p>}
@@ -229,7 +265,7 @@ const AddTrading = () => {
 
                     {/* Product Select */}
                     <div className='flex items-center'>
-                        <label className='sm:min-w-[140px] min-w-[130px] text-sm font-medium text-dark-700'>Add Watches:</label>
+                        <label className='min-w-[160px] text-sm font-medium text-dark-700'>Add Watches:</label>
                         <div className='flex items-center relative flex-1'>
                             <span className='start-2 z-10 absolute'><Icon name='search' size='1.3rem' /></span>
                             <Controller
@@ -259,7 +295,7 @@ const AddTrading = () => {
                     {/* Quantity Block */}
                     {product.length ? (
                         <div className='flex'>
-                            <div className='sm:min-w-[140px] min-w-[130px] text-sm font-medium text-dark-700'>Quantity:</div>
+                            <div className='min-w-[160px] text-sm font-medium text-dark-700'>Quantity:</div>
                             <div className='w-full flex flex-col gap-3'>
                                 {product.map((item, i) => (
                                     <div key={item?.id} className=" flex items-center justify-between w-full max-w-[320px]">
@@ -267,7 +303,7 @@ const AddTrading = () => {
                                             <div className="w-8 h-8 rounded py-1 bg-[#f9f9f9]">
                                                 <img src={item?.image} alt="" className="w-full h-full rounded" />
                                             </div>
-                                            <span>{item?.product_name}</span>
+                                            <span>{item?.model_name}</span>
                                         </div>
                                         <div className="w-[77px] flex items-center justify-between px-2 h-7 rounded-3xl border border-[#F0F1F3]">
                                             <button disabled={item?.quantity < 2} type="button" onClick={() => handleDecrement(i, item)} className="text-[#ACACAC] text-lg">-</button>
@@ -283,7 +319,7 @@ const AddTrading = () => {
 
                     {/* Date Input */}
                     <div className='flex items-center'>
-                        <label className='sm:min-w-[140px] min-w-[130px] text-sm font-medium text-dark-700'>Transaction Date:</label>
+                        <label className='min-w-[160px] text-sm font-medium text-dark-700'>Transaction Date:</label>
                         <div className="flex-1 max-w-[320px] relative">
                             <Controller
                                 name="date"
@@ -318,7 +354,7 @@ const AddTrading = () => {
 
                     {/* Purchase Price */}
                     <div className='flex items-center'>
-                        <label className='sm:min-w-[140px] min-w-[130px] text-sm font-medium text-dark-700'>Purchase Price:</label>
+                        <label className='min-w-[160px] text-sm font-medium text-dark-700'>Purchase Price:</label>
                         <div className="flex-1 max-w-[320px]">
                             <input {...register("purchase_price", { valueAsNumber: true })} type="number"
                                 className='w-full outline-none font-normal border text-sm rounded-lg px-3 h-[34px] border-gray-70 text-dark-800' />
@@ -328,7 +364,7 @@ const AddTrading = () => {
 
                     {/* Sale Price */}
                     <div className='flex items-center'>
-                        <label className='sm:min-w-[140px] min-w-[130px] text-sm font-medium text-dark-700'>Sale Price:</label>
+                        <label className='min-w-[160px] text-sm font-medium text-dark-700'>Sale Price:</label>
                         <div className="flex-1 max-w-[320px]">
                             <input {...register("sale_price", { valueAsNumber: true })} type="number"
                                 className='w-full outline-none font-normal border text-sm rounded-lg px-3 h-[34px] border-gray-70 text-dark-800' />
@@ -340,7 +376,7 @@ const AddTrading = () => {
                     <div className='border-t border-[#F0F1F3] mt-1'>
                         <h4 className='font-semibold text-dark-800 my-4'>Buyer Details</h4>
                         <div className='flex items-center'>
-                            <label className='sm:min-w-[140px] min-w-[130px] text-sm font-medium text-dark-700'>Name:</label>
+                            <label className='min-w-[160px] text-sm font-medium text-dark-700'>Name:</label>
                             <div className='flex items-center relative flex-1 pointer-events-none opacity-50'>
                                 <span className='start-2 z-10 absolute'><Icon name='search' size='1.3rem' /></span>
                                 <Controller

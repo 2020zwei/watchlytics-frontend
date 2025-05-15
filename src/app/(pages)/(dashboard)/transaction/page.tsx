@@ -44,18 +44,18 @@ const page = () => {
     return (
         <RoundedBox>
             <div className='flex items-center justify-between px-5 pt-7 pb-3'>
-                <Heading>All Trades</Heading>
+                <Heading>All Transactions</Heading>
                 <Link href="/add-trading"
                     className="h-10 px-3 text-sm font-medium flex items-center justify-between text-white rounded-lg bg-blue-gradient"
-                >Add Trade Details</Link>
+                >Add Transaction Details</Link>
             </div>
             <div className=''>
-                {!tradings?.results?.length ? <Notfound label='Tradings not found' /> :
+                {!tradings?.results?.length ? <Notfound label='Transactions not found' /> :
                     <table className='w-full'>
                         <thead className='h-12'>
                             <tr className='text-white text-sm font-medium bg-blue-gradient'>
                                 <th className='text-start ps-4 first:rounded-s-lg  overflow-hidden'>
-                                    Name Of Trade
+                                    Name Of Transaction
                                 </th>
                                 <th className='text-end pe-4 last:rounded-e-lg overflow-hidden'>
                                     Action

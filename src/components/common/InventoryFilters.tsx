@@ -105,8 +105,9 @@ const InventoryFilterModal: React.FC<InventoryFilterModalTypes> = ({
             <TransparentButton
                 onPress={onOpen}
                 title="Filters"
-                className="h-10"
+                className="h-10 !text-[#1C274C] !border-[#1C274C]"
                 icon="filter"
+                iconStroke="#1C274C"
             />
 
             <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">

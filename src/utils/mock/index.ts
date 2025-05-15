@@ -22,12 +22,6 @@ const city = {
     "fieldType": "input",
     "type": "text"
 }
-const productName = {
-    "label": "Product Name",
-    "name": "product_name",
-    "placeholder": "Enter Product Name",
-    "fieldType": "input"
-}
 
 const quantity = {
     "label": "Quantity",
@@ -39,7 +33,10 @@ const quantity = {
 
 export const InventoryFormFields = [
     {
-        ...productName
+        "label": "Model Name",
+        "name": "model_name",
+        "placeholder": "Enter Model Name",
+        "fieldType": "input"
     },
     {
         "label": "Reference Number",
@@ -48,9 +45,9 @@ export const InventoryFormFields = [
         "fieldType": "input"
     },
     {
-        "label": "Category",
+        "label": "Brand",
         "name": "category",
-        "placeholder": "Select product category",
+        "placeholder": "Select product brand",
         "fieldType": "select"
     },
     {
@@ -150,20 +147,20 @@ export const InventoryFormFields = [
         "fieldType": "input",
         "type": "number"
     },
-    {
-        "label": "Profit Margin",
-        "name": "profit_margin",
-        "placeholder": "Enter Profit Margin",
-        "fieldType": "input",
-        "type": "number"
-    },
-    {
-        "label": "Profit",
-        "name": "profit",
-        "placeholder": "Enter profit",
-        "fieldType": "input",
-        "type": "number"
-    },
+    // {
+    //     "label": "Profit Margin",
+    //     "name": "profit_margin",
+    //     "placeholder": "Enter Profit Margin",
+    //     "fieldType": "input",
+    //     "type": "number"
+    // },
+    // {
+    //     "label": "Profit",
+    //     "name": "profit",
+    //     "placeholder": "Enter profit",
+    //     "fieldType": "input",
+    //     "type": "number"
+    // },
     {
         "label": "Unit",
         "name": "unit",
@@ -254,10 +251,10 @@ const availabilityEnum = z.enum(["in_stock", "sold", "reserved", "in_repair"]);
 const conditionEnum = z.enum(["new", "used"]);
 
 export const InventoryFormSchema = z.object({
-    product_name: z
+    model_name: z
         .string()
-        .nonempty("Product name is required")
-        .min(3, "Product name must be at least 3 characters")
+        .nonempty("Model name is required")
+        .min(3, "Model name must be at least 3 characters")
         .max(200, "Max 200 characters"),
     year: z.preprocess(
         (val) => typeof val === "string" ? Number(val) : val,
@@ -272,9 +269,9 @@ export const InventoryFormSchema = z.object({
         .min(3, "Reference ID must be at least 3 characters")
         .max(50, "Max 50 characters"),
 
-    category: z.union([z.string(), z.number()])
+        category: z.union([z.string(), z.number()])
         .refine(val => val !== null && val !== undefined && val !== '', {
-            message: "Category is required",
+            message: "Brand is required",
         }),
 
     availability: z.preprocess(
@@ -321,22 +318,22 @@ export const InventoryFormSchema = z.object({
 
     sold_price: z.coerce.number().nullable().optional(),
     whole_price: z.coerce.number().nullable().optional(),
-    profit_margin: z.coerce.number().nullable().optional(),
-    profit: z.coerce.number().nullable().optional(),
+    // profit_margin: z.coerce.number().nullable().optional(),
+    // profit: z.coerce.number().nullable().optional(),
     unit: z.string().nullable().optional(),
     date_sold: z.preprocess(
         (val) => {
-            if (typeof val === "string") {
+            if (val === '' || val === null) return undefined;
+
+            if (typeof val === 'string') {
                 const date = new Date(val);
                 return isNaN(date.getTime()) ? undefined : date;
             }
             return val;
         },
-        z.date({
-            required_error: "Sale date is required",
-            invalid_type_error: "Invalid date format",
-        })
+        z.date().optional()
     ),
+
     source_of_sale: z.string().nullable().optional(),
     delivery_content: z.string().nullable().optional(),
     condition: z.preprocess(
@@ -357,7 +354,7 @@ export const InventoryFormSchema = z.object({
     serial_number: z.string().nullable().optional(),
 }).refine((data) => {
     if (!data.date_sold) return true;
-    return new Date(data.date_purchased) < new Date(data.date_sold);
+    return new Date(data.date_purchased) <= new Date(data.date_sold);
 }, {
     message: "Date Purchased must be less than Date Sold",
     path: ["date_sold"],
@@ -430,8 +427,8 @@ export const SidebarItems = [
         "icon": "shipping"
     },
     {
-        "href": "/trade",
-        "label": "Trade",
+        "href": "/transaction",
+        "label": "Transaction",
         "icon": "trade",
         "matchPaths": ["/trading", "/add-trading", "/edit-trading"]
     },
