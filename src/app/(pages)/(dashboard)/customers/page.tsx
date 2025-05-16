@@ -78,12 +78,7 @@ const page = () => {
                                 <table className="border-collapse min-w-[1200px] w-full text-start">
                                     <thead className="bg-blue-gradient text-white">
                                         <tr>
-                                            {Object.keys(customers?.results[0]).map((heading: string,index:number) => (
-                                                heading !== "id" ?
-                                                    <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4", index === 0?"rounded-lg":"")}
-                                                    >{heading}</th> : index
-                                            ))}
-                                            {/* <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >Name </th>
                                             <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >No. of Orders </th>
@@ -92,7 +87,7 @@ const page = () => {
                                             <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >Follow Up </th>
                                             <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
-                                            >Status</th> */}
+                                            >Status</th>
                                             <th className="px-4 rounded-tr-lg rounded-br-lg text-sm font-medium py-3">Actions</th>
                                         </tr>
                                     </thead>
