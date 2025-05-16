@@ -326,7 +326,7 @@ export default function SignIn() {
         router.push("/subscription");
       }
       else {
-        router.push("/profile");
+        router.push("/dashboard");
       }
 
     } catch (error: any) {

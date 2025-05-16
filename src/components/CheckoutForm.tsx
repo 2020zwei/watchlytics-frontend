@@ -74,6 +74,7 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
             setIsSubmitting(false);
         } else {
             const PAYLOAD = {
+                card_holder_name:name,
                 plan_name: planName,
                 price_id: priceId,
                 payment_method_token: paymentMethod?.id,
