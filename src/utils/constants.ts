@@ -44,6 +44,7 @@ export const URLS = {
   EXPENSES: "/v1/reports/expenses/",
   CARDS: "/v1/cards/",
   INVOICE: "/v1/invoices/",
+  CUSTOMERS: "/v1/customers/",
 };
 
 export const METHODS = {
