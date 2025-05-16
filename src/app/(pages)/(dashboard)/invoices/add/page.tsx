@@ -12,6 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 import { z } from "zod";
 type FormSchemaType = z.infer<typeof InvoiceFormFieldsSchema>;
 const page = () => {
@@ -28,23 +29,41 @@ const page = () => {
         mode: "onChange",
     });
 
-    const fetchCategories = async () => {
+    const fetchProducts = async () => {
         const PAYLOAD: RequestTypes = {
             url: `${URLS.PRODUCTS}/`,
             method: METHODS.GET,
         };
         sendRequest(PAYLOAD).then((res) => {
+            console.log(res)
             if (res.status === 200) {
                 const options = res?.data?.results?.map((item: any) => ({
                     value: item.id,
-                    label: item.product_name,
+                    label: item.model_name,
                 }));
                 setProducts(options);
             }
         });
     };
-    useEffect(() => { fetchCategories() }, [])
-    const onSubmit = (data: FormSchemaType) => { }
+    useEffect(() => { fetchProducts() }, [])
+    const onSubmit = (data: FormSchemaType) => {
+        console.log(data)
+        setLoading(true)
+        const PAYLOAD: RequestTypes = {
+            url: `${URLS.INVOICE}`,
+            method: METHODS.POST,
+            payload: data
+        };
+        sendRequest(PAYLOAD).then((res) => {
+            console.log(res)
+            if (res.status === 200) {
+                toast.success("fd")
+            }
+            else {
+                toast.error(res?.response?.data||"Something went wrong")
+            }
+        }).finally(() => setLoading(false));
+    }
 
     return (
         <RoundedBox className='px-4 py-8 '>

@@ -43,6 +43,7 @@ export const URLS = {
   REPORT_STATE: "/v1/reports/stats/",
   EXPENSES: "/v1/reports/expenses/",
   CARDS: "/v1/cards/",
+  INVOICE: "/v1/invoices/",
 };
 
 export const METHODS = {

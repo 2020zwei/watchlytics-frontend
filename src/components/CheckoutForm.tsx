@@ -85,16 +85,13 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                         toast.success(res?.data?.message);
                         const isLoggedIn = JSON.parse(localStorage.getItem("isLoggedin") || "false");
                         if (isLoggedIn) {
-                            navigate.push("/profile");
+                            navigate.push("/dashboard");
                         }
                         else {
                             await fetch('/api/logout')
                             navigate.push("/login")
                         }
                     } else {
-                        if (!res?.response?.data?.card_declined) {
-                            toast.error(res?.response?.data?.message);
-                        }
                         if (res?.status === 400 || res?.status == 500) {
                             toast.error(res?.response?.data?.message || "Something went wrong");
                         }
