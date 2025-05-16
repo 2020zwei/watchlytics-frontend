@@ -31,7 +31,7 @@ export const TradeFormSchema = z.object({
     product: z
         .array(z.any())
         .min(1, "At least one transaction item is required"),
-    customer: z.string().optional(),
+    customer: z.string().min(1, "Customer name is required"),
 });
 
 
@@ -47,6 +47,7 @@ const AddTrading = () => {
     const dateRef = React.useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState(false)
     const [originalQty, setOriginalQty] = useState(0)
+    const [customerOptions, setCustomerOptions] = useState<any>([])
     const navigate = useRouter()
     const {
         register,
@@ -156,16 +157,19 @@ const AddTrading = () => {
             return;
         }
 
-        if (!id) { matched["quantity"] = matched["quantity"] - 1 }
-        if (matched.quantity == 0) {
+        if (!id && matched.quantity>0) { matched["quantity"] = matched["quantity"] - 1 }
+        if (matched.quantity <= 0) {
             toast.info(`Only ${matched.quantity} units available`);
             return;
         }
-        if (id) { matched["quantity"] = matched["quantity"] - 1 }
-        const updatedProducts = product.map(el =>
-            el.id === item.id ? { ...el, quantity: el.quantity + 1 } : el
-        );
-        setProduct(updatedProducts);
+        if (id && matched.quantity>0) { matched["quantity"] = matched["quantity"] - 1 }
+        console.log(matched.quantity, 'matched.quantity')
+        if (matched.quantity !== 0) {
+            const updatedProducts = product.map(el =>
+                el.id === item.id ? { ...el, quantity: el.quantity + 1 } : el
+            );
+            setProduct(updatedProducts);
+        }
     };
 
 
@@ -195,8 +199,15 @@ const AddTrading = () => {
 
         setProduct(updated);
     };
-
-
+    const getCustomers = () => {
+        setLoading(true)
+        sendRequest({ url: URLS.CUSTOMERS }).then((res) => {
+            const options = res?.data?.results?.map((item: any) => ({ value: item?.id, label: item?.name }))
+            setCustomerOptions(options)
+        }).finally(() => {
+            setLoading(false)
+        });
+    }
     const onSubmit = (data: TradeFormValues) => {
         setLoading(true)
         const products = product?.map((item, index) => ({
@@ -227,6 +238,7 @@ const AddTrading = () => {
     };
 
     useEffect(() => {
+        getCustomers()
         fetchCategories();
     }, []);
 
@@ -380,16 +392,14 @@ const AddTrading = () => {
                         <h4 className='font-semibold text-dark-800 my-4'>Buyer Details</h4>
                         <div className='flex items-center'>
                             <label className='min-w-[160px] text-sm font-medium text-dark-700'>Name:</label>
-                            <div className='flex items-center relative flex-1 pointer-events-none opacity-50'>
+                            <div className='flex items-center relative flex-1'>
                                 <span className='start-2 z-10 absolute'><Icon name='search' size='1.3rem' /></span>
                                 <Controller
                                     name="customer"
                                     control={control}
                                     render={({ field }) => (
                                         <Select
-                                            options={categories}
-                                            onChange={(item) => field.onChange(item?.value)}
-                                            value={categories.find((opt) => opt.value === field.value) || null}
+                                            options={customerOptions}
                                             placeholder="Buyer Name"
                                             classNamePrefix="searchbale-select"
                                             isSearchable
