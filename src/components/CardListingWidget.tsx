@@ -47,6 +47,7 @@ const CardListingWidget = () => {
             method: METHODS.DELETE,
         }
         sendRequest(PAYLOAD).then((res) => {
+            console.log(res)
             if (res?.status === 200) {
                 setCards(() => cards.filter((card: any) => card.id !== deleteId))
                 toast.success(res.data.message);

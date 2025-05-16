@@ -46,6 +46,7 @@ const AddTrading = () => {
     const id = useSearchParams().get('id');
     const dateRef = React.useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState(false)
+    const [originalQty, setOriginalQty] = useState(0)
     const navigate = useRouter()
     const {
         register,
@@ -73,7 +74,7 @@ const AddTrading = () => {
 
     const fetchCategories = async () => {
         const PAYLOAD: RequestTypes = {
-            url: `${URLS.PRODUCTS}/`,
+            url: `${URLS.PRODUCTS}/?is_transaction=${true}/`,
             method: METHODS.GET,
         };
         sendRequest(PAYLOAD).then((res) => {
@@ -128,21 +129,20 @@ const AddTrading = () => {
             }
         });
     };
-    const handleIncrement1 = (index: number, item: any) => {
-        const updatedProducts = products.map((el) => {
-            if (el.id === item.id) {
-                const maxQty = item.maxQuantity ?? Infinity;
-                if (el.quantity < maxQty) {
-                    return { ...el, quantity: el.quantity + 1 };
-                }
-            }
-            return el;
-        });
-        setProduct(updatedProducts);
-    };
 
     const handleIncrement = (index: number, item: any) => {
         const matched = products.find((el) => el.id === item.id);
+        const copyMatched = JSON.stringify(matched)
+        setOriginalQty((prev) => {
+            if (!prev) {
+                return JSON.parse(copyMatched).quantity
+            }
+            else {
+                return prev
+            }
+        })
+
+
 
         if (!matched) {
             toast.error(`Product ${item.name || item.id} not found in available stock!`);
@@ -156,12 +156,12 @@ const AddTrading = () => {
             return;
         }
 
-        if (currentProduct.quantity >= matched.quantity) {
+        if (!id) { matched["quantity"] = matched["quantity"] - 1 }
+        if (matched.quantity == 0) {
             toast.info(`Only ${matched.quantity} units available`);
             return;
         }
-
-        // ✅ Safe to increment
+        if (id) { matched["quantity"] = matched["quantity"] - 1 }
         const updatedProducts = product.map(el =>
             el.id === item.id ? { ...el, quantity: el.quantity + 1 } : el
         );
@@ -170,8 +170,10 @@ const AddTrading = () => {
 
 
     const handleDecrement = (index: number, item: any) => {
-        const products = product.map(el => el.id === item.id ? { ...el, quantity: el.quantity - 1 } : el)
-        setProduct(products)
+        const matched = products.find((el) => el.id === item.id);
+        matched['quantity'] = matched['quantity'] + 1
+        const updatedProducts = product.map(el => el.id === item.id ? { ...el, quantity: el.quantity - 1 } : el)
+        setProduct(updatedProducts)
     };
 
     const handleAddProduct = (items: any[]) => {
@@ -215,9 +217,12 @@ const AddTrading = () => {
                 toast.success(`Trade successfully ${id ? "updated" : "created"}`)
                 navigate.push("/transaction")
             }
-            else {
-                toast.error("Something went wrong")
+            if (res.status === 400) {
+                res?.response?.data?.details?.non_field_errors.forEach((error: string) => {
+                    toast.error(error || "Something went wrong")
+                })
             }
+
         }).finally(() => setLoading(false));
     };
 
@@ -237,7 +242,6 @@ const AddTrading = () => {
         setValue('purchase_price', sumOfPurchesPrice);
         setValue("sale_price", sumOfSalePrice);
     }, [quantities, product])
-
 
     return (
         <RoundedBox>

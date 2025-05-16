@@ -3,11 +3,12 @@ import RoundedBox from '@/components/common/baseButton/RoundedBox'
 import Heading from '@/components/common/heading'
 import clsx from 'clsx'
 import React, { useState } from 'react'
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
 import Pagination from '@/components/common/Pagination'
 import Icon from './common/Icon'
 import SelectWidget from './common/SelectWidget'
 import AddNoteModalWidget from './common/AddNoteModalWidget'
+import Link from 'next/link'
 
 const buttons = {
     "status": ["Active", "Inactive"],
@@ -36,7 +37,7 @@ const CustomerWidget = () => {
             <RoundedBox as='section' className="px-4 py-5 gap-3 mt-5">
                 <div className='flex items-center justify-between md:flex-row flex-col'>
                     <Heading className='text-start md:w-auto w-full md:-order-1 order-1'>Customers Property</Heading>
-                    <ul className='flex items-center gap-4 md:mb-0 mb-5 md:flex-nowrap flex-wrap md:w-auto w-full inventory-btns'>
+                    <ul className='flex items-center gap-2 md:mb-0 mb-5 md:flex-nowrap flex-wrap md:w-auto w-full inventory-btns'>
 
                         {Object.keys(buttons).map((key: string, index: number) => {
                             return (
@@ -56,6 +57,7 @@ const CustomerWidget = () => {
                             )
                         })}
                     </ul>
+                    <Link href="/customers/add" className='bg-blue-gradient text-white rounded-lg text-sm h-10 w-[128px] ms-1 flex items-center justify-center'>Add Customer</Link>
                 </div>
                 {/* <Notfound label='No Products Found' />  */}
                 <div className='pt-3'>

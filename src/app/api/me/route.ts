@@ -19,6 +19,7 @@ export async function GET(req: NextRequest) {
             },
         });
 
+
         // Check if the response is not JSON (i.e., it might be an HTML page like a 404 or error page)
         if (!res.ok) {
             const errorText = await res.text();  // Get the raw response text

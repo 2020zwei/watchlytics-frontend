@@ -789,13 +789,16 @@ export const InvoiceFormFieldsSchema = z.object({
             invalid_type_error: "Invalid date format",
         })
     ),
-    quantity: z
-        .number({ invalid_type_error: "Quantity must be a number" })
-        .min(1, "Quantity is required"),
-    unit_price: z
-        .number({ invalid_type_error: "Unit Price must be a number" })
-        .min(0.01, "Unit Price is required"),
+    quantity: z.coerce.number()
+        .int({ message: "Quantity must be an integer." })
+        .min(1, { message: "Quantity must be at least 1." })
+        .default(1),
+    unit_price: z.coerce.number().int({ message: "Unit Price must be a number" })
+        .min(1, { message: "Unit price must be at least 1." })
+        .default(1),
     city: z.string().min(1, "City is required"),
 });
+
+
 
 

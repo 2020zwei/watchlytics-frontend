@@ -111,18 +111,16 @@ export default function ExpenseTrackingChart() {
               </div>
             </div>
           </div>
-          <div className="h-[430px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={lineData} margin={{ top: 10, right: 0, left: 0, bottom: 90 }}>
-                <CartesianGrid vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="month" tick={{ fontSize: 12 }} padding={{ right: 10, left: 30 }} tickMargin={40} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} domain={['dataMin - 10000', 'dataMax']} />
-                <Tooltip formatter={(value: any) => new Intl.NumberFormat().format(value)} />
-                <Line type="monotone" dataKey="sales" stroke="#EB2F96" dot={{ r: 3 }} strokeWidth={2} />
-                <Line type="monotone" dataKey="purchase" stroke="#52C41A" dot={{ r: 3 }} strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={lineData} margin={{ top: 10, right: 0, left: 0, bottom: 90 }}>
+              <CartesianGrid vertical={false} stroke="#f0f0f0" />
+              <XAxis dataKey="month" tick={{ fontSize: 12 }} padding={{ right: 10, left: 30 }} tickMargin={40} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} domain={['dataMin - 10000', 'dataMax']} />
+              <Tooltip formatter={(value: any) => new Intl.NumberFormat().format(value)} />
+              <Line type="monotone" dataKey="sales" stroke="#EB2F96" dot={{ r: 3 }} strokeWidth={2} />
+              <Line type="monotone" dataKey="purchase" stroke="#52C41A" dot={{ r: 3 }} strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
         </RoundedBox>
         <RoundedBox className="pt-5 px-4 max-h-[430px] lg:w-[270px] flex flex-col justify-between pb-4">
           <Heading>Income</Heading>
