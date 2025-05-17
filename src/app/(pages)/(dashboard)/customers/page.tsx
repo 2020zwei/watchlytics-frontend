@@ -7,11 +7,15 @@ import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "
 import Pagination from '@/components/common/Pagination'
 import Link from 'next/link'
 import { sendRequest } from '@/utils/apis'
-import { URLS } from '@/utils/constants'
+import { METHODS, URLS } from '@/utils/constants'
 import SelectWidget from '@/components/common/SelectWidget'
 import Icon from '@/components/common/Icon'
 import AddNoteModalWidget from '@/components/common/AddNoteModalWidget'
 import Notfound from '@/components/common/Notfound'
+import AlertModal from '@/components/common/AlertModal'
+import { RequestTypes } from '@/types'
+import { toast } from 'react-toastify'
+import { useRouter } from 'next/navigation'
 
 const buttons: any = {
     "status": ["Active", "Inactive"],
@@ -23,26 +27,57 @@ const buttons: any = {
 
 
 const page = () => {
-    const [status, setStatus] = useState("Active");
+    const [deleteId, setDeleteId] = useState()
+    const [currentPage, setCurrentPage] = useState(1)
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+    const [deleteAlert, setDeleteAlert] = useState(false);
+    const navigate = useRouter()
+
     const closeUploadModal = () => {
         setIsUploadModalOpen(false);
+        setDeleteAlert(false);
     };
+
     const [customers, setCustomers] = useState<any>([])
     const [loading, setLoading] = useState<boolean>(false)
+
+    const handleDelete = (id: any) => {
+        setDeleteId(id)
+        setDeleteAlert(true)
+
+    }
+
+    const comfirmDelete = () => {
+        const PAYLOAD: RequestTypes = {
+            url: `${URLS.CUSTOMERS}${deleteId}/`,
+            method: METHODS.DELETE,
+        }
+        sendRequest(PAYLOAD).then((res) => {
+            if (res?.status === 204) {
+                getCustomers()
+                toast.success("Customer successfully deleted");
+            }
+            else {
+                toast.error(res?.error?.message || "Something went wrong, please try again.");
+            }
+        }).catch((err) => {
+            toast.error("An error occurred while deleting customer.");
+        }).finally(() => setDeleteAlert(false))
+    }
     const getCustomers = () => {
         setLoading(true)
         sendRequest({ url: URLS.CUSTOMERS }).then((res) => {
-            console.log(res)
             setCustomers(res?.data)
         }).finally(() => {
             setLoading(false)
         });
     }
+
     useEffect(() => { getCustomers() }, [])
     if (loading) {
         return <div className='text-center mt-5'><Spinner /></div>
     }
+
     return (
         <div>
             <RoundedBox as='section' className="px-4 py-5 gap-3 mt-5">
@@ -70,7 +105,7 @@ const page = () => {
                     </ul>
                     <Link href="/customers/add" className='bg-blue-gradient text-white rounded-lg text-sm h-10 w-[128px] ms-1 flex items-center justify-center'>Add Customer</Link>
                 </div>
-                {/* <Notfound label='No Products Found' />  */}
+
                 <div className='pt-3'>
                     {!customers?.results?.length ? <Notfound /> :
                         <>
@@ -81,7 +116,15 @@ const page = () => {
                                             <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >Name </th>
                                             <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            >email</th>
+                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            >address</th>
+                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            >phone</th>
+                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >No. of Orders </th>
+                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            >last purchase date </th>
                                             <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >Spending </th>
                                             <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
@@ -92,104 +135,74 @@ const page = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr className="border-b border-gray-200 last:border-b-0 text-sm font-medium text-dark-700"                                    >
-                                            <td>
-                                                <div className='flex items-center gap-2'>
-                                                    <RoundedBox className="relative items-center justify-center flex  my-2 !bg-gray-80 p-2 h-7 w-7 !rounded-full">
-                                                        {/* <img src="" width={48} alt="image" className='w-full h-full rounded-md' /> */}
-                                                    </RoundedBox>
-                                                    <span>Carter Press</span>
-                                                </div>
-                                            </td>
-                                            <td className="py-5 whitespace-nowrap px-4 text-center">7</td>
-                                            <td className="py-5 whitespace-nowrap px-4 text-center">$97</td>
-                                            <td className="py-5 whitespace-nowrap px-4 text-center">Yes</td>
-                                            <td className="py-5 whitespace-nowrap px-4 text-center">
-                                                <button className={clsx("border border-[#10A760] text-[#10A760] rounded-lg h-8 w-[72px] hover:opacity-50")}>Active</button>
-                                            </td>
-                                            <td className='text-center'>
-                                                <Dropdown className='!rounded-lg'>
-                                                    <DropdownTrigger>
-                                                        <button className='p-3'><Icon name='more' /></button>
-                                                    </DropdownTrigger>
-                                                    <DropdownMenu aria-label="Dropdown menu with description" variant="faded">
-                                                        <DropdownItem
-                                                            onPress={() => { setIsUploadModalOpen(true) }}
-                                                            key="Add Notes"
-                                                            className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
-                                                            startContent={<Icon name='notes' stroke='#acacac' />}>
-                                                            Add Notes
-                                                        </DropdownItem>
-                                                        <DropdownItem
-                                                            onPress={() => { }}
-                                                            key="new"
-                                                            className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
-                                                            startContent={<Icon name='edit' stroke='#acacac' />}>
-                                                            Edit
-                                                        </DropdownItem>
-                                                        <DropdownItem
-                                                            onPress={() => { }}
-                                                            key="new"
-                                                            className='text-gray-180 text-sm font-medium hover:!bg-transparent hover:!border-transparent'
-                                                            startContent={<Icon name='trash' stroke='#acacac' />}>
-                                                            Delete
-                                                        </DropdownItem>
-                                                    </DropdownMenu>
-                                                </Dropdown>
-                                            </td>
-                                        </tr>
-                                        <tr className="border-b border-gray-200 last:border-b-0 text-sm font-medium text-dark-700"                                    >
-                                            <td>
-                                                <div className='flex items-center gap-2'>
-                                                    <RoundedBox className="relative items-center justify-center flex  my-2 !bg-gray-80 p-2 h-7 w-7 !rounded-full">
-                                                        {/* <img src="" width={48} alt="image" className='w-full h-full rounded-md' /> */}
-                                                    </RoundedBox>
-                                                    <span>Carter Press</span>
-                                                </div>
-                                            </td>
-                                            <td className="py-5 whitespace-nowrap px-4 text-center">7</td>
-                                            <td className="py-5 whitespace-nowrap px-4 text-center">$97</td>
-                                            <td className="py-5 whitespace-nowrap px-4 text-center">Yes</td>
-                                            <td className="py-5 whitespace-nowrap px-4 text-center">
-                                                <button className={clsx("border border-[#E22C69] text-[#E22C69] rounded-lg h-8 w-[72px] hover:opacity-50")}>Inactive</button>
-                                            </td>
-                                            <td className='text-center'>
-                                                <Dropdown className='!rounded-lg'>
-                                                    <DropdownTrigger>
-                                                        <button className='p-3'><Icon name='more' /></button>
-                                                    </DropdownTrigger>
-                                                    <DropdownMenu aria-label="Dropdown menu with description" variant="faded">
-                                                        <DropdownItem
-                                                            onPress={() => { }}
-                                                            key="new"
-                                                            className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
-                                                            startContent={<Icon name='edit' stroke='#acacac' />}>
-                                                            Edit
-                                                        </DropdownItem>
-                                                        <DropdownItem
-                                                            onPress={() => { }}
-                                                            key="new"
-                                                            className='text-gray-180 text-sm font-medium hover:!bg-transparent hover:!border-transparent'
-                                                            startContent={<Icon name='trash' stroke='#acacac' />}>
-                                                            Delete
-                                                        </DropdownItem>
-                                                    </DropdownMenu>
-                                                </Dropdown>
-                                            </td>
-                                        </tr>
+                                        {customers?.results?.map((item: any) => (
+                                            <tr key={item?.id} className="border-b border-gray-200 last:border-b-0 text-sm font-medium text-dark-700"                                    >
+                                                <td>
+                                                    <div className='flex items-center gap-2'>
+                                                        <RoundedBox className="relative items-center justify-center flex  my-2 !bg-gray-80 p-2 h-7 w-7 !rounded-full">
+                                                            <img src="" width={48} alt="image" className='w-full h-full rounded-md' />
+                                                        </RoundedBox>
+                                                        <span className='whitespace-nowrap'>{item?.name}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.email || "-"}</td>
+                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.address || "-"}</td>
+                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.phone || "-"}</td>
+                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.orders_count || "-"}</td>
+                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.last_purchase_date || "-"}</td>
+                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.total_spending || "-"}</td>
+                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.follow_up_display || "-"}</td>
+                                                <td className="py-5 whitespace-nowrap px-4 text-center">
+                                                    <button className={clsx("border rounded-lg h-8 w-[72px] hover:opacity-50", item?.status_display === "Active" ? "border-[#10A760] text-[#10A760]" : "border-[#DA3E33] text-[#DA3E33]")}>{item?.status_display}</button>
+                                                </td>
+                                                <td className='text-center'>
+                                                    <Dropdown className='!rounded-lg'>
+                                                        <DropdownTrigger>
+                                                            <button className='p-3'><Icon name='more' /></button>
+                                                        </DropdownTrigger>
+                                                        <DropdownMenu aria-label="Dropdown menu with description" variant="faded">
+                                                            <DropdownItem
+                                                                onPress={() => { setIsUploadModalOpen(true) }}
+                                                                key="Add Notes"
+                                                                className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
+                                                                startContent={<Icon name='notes' stroke='#acacac' />}>
+                                                                Add Notes
+                                                            </DropdownItem>
+                                                            <DropdownItem
+                                                                onPress={() => navigate.push(`/customers/add/?id=${item?.id}`)}
+                                                                key="new"
+                                                                className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
+                                                                startContent={<Icon name='edit' stroke='#acacac' />}>
+                                                                Edit
+                                                            </DropdownItem>
+                                                            <DropdownItem
+                                                                onPress={() => handleDelete(item.id)}
+                                                                key="new"
+                                                                className='text-gray-180 text-sm font-medium hover:!bg-transparent hover:!border-transparent'
+                                                                startContent={<Icon name='trash' stroke='#acacac' />}>
+                                                                Delete
+                                                            </DropdownItem>
+                                                        </DropdownMenu>
+                                                    </Dropdown>
+                                                </td>
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>
-                            <Pagination
-                                totalPages={34}
-                                currentPage={1}
-                                onPageChange={(page) => { }}
-                            />
+                            {customers?.count > 20 ?
+                                <Pagination
+                                    totalPages={customers?.count}
+                                    currentPage={currentPage}
+                                    onPageChange={(page) => setCurrentPage(page)}
+                                /> : null}
                         </>
                     }
                 </div>
             </RoundedBox>
             <AddNoteModalWidget isOpen={isUploadModalOpen} onOpen={closeUploadModal} />
+            <AlertModal alertText="Are you sure you want to delete this card?"
+                isOpen={deleteAlert} onOpen={closeUploadModal} callBack={comfirmDelete} />
         </div >
     )
 }

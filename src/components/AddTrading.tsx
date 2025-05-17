@@ -31,7 +31,10 @@ export const TradeFormSchema = z.object({
     product: z
         .array(z.any())
         .min(1, "At least one transaction item is required"),
-    customer: z.string().min(1, "Customer name is required"),
+    customer: z.union([
+        z.string().min(1, { message: "Customer name is required" }),
+        z.number({ invalid_type_error: "Customer ID must be a number" })
+    ]),
 });
 
 
@@ -157,13 +160,12 @@ const AddTrading = () => {
             return;
         }
 
-        if (!id && matched.quantity>0) { matched["quantity"] = matched["quantity"] - 1 }
+        if (!id && matched.quantity > 0) { matched["quantity"] = matched["quantity"] - 1 }
         if (matched.quantity <= 0) {
             toast.info(`Only ${matched.quantity} units available`);
             return;
         }
-        if (id && matched.quantity>0) { matched["quantity"] = matched["quantity"] - 1 }
-        console.log(matched.quantity, 'matched.quantity')
+        if (id && matched.quantity > 0) { matched["quantity"] = matched["quantity"] - 1 }
         if (matched.quantity !== 0) {
             const updatedProducts = product.map(el =>
                 el.id === item.id ? { ...el, quantity: el.quantity + 1 } : el
@@ -254,6 +256,8 @@ const AddTrading = () => {
         setValue('purchase_price', sumOfPurchesPrice);
         setValue("sale_price", sumOfSalePrice);
     }, [quantities, product])
+
+    console.log(errors)
 
     return (
         <RoundedBox>
@@ -392,21 +396,25 @@ const AddTrading = () => {
                         <h4 className='font-semibold text-dark-800 my-4'>Buyer Details</h4>
                         <div className='flex items-center'>
                             <label className='min-w-[160px] text-sm font-medium text-dark-700'>Name:</label>
-                            <div className='flex items-center relative flex-1'>
-                                <span className='start-2 z-10 absolute'><Icon name='search' size='1.3rem' /></span>
-                                <Controller
-                                    name="customer"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select
-                                            options={customerOptions}
-                                            placeholder="Buyer Name"
-                                            classNamePrefix="searchbale-select"
-                                            isSearchable
-                                            styles={{ container: (base) => ({ ...base, width: '100%', maxWidth: "320px" }) }}
-                                        />
-                                    )}
-                                />
+                            <div className='flex flex-col w-full'>
+                                <div className='flex items-center relative flex-1'>
+                                    <span className='start-2 z-10 absolute'><Icon name='search' size='1.3rem' /></span>
+                                    <Controller
+                                        name="customer"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select
+                                                options={customerOptions}
+                                                placeholder="Buyer Name"
+                                                classNamePrefix="searchbale-select"
+                                                onChange={(item: any) => field.onChange(item.value)}
+                                                isSearchable
+                                                styles={{ container: (base) => ({ ...base, width: '100%', maxWidth: "320px" }) }}
+                                            />
+                                        )}
+                                    />
+                                </div>
+                                {errors.customer && <p className="text-red-500 text-xs mt-1">{errors.customer.message}</p>}
                             </div>
                         </div>
                     </div>
