@@ -127,6 +127,7 @@ const AddTrading = () => {
                 setValue('product', selectedOptions);
                 handleAddProduct(selectedOptions);
                 selectedProducts?.forEach((item: any) => setQuantities(Array(selectedProducts?.length).fill(item?.quantity)))
+                console.log(selectedProducts,'selectedProducts')
                 setProduct(selectedProducts);
                 trigger();
 
@@ -186,12 +187,12 @@ const AddTrading = () => {
         const selectedIds = items.map((item) => item.value);
 
         const updated = selectedIds.map((id) => {
-            const existing = product.find((p) => p.id === id);
-            const prod = products.find((p) => p.id === id);
+            const existing = product.find((p) => p?.id === id);
+            const prod = products.find((p) => p?.id === id);
 
             return existing || {
-                id: prod.id,
-                image: prod.image,
+                id: prod?.id,
+                image: prod?.image,
                 model_name: prod?.model_name,
                 sold_price: prod?.sold_price || 0,
                 buying_price: prod?.buying_price || 0,

@@ -5,16 +5,19 @@ import { RequestTypes } from '@/types';
 import { sendRequest } from '@/utils/apis';
 import { METHODS, URLS } from '@/utils/constants';
 import { Spinner } from '@heroui/react';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
 const Page = () => {
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState<any>();
+    const navigate = useRouter()
 
-    const fetchReports = async () => {
+    const fetchReports = async (query: any) => {
         setLoading(true)
         const PAYLOAD: RequestTypes = {
-            url: URLS.PURCHASE_SALES,
+            url: `${URLS.PURCHASE_SALES}?period=${query}`,
             method: METHODS.GET,
         };
         sendRequest(PAYLOAD)
@@ -25,9 +28,18 @@ const Page = () => {
                 }
             }).finally(() => setLoading(false))
     };
+    const updateFilter = (value: string) => {
+        const newFilters = { "query": value };
+        setFilter(value)
+        const query = new URLSearchParams(newFilters).toString();
+        navigate.push(`?${query}`);
+        fetchReports(value);
+    };
 
     useEffect(() => {
-        fetchReports();
+        const params = new URLSearchParams(window.location.search);
+        setFilter(params.get("query"));
+        fetchReports(params.get("query"));
     }, []);
 
     const normalizedData = reports?.map((item: any) => ({
@@ -41,11 +53,12 @@ const Page = () => {
     return (
         <div>
             <Chart
+                selected={filter}
                 lineA="purchase"
                 lineB="sale"
                 label="Purchase & Sales Report"
                 data={normalizedData}
-                callBack={(filter) => { console.log(filter) }}
+                callBack={updateFilter}
                 lineACol="#448DF2"
                 lineBCol="#DBA36247"
             />

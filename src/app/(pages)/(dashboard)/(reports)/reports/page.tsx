@@ -111,7 +111,7 @@ const page = () => {
                 <RoundedBox className='!bg-white'>
                     <div className=''>
                         <Heading as='h3' className='px-4 pt-4'>Expense Report</Heading>
-                        <div className='pt-5'>
+                        <div className='pt-5 overflow-auto max-h-[200px]'>
                             <table className='w-full'>
                                 <thead>
                                     <tr>

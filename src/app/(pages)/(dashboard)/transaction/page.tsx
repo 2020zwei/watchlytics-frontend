@@ -45,7 +45,7 @@ const page = () => {
         <RoundedBox>
             <div className='flex items-center justify-between px-5 pt-7 pb-3'>
                 <Heading>All Transactions</Heading>
-                <Link href="/add-trading"
+                <Link href="/add-transaction"
                     className="h-10 px-3 text-sm font-medium flex items-center justify-between text-white rounded-lg bg-blue-gradient"
                 >Add Transaction Details</Link>
             </div>
@@ -70,7 +70,7 @@ const page = () => {
                                         <td className=' text-start py-3 px-4'>{trade?.name_of_trade}</td>
                                         <td className='text-end py-3 px-4'>
                                             <div className='flex items-center justify-end gap-3 text-[#808080]'>
-                                                <Link href={`/add-trading/?id=${trade?.id}`}><Icon name='edit' size='1.7rem' /></Link>
+                                                <Link href={`/add-transaction/?id=${trade?.id}`}><Icon name='edit' size='1.7rem' /></Link>
                                                 <TradingModal modalTile={trade?.name_of_trade} data={trade?.items} />
                                             </div>
                                         </td>

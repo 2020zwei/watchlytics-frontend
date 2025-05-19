@@ -6,15 +6,17 @@ import { sendRequest } from '@/utils/apis';
 import { METHODS, URLS } from '@/utils/constants';
 import { RequestTypes } from '@/types';
 import { Spinner } from '@heroui/react';
+import { useRouter } from 'next/navigation';
 
 const Page = () => {
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    const fetchReports = async () => {
+    const [filter, setFilter] = useState<any>();
+    const navigate = useRouter()
+    const fetchReports = async (query: any) => {
         setLoading(true);
         const PAYLOAD: RequestTypes = {
-            url: URLS.MONTHLY_PROFIT,
+            url: `${URLS.MONTHLY_PROFIT}?period=${query}`,
             method: METHODS.GET,
         };
         try {
@@ -33,21 +35,31 @@ const Page = () => {
             setLoading(false);
         }
     };
-
+    const updateFilter = (value: string) => {
+        const newFilters = { "query": value };
+        setFilter(value)
+        const query = new URLSearchParams(newFilters).toString();
+        navigate.push(`?${query}`);
+        fetchReports(value);
+    };
     useEffect(() => {
-        fetchReports();
+        const params = new URLSearchParams(window.location.search);
+        setFilter(params.get("query"));
+        fetchReports(params.get("query"));
     }, []);
+
     if (loading) {
         return <div className='text-center'><Spinner /></div>;
     }
     return (
         <div>
             <Chart
+                selected={filter}
                 lineA="profit"
                 lineB="loss"
                 label="Profit & Loss Report"
                 data={reports}
-                callBack={(filter) => { console.log(filter) }}
+                callBack={updateFilter}
                 lineACol="#80F58D"
                 lineBCol="#7459D9"
             />

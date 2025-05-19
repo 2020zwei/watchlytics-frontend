@@ -209,14 +209,14 @@ const Inventory = () => {
                                 </DropdownTrigger>
                                 <DropdownMenu aria-label="Dropdown menu with description" variant="faded">
                                     <DropdownItem
-                                        key="new"
+                                        key="upload"
                                         className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
                                         startContent={<Icon name='upload' stroke='#acacac' />}
                                         onPress={handleUploadClick}                                   >
                                         Upload
                                     </DropdownItem>
                                     <DropdownItem
-                                        key="new"
+                                        key="download"
                                         className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
                                         startContent={<Icon name='upload' stroke='#acacac' className=' rotate-180' />}>
                                         <Link href="/files/download-template.xlsx" passHref legacyBehavior>
@@ -276,14 +276,14 @@ const Inventory = () => {
                                                             </DropdownItem>
                                                             <DropdownItem
                                                                 onPress={() => { onOpen(); setProduct(row) }}
-                                                                key="new"
+                                                                key="edit"
                                                                 className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
                                                                 startContent={<Icon name='edit' stroke='#acacac' />}>
                                                                 Edit
                                                             </DropdownItem>
                                                             <DropdownItem
                                                                 onPress={() => handleDelete(row)}
-                                                                key="new"
+                                                                key="delete"
                                                                 className='text-gray-180 text-sm font-medium hover:!bg-transparent hover:!border-transparent'
                                                                 startContent={<Icon name='trash' stroke='#acacac' />}>
                                                                 Delete
@@ -326,7 +326,7 @@ const Inventory = () => {
                                                             }
                                                         >
                                                             <div className={clsx("whitespace-nowrap px-4 text-center")}>{
-                                                                col == "profit_margin" ? `${row?.[col]}%` : col == "hold_time" ? `~${row?.[col]}` : col == "is_sold" ?
+                                                                col == "profit_margin" ? row?.[col] ? `${row?.[col]}%` : "-" : col == "hold_time" ? `~${row?.[col]}` : col == "is_sold" ?
                                                                     <div className={clsx("min-w-5 mx-auto w-5 h-5 rounded border flex items-center justify-between", row?.is_sold ? "bg-blue-850" : "")}>
                                                                         <Icon name='checkmark' className=' text-white text-lg' />
                                                                     </div> :

@@ -17,7 +17,7 @@ const config = {
         sm: "768px",
         md: "992px",
         lg: "1200px",
-        // lg: "1280px",
+        "lg-xl": "1290px",
         xl: "1440px",
       },
       container: {
@@ -40,7 +40,7 @@ const config = {
       colors: {
         blue: {
           800: "#0047FF",
-          700:"#3460E3",
+          700: "#3460E3",
           850: "#003BFF",
           150: "#003BFF26",
           100: "#003BFF0D",
@@ -79,8 +79,8 @@ const config = {
         },
         red: {
           700: "#F36960",
-          600:"#E22C69",
-          500:"#DA3E33"
+          600: "#E22C69",
+          500: "#DA3E33"
         },
         green: {
           600: "#39AD79",
@@ -95,7 +95,7 @@ const config = {
       },
       boxShadow: {
         md: "0px 1px 2px 0px #1018280D",
-        lg:"0px 4px 25px 0px #0000000D"
+        lg: "0px 4px 25px 0px #0000000D"
       }
     },
   },
