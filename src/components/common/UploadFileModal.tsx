@@ -42,7 +42,7 @@ export default function UploadFileModal({
                                 <p className="text-gray-600 font-medium">
                                     Click to upload or drag and drop
                                 </p>
-                                <p className="text-sm text-gray-400 mt-1">SVG, PNG, JPG or PDF (max. 10MB)</p>
+                                <p className="text-sm text-gray-400 mt-1">Excel,CSV are allowed</p>
                                 <input
                                     id="file-upload"
                                     type="file"

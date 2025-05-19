@@ -17,6 +17,7 @@ import Icon from "./Icon";
 import ReportFilters from "./ReportFilters";
 
 interface ChartProps {
+    selected?: string,
     lineA: "profit" | "purchase";
     lineB: "loss" | "sale";
     lineACol: string;
@@ -45,7 +46,7 @@ const renderCustomLegend = (lineA: string, lineB: string, lineACol: string, line
     );
 };
 
-const Chart: React.FC<ChartProps> = ({ lineA, lineB, label, data, lineACol, lineBCol, callBack }) => {
+const Chart: React.FC<ChartProps> = ({ lineA, lineB, label, data, lineACol, lineBCol, selected, callBack }) => {
     const handleChartTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         callBack?.(e.target.value as string);
     };
@@ -72,6 +73,7 @@ const Chart: React.FC<ChartProps> = ({ lineA, lineB, label, data, lineACol, line
                             <Icon name="calener" />
                         </span>
                         <select
+                            value={selected}
                             onChange={handleChartTypeChange}
                             className="outline-none flex-1 text-sm font-medium text-dark-700"
                         >

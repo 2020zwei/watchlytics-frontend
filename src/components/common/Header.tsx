@@ -66,7 +66,7 @@ const Header = () => {
           </DropdownTrigger>
           <DropdownMenu aria-label="Dropdown menu with description" variant="faded">
             <DropdownItem
-              key="new"
+              key="profile"
               className=' text-blue-850 text-sm'
               startContent={<Icon name='users' />}>
               <Link href="/profile" className='block'>Profile</Link>
