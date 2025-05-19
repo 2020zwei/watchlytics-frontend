@@ -15,7 +15,7 @@ import { z } from "zod";
 export const FormFieldsSchema = z.object({
     name: z.string().min(3, "Name is required and at least 3 characters"),
     email: z.string().email("Invalid email address"),
-    number: z
+    phone: z
         .string()
         .min(1, { message: "Number is required" })
         .min(8, { message: "Number must be at least 8 characters" }),
@@ -38,7 +38,7 @@ const fields = [
     },
     {
         label: "Phone number:",
-        name: "number",
+        name: "phone",
         placeholder: "Enter number",
         fieldType: "input",
         type: "text"
@@ -105,7 +105,7 @@ const AddCustomerWidget = () => {
                 const { name, email, phone, address } = res?.data
                 setValue("name", name)
                 setValue("email", email)
-                setValue("number", phone)
+                setValue("phone", phone)
                 setValue("address", address)
                 trigger()
             }
