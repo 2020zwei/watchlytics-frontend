@@ -256,7 +256,19 @@ const Icon: React.FC<PropsTypes> = ({ name, fill, className, stroke, size = "2em
                 <path d="M8 13.3337V2.66699M8 2.66699L12 6.66699M8 2.66699L4 6.66699" stroke={stroke || "#10A760"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
 
-        )
+        ),
+        offline:(<svg width="120" height="140" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+
+            <circle cx="60" cy="50" r="30" fill="none" stroke="#ccc" stroke-width="4">
+                <animate attributeName="r" from="30" to="40" dur="1.5s" repeatCount="indefinite" />
+                <animate attributeName="opacity" from="1" to="0" dur="1.5s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="60" cy="50" r="20" fill="#aaa" />p  <circle cx="60" cy="40" r="6" fill="#fff" />
+            <path d="M52,60 C52,52 68,52 68,60" fill="#fff" />
+            <text x="60" y="140" font-size="24" text-anchor="middle" fill="#1c274c" font-family="Arial, sans-serif">
+                Your offline
+            </text>
+        </svg>)
 
     };
 

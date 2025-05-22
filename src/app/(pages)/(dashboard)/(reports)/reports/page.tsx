@@ -24,6 +24,7 @@ const page = () => {
             method: METHODS.GET,
         };
         sendRequest(PAYLOAD).then((res) => {
+            console.log(res)
             if (res.status === 200) {
                 setReports(res?.data);
             }
@@ -182,13 +183,17 @@ const page = () => {
                         </div>
                     </RoundedBox>
                 </div>
-                <div>
+            {
+                reports?.count > 20?
+                    <div>
                     <Pagination
                         totalPages={10}
                         currentPage={12}
                         onPageChange={(page) => { }}
                     />
                 </div>
+                :null
+            }
             </div>
         </div>
     )
