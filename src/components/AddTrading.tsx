@@ -18,6 +18,11 @@ import { z } from "zod";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
 import { formatDate } from '@/utils/dateFormater';
+import SelectDropdown from './SelectDropdown';
+export type OptionType = {
+    value: string | number;
+    label: string;
+};
 
 export const TradeFormSchema = z.object({
     name_of_trade: z.string().min(1, "Trade name is required"),
@@ -50,7 +55,8 @@ const AddTrading = () => {
     const dateRef = React.useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState(false)
     const [customerOptions, setCustomerOptions] = useState<any>([])
-     const [originalQty, setOriginalQty] = useState<Record<number, number>>({});
+    const [originalQty, setOriginalQty] = useState<Record<number, number>>({});
+    const [previousProducts, setPreviousProducts] = useState<any[]>([]);
     const navigate = useRouter()
     const {
         register,
@@ -83,12 +89,14 @@ const AddTrading = () => {
         };
         sendRequest(PAYLOAD).then((res) => {
             if (res.status === 200) {
-                const options = res?.data?.results?.map((item: any) => ({
+                const filtered=res?.data?.results.filter(el=>el?.quantity>0)
+                const options = (id?res?.data?.results:filtered)?.map((item: any) => ({
                     value: item.id,
                     label: item.model_name,
                 }));
-                setProducts( res?.data?.results);
+                setProducts(res?.data?.results);
                 setCategories(options);
+                id && fetchTradeById();
             }
         });
     };
@@ -118,6 +126,7 @@ const AddTrading = () => {
                     sold_price: Number(el?.sale_price),
                     buying_price: Number(el?.purchase_price),
                     quantity: Number(el?.quantity),
+                    isExisting: true
                 }));
                 const selectedOptions = selectedProducts.map((p: any) => ({
                     label: p.model_name,
@@ -126,47 +135,31 @@ const AddTrading = () => {
                 setValue('product', selectedOptions);
                 handleAddProduct(selectedOptions);
                 selectedProducts?.forEach((item: any) => setQuantities(Array(selectedProducts?.length).fill(item?.quantity)))
-                console.log(selectedProducts, 'selectedProducts')
+                const mapedIds: any[] = selectedProducts.map((ele: any) => (ele.id))
                 setProduct(selectedProducts);
+                setProducts((prev) => prev.map(ele => mapedIds.includes(ele.id) ? { ...ele, isExisting: true } : ele));
+                setPreviousProducts(selectedProducts);
                 trigger();
 
             }
         });
     };
 
-const handleIncrement = (_index: number, item: any) => {
-        console.log(item)
+    const handleIncrement = (_index: number, item: any) => {
         const found = product.find((el) => el?.id === item?.id);
-        const sourceItem =products.find((el) => el?.id === item?.id);
-
-        if (!found || !sourceItem) {
-
-            // setOriginalQty((prev) => {
-            //     const alreadySet = prev[item.id] !== undefined;
-            //     if (!alreadySet) {
-            //         return {
-            //             ...prev,
-            //             [item.id]: (sourceItem?.quantity || 0) + found.quantity,
-            //         };
-            //     }
-            //     return prev;
-            // });
-            // toast.error(`This ${item.id} product is not found`);
-            // return
-        };
-
+        const sourceItem = products.find((el) => el?.id === item?.id);
         setOriginalQty((prev) => {
             const alreadySet = prev[item.id] !== undefined;
             if (!alreadySet) {
                 return {
                     ...prev,
-                    [item.id]: (sourceItem?.quantity || 0) + (id? found.quantity:0),
+                    [item.id]: !sourceItem?.isExisting ? sourceItem?.quantity : (sourceItem?.quantity || 0) + (id ? found.quantity : 0),
                 };
             }
             return prev;
         });
 
-        const maxQty = originalQty[item.id] ?? ((sourceItem?.quantity || 0) + (id?found.quantity:0));
+        const maxQty = originalQty[item.id] ?? ((sourceItem?.quantity || 0) + (id ? found.quantity : 0));
 
         if (found.quantity >= maxQty) {
             toast.info(`Only ${maxQty} units available`);
@@ -198,9 +191,7 @@ const handleIncrement = (_index: number, item: any) => {
     };
 
     const handleAddProduct = (items: any[]) => {
-        console.log(product,products)
         const selectedIds = items.map((item) => item.value);
-
         const updated = selectedIds.map((id) => {
             const existing = product.find((p) => p?.id === id);
             const prod = products.find((p) => p?.id === id);
@@ -217,6 +208,7 @@ const handleIncrement = (_index: number, item: any) => {
 
         setProduct(updated);
     };
+
     const getCustomers = () => {
         setLoading(true)
         sendRequest({ url: URLS.CUSTOMERS }).then((res) => {
@@ -261,29 +253,36 @@ const handleIncrement = (_index: number, item: any) => {
     }, []);
 
     useEffect(() => {
-        if (id) {
-            fetchTradeById();
-        }
-    }, [id]);
-
-    useEffect(() => {
         const sumOfPurchesPrice = product.reduce((acc, curr) => acc + Number(curr.buying_price * curr?.quantity || 0), 0);
         const sumOfSalePrice = product.reduce((acc, curr) => acc + Number(curr.sold_price || 0), 0);
         setValue('purchase_price', sumOfPurchesPrice);
         setValue("sale_price", sumOfSalePrice);
     }, [quantities, product])
-
-    console.log(errors)
+    const handleSelectionChange = (removedItem?: OptionType) => {
+        const exist = previousProducts.find(item => item.id == removedItem?.value)
+        if (removedItem && exist) {
+            const sourceItem = products.find((el) => el?.id === exist?.id);
+            setOriginalQty((prev) => {
+                const alreadySet = prev[exist.id] !== undefined;
+                if (!alreadySet) {
+                    return {
+                        ...prev,
+                        [exist.id]: (sourceItem?.quantity || 0) + (id ? exist.quantity : 0),
+                    };
+                }
+                return prev;
+            });
+        }
+    };
 
     return (
         <RoundedBox>
             <div className='flex items-center justify-between px-4 pt-7 pb-3 border-b border-[#F0F1F3]'>
-                <Heading>{id ? 'Edit' : 'Add'} Transaction Details {JSON.stringify(originalQty)}</Heading>
+                <Heading>{id ? 'Edit' : 'Add'} Transaction Details{JSON.stringify(originalQty)}</Heading>
             </div>
             {/* @ts-ignore */}
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className='pt-5 px-4 pb-8 flex flex-col gap-3'>
-
                     {/* Name of Trade */}
                     <div className='flex items-center'>
                         <label className='min-w-[160px] text-sm font-medium text-dark-700'>Name Of Transaction:</label>
@@ -304,26 +303,26 @@ const handleIncrement = (_index: number, item: any) => {
                         <div className='flex items-center relative flex-1'>
                             <span className='start-2 z-10 absolute'><Icon name='search' size='1.3rem' /></span>
                             <Controller
-                                // @ts-ignore
                                 name="product"
                                 control={control}
                                 render={({ field }) => (
-                                    <Select
+                                    <SelectDropdown
                                         isMulti
-                                        {...field}
-                                        options={categories}
-                                        placeholder="Add Watches"
                                         isSearchable
-                                        classNamePrefix="searchbale-select"
-                                        styles={{ container: (base) => ({ ...base, width: "100%", maxWidth: "320px" }) }}
-                                        onChange={(item: any) => {
-                                            field.onChange(item);
-                                            handleAddProduct(item);
+                                        options={categories}
+                                        value={field?.value || []}
+                                        onChange={(selected, removed) => {
+                                            field?.onChange(selected);
+                                            handleSelectionChange(removed);
+                                            handleAddProduct(selected);
                                         }}
-                                        value={field.value || []}
+                                        classNamePrefix="searchbale-select"
+                                        placeholder="Add Watches"
+                                        style={{ container: (base) => ({ ...base, width: "100%", maxWidth: "320px" }) }}
                                     />
                                 )}
                             />
+
                         </div>
                     </div>
 
@@ -424,7 +423,7 @@ const handleIncrement = (_index: number, item: any) => {
                                                 placeholder="Buyer Name"
                                                 classNamePrefix="searchbale-select"
                                                 onChange={(item: any) => field.onChange(item.value)}
-                                                value={customerOptions.find((option: any) => option.value === field.value)}
+                                                value={customerOptions?.find((option: any) => option.value === field.value)}
                                                 isSearchable
                                                 styles={{ container: (base) => ({ ...base, width: '100%', maxWidth: "320px" }) }}
                                             />

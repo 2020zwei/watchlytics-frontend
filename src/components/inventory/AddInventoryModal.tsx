@@ -170,7 +170,7 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
                                             trigger("image");
                                         }}
                                     >
-                                        <div className="flex items-center xs:flex-row flex-col gap-5 w-fit sm:-ms-[100px] Pagination">
+                                        <div className="flex items-center relative xs:flex-row flex-col gap-5 w-fit sm:-ms-[100px] Pagination">
                                             <RoundedBox className={clsx("w-20 h-20 outline-gray-180 overflow-hidden", watch("image") ? "" : " outline-dashed")}>
                                                 {fileMeta?.url || defaultData?.image ? (
                                                     <img
@@ -187,8 +187,8 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
                                                 <div className="text-center text-gray-180">or</div>
                                                 <div className="text-dark-800">Browse image</div>
                                             </div>
+                                        {errors?.image?.message ? <p className="text-sm text-red-800 absolute">{errors?.image?.message}</p> : null}
                                         </div>
-                                        {errors?.image?.message ? <p className="text-sm text-red-800">{errors?.image?.message}</p> : null}
                                     </FileUploader>
 
                                     <div className="pt-4">
