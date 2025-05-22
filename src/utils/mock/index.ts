@@ -347,11 +347,15 @@ export const InventoryFormSchema = z.object({
     sold_source: z.string().nullable().optional(),
     listed_on: z.string().nullable().optional(),
 
-    image: z.any().refine(
-        (val) =>
-            (val instanceof File && val.size > 0) ||
-            (typeof val === "string" && val.length > 0),
-        { message: "Image is required" }
+    image: z
+    .any()
+    .optional()
+    .refine(
+      (val) =>
+        val === undefined ||
+        (val instanceof File && val.size > 0) ||
+        (typeof val === "string" && val.length > 0),
+      { message: "Image must be a non-empty file or string when provided" }
     ),
 
     serial_number: z.string().nullable().optional(),

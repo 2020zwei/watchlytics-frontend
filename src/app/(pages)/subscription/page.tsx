@@ -20,6 +20,7 @@ const planIcons = {
 const page = () => {
     const [plansTypes, setPlansTypes] = useState<any>()
     const [loading, setLoading] = useState(false)
+    const [isOnline, setIsOnline] = useState(true)
     const navigate = useRouter()
     const getSubscriptions = () => {
         setLoading(true)
@@ -63,11 +64,31 @@ const page = () => {
             }
         }
     }
+
     useEffect(() => {
         navigate.push("/subscription")
         getSubscriptions()
-    }, [])
 
+        const updateOnlineStatus = () => {
+            setIsOnline(navigator.onLine)
+        }
+
+        // Set initial online status
+        setIsOnline(navigator.onLine)
+
+        // Listen for online/offline events
+        window.addEventListener('online', updateOnlineStatus)
+        window.addEventListener('offline', updateOnlineStatus)
+
+        // Cleanup listeners on unmount
+        return () => {
+            window.removeEventListener('online', updateOnlineStatus)
+            window.removeEventListener('offline', updateOnlineStatus)
+        }
+    }, [])
+    if (!isOnline && !loading) {
+        return <div className='flex items-center justify-center h-screen'><Icon name='offline' /></div>
+    }
     return (
         <main className='container max-w-screen-lg pb-10'>
             <header className='flex items-center text-blue-850 pt-7 gap-2'>
@@ -97,7 +118,7 @@ const page = () => {
                                                         <h2 className=' font-bold text-3xl text-blue-850'>{item.name}</h2>
                                                         <h4 className='text-blue-850 font-bold'>What`s Included :</h4>
                                                         <ul className='pt-3 flex flex-col gap-3'>
-                                                            {item.description?.split(",")?.map((feature) => (
+                                                            {item.description?.split(",")?.map((feature: any) => (
                                                                 <li className='gap-2 font-medium text-dark-700 flex' key={feature}>
                                                                     <span><Icon name='checkmark' className="text-blue-850 text-xl" /></span>
                                                                     {feature}

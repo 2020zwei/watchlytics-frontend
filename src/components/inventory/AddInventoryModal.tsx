@@ -54,6 +54,9 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
         // @ts-ignore
         resolver: zodResolver(InventoryFormSchema),
         mode: "onChange",
+        defaultValues:{
+            quantity:1
+        }
     });
 
     const onFormSubmit = (data: FormSchemaType) => {

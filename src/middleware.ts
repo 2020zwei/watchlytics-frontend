@@ -19,7 +19,8 @@ export async function middleware(request: NextRequest, response: NextResponse) {
   const isRootPath = pathname === "/";
 
   const isInvalidToken = token && !isTokenValid(token);
-  if (token && isPublicRoute) {
+  if (token && token !== 'undefined' && isPublicRoute) {
+    console.log(12279,token,'token')
     return NextResponse.redirect(new URL("/", request.url));
   }
   if (!isInvalidToken && isPublicRoute) {

@@ -49,8 +49,8 @@ const AddTrading = () => {
     const id = useSearchParams().get('id');
     const dateRef = React.useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState(false)
-    const [originalQty, setOriginalQty] = useState(0)
     const [customerOptions, setCustomerOptions] = useState<any>([])
+     const [originalQty, setOriginalQty] = useState<Record<number, number>>({});
     const navigate = useRouter()
     const {
         register,
@@ -78,7 +78,7 @@ const AddTrading = () => {
 
     const fetchCategories = async () => {
         const PAYLOAD: RequestTypes = {
-            url: `${URLS.PRODUCTS}/?is_transaction=${true}/`,
+            url: `${URLS.PRODUCTS}/`,
             method: METHODS.GET,
         };
         sendRequest(PAYLOAD).then((res) => {
@@ -87,7 +87,7 @@ const AddTrading = () => {
                     value: item.id,
                     label: item.model_name,
                 }));
-                setProducts(res?.data?.results);
+                setProducts( res?.data?.results);
                 setCategories(options);
             }
         });
@@ -123,11 +123,10 @@ const AddTrading = () => {
                     label: p.model_name,
                     value: p.id,
                 }));
-
                 setValue('product', selectedOptions);
                 handleAddProduct(selectedOptions);
                 selectedProducts?.forEach((item: any) => setQuantities(Array(selectedProducts?.length).fill(item?.quantity)))
-                console.log(selectedProducts,'selectedProducts')
+                console.log(selectedProducts, 'selectedProducts')
                 setProduct(selectedProducts);
                 trigger();
 
@@ -135,55 +134,71 @@ const AddTrading = () => {
         });
     };
 
-    const handleIncrement = (index: number, item: any) => {
-        const matched = products.find((el) => el.id === item.id);
-        const copyMatched = JSON.stringify(matched)
+const handleIncrement = (_index: number, item: any) => {
+        console.log(item)
+        const found = product.find((el) => el?.id === item?.id);
+        const sourceItem =products.find((el) => el?.id === item?.id);
+
+        if (!found || !sourceItem) {
+
+            // setOriginalQty((prev) => {
+            //     const alreadySet = prev[item.id] !== undefined;
+            //     if (!alreadySet) {
+            //         return {
+            //             ...prev,
+            //             [item.id]: (sourceItem?.quantity || 0) + found.quantity,
+            //         };
+            //     }
+            //     return prev;
+            // });
+            // toast.error(`This ${item.id} product is not found`);
+            // return
+        };
+
         setOriginalQty((prev) => {
-            if (!prev) {
-                return JSON.parse(copyMatched).quantity
+            const alreadySet = prev[item.id] !== undefined;
+            if (!alreadySet) {
+                return {
+                    ...prev,
+                    [item.id]: (sourceItem?.quantity || 0) + (id? found.quantity:0),
+                };
             }
-            else {
-                return prev
-            }
-        })
+            return prev;
+        });
 
+        const maxQty = originalQty[item.id] ?? ((sourceItem?.quantity || 0) + (id?found.quantity:0));
 
-
-        if (!matched) {
-            toast.error(`Product ${item.name || item.id} not found in available stock!`);
+        if (found.quantity >= maxQty) {
+            toast.info(`Only ${maxQty} units available`);
             return;
         }
 
-        const currentProduct = product.find((el) => el.id === item.id);
-
-        if (!currentProduct) {
-            toast.error(`Selected product ${item.name || item.id} not found!`);
-            return;
-        }
-
-        if (!id && matched.quantity > 0) { matched["quantity"] = matched["quantity"] - 1 }
-        if (matched.quantity <= 0) {
-            toast.info(`Only ${matched.quantity} units available`);
-            return;
-        }
-        if (id && matched.quantity > 0) { matched["quantity"] = matched["quantity"] - 1 }
-        if (matched.quantity !== 0) {
-            const updatedProducts = product.map(el =>
-                el.id === item.id ? { ...el, quantity: el.quantity + 1 } : el
-            );
-            setProduct(updatedProducts);
-        }
+        const updatedProducts = product.map((el) =>
+            el.id === item.id ? { ...el, quantity: el.quantity + 1 } : el
+        );
+        setProduct(updatedProducts);
     };
 
 
     const handleDecrement = (index: number, item: any) => {
-        const matched = products.find((el) => el.id === item.id);
-        matched['quantity'] = matched['quantity'] + 1
+        if (item) {
+            setOriginalQty((prev) => {
+                const alreadySet = prev[item.id] !== undefined;
+                if (!alreadySet) {
+                    return {
+                        ...prev,
+                        [item.id]: item.quantity,
+                    };
+                }
+                return prev;
+            });
+        }
         const updatedProducts = product.map(el => el.id === item.id ? { ...el, quantity: el.quantity - 1 } : el)
         setProduct(updatedProducts)
     };
 
     const handleAddProduct = (items: any[]) => {
+        console.log(product,products)
         const selectedIds = items.map((item) => item.value);
 
         const updated = selectedIds.map((id) => {
@@ -246,10 +261,10 @@ const AddTrading = () => {
     }, []);
 
     useEffect(() => {
-        if (id && products?.length) {
+        if (id) {
             fetchTradeById();
         }
-    }, [id, products]);
+    }, [id]);
 
     useEffect(() => {
         const sumOfPurchesPrice = product.reduce((acc, curr) => acc + Number(curr.buying_price * curr?.quantity || 0), 0);
@@ -263,7 +278,7 @@ const AddTrading = () => {
     return (
         <RoundedBox>
             <div className='flex items-center justify-between px-4 pt-7 pb-3 border-b border-[#F0F1F3]'>
-                <Heading>{id ? 'Edit' : 'Add'} Transaction Details</Heading>
+                <Heading>{id ? 'Edit' : 'Add'} Transaction Details {JSON.stringify(originalQty)}</Heading>
             </div>
             {/* @ts-ignore */}
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -409,6 +424,7 @@ const AddTrading = () => {
                                                 placeholder="Buyer Name"
                                                 classNamePrefix="searchbale-select"
                                                 onChange={(item: any) => field.onChange(item.value)}
+                                                value={customerOptions.find((option: any) => option.value === field.value)}
                                                 isSearchable
                                                 styles={{ container: (base) => ({ ...base, width: '100%', maxWidth: "320px" }) }}
                                             />

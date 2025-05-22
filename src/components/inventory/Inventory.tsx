@@ -113,10 +113,16 @@ const Inventory = () => {
             payload: formData,
         }
         sendRequest(PAYLOAD).then((res) => {
+            console.log(res,"dsfdsfsdf")
             if (res?.status === 201) {
                 setIsUploadModalOpen(false);
                 toast.success("File uploaded successfully")
                 fetchData()
+            }
+            else{
+                Object.keys(res?.response?.data).forEach((key)=>{
+                  toast.error(res?.response?.data[key]||"Something went wrong")  
+                })
             }
         }).finally(() => {
             setApiLoading(false)
