@@ -3,7 +3,7 @@ import React from 'react'
 
 const LoaderWidget = () => {
     return (
-        <div className='flex items-center justify-center h-[calc(100vh-8rem)]'>
+        <div className="text-center mt-5">
             <Spinner />
         </div>
     )
