@@ -278,7 +278,7 @@ const AddTrading = () => {
     return (
         <RoundedBox>
             <div className='flex items-center justify-between px-4 pt-7 pb-3 border-b border-[#F0F1F3]'>
-                <Heading>{id ? 'Edit' : 'Add'} Transaction Details{JSON.stringify(originalQty)}</Heading>
+                <Heading>{id ? 'Edit' : 'Add'} Transaction Details</Heading>
             </div>
             {/* @ts-ignore */}
             <form onSubmit={handleSubmit(onSubmit)}>
