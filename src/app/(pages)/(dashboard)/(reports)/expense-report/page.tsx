@@ -18,7 +18,7 @@ const page = () => {
     const fetchReports = async () => {
         setLoading(true);
         const PAYLOAD: RequestTypes = {
-            url: URLS.REPORTS_EXPENSES,
+            url: `${URLS.REPORTS_EXPENSES}?page=${currentPage}&page_size=20`,
             method: METHODS.GET,
         };
         sendRequest(PAYLOAD).then((res) => {
@@ -70,7 +70,7 @@ const page = () => {
                         </thead>
 
                         <tbody>
-                            {reports.map((report: any,index) => (
+                            {reports?.results?.map((report: any,index) => (
                                 <tr key={index} className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
                                     <td className=' text-start py-3 px-4 first-letter:uppercase'>{report?.product}</td>
                                     <td>{report?.reference_number}</td>

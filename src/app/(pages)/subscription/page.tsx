@@ -104,7 +104,7 @@ const page = () => {
                 <h1 className=' font-bold lg:text-3xl md:text-2xl text-xl text-blue-850'>Subscription Plan</h1>
                 <p className='text-gray-180'>Explore our subscription plans tailored to boost your experience.</p>
             </div>
-            {error?.code === "ERR_NETWORK" && <div className='text-center pt-5'>{error?.message}</div>}
+            {error?.code === "ERR_NETWORK" && <div className='text-center pt-5 text-dark-800'>{error?.message}</div>}
             {
                 loading ? <div className="h-[calc(100vh-200px)] flex justify-center items-center"><Spinner /></div>
                     : plansTypes?.plans?.length && <RoundedBox className='!bg-blue-100'>

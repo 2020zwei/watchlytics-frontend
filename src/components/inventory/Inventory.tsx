@@ -113,7 +113,6 @@ const Inventory = () => {
             payload: formData,
         }
         sendRequest(PAYLOAD).then((res) => {
-            console.log(res,"dsfdsfsdf")
             if (res?.status === 201) {
                 setIsUploadModalOpen(false);
                 toast.success("File uploaded successfully")
