@@ -45,6 +45,11 @@ export const URLS = {
   CARDS: "/v1/cards/",
   INVOICE: "/v1/invoices/",
   CUSTOMERS: "/v1/customers/",
+  DASHBOARD_STATS: "/v1/dashboard/stats/",
+  DASHBOARD_INCOME_BREAKDONW: "/v1/dashboard/income-breakdown/",
+  DASHBOARD_EXPENSE_TRACKING: "/v1/dashboard/expense-tracking/",
+  // DASHBOARD_DETAILED_ANALYTICS: "/v1/dashboard/detailed-analytics/",
+  MARKET_COMPARISON: "/v1/market-insightsmarket-comparison/",
 };
 
 export const METHODS = {

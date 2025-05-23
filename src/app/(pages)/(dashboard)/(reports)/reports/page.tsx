@@ -16,6 +16,7 @@ const page = () => {
     const [states, setStates] = useState<any>({})
     const [expenses, setExpenses] = useState<any>([])
     const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
 
     const fetchReports = async () => {
         setLoading(true);
@@ -183,17 +184,17 @@ const page = () => {
                         </div>
                     </RoundedBox>
                 </div>
-            {
-                reports?.count > 20?
-                    <div>
-                    <Pagination
-                        totalPages={10}
-                        currentPage={12}
-                        onPageChange={(page) => { }}
-                    />
-                </div>
-                :null
-            }
+                {
+                    reports?.count > 20 ?
+                        <div>
+                            <Pagination
+                                totalPages={reports?.count}
+                                currentPage={currentPage}
+                                onPageChange={(page) => setCurrentPage(page)}
+                            />
+                        </div>
+                        : null
+                }
             </div>
         </div>
     )

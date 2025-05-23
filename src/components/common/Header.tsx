@@ -46,7 +46,7 @@ const Header = () => {
 
     <div className={clsx("flex items-center w-full pe-4", showSearchBar ? "justify-between" : "justify-end")}>
       {showSearchBar ?
-        <div className='flex items-center border rounded-lg flex-1 me-3 max-w-[320px] ps-4 border-[#F0F1F3] font-normal'>
+        <div className='flex items-center ms-2 border rounded-lg flex-1 me-3 max-w-[320px] ps-4 border-[#F0F1F3] font-normal'>
           <SearchBar placeholder='Search product, supplier, order' icon='search'
             inputClass='order-1'
             placeholderClass='placeholder:text-[#858D9D] sm:placeholder:text-base placeholder:text-xs'

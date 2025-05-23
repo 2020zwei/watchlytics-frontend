@@ -22,7 +22,7 @@ const SideBarItems = () => {
     return (
         <ul className="flex flex-col gap-5">
             <li className="gap-3 flex items-center xl:text-2xl text-xl font-medium text-white py-8 relative">
-                <Image src="/images/white-logo.png" alt="logo" width={40} height={40} />
+                <img src="/images/white-logo.png" alt="logo" width={40} height={40} />
                 <span>Watchlytics</span>
             </li>
             {SidebarItems.map((item) => {

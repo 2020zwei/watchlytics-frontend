@@ -13,7 +13,7 @@ import {
   Cell,
 } from 'recharts';
 
-import { RequestTypes } from "@/types";
+import { DASHBOARD_EXPENSE, DASHBOARD_INCOME, DASHBOARD_STATS, MARKETDATA, RequestTypes } from "@/types";
 import { sendRequest } from "@/utils/apis";
 import { METHODS, URLS } from "@/utils/constants";
 import { Spinner } from "@heroui/react";
@@ -22,15 +22,9 @@ import Heading from "@/components/common/heading";
 import SearchBar from "@/components/common/SearchBar";
 import SelectWidget from "@/components/common/SelectWidget";
 import Pagination from "@/components/common/Pagination";
+import Icon from "@/components/common/Icon";
+import { useRouter } from "next/navigation";
 
-
-const lineData = [
-  { month: "Sep 2024", sales: 125000, purchase: 100000 },
-  { month: "Sep 2024", sales: 95000, purchase: 125000 },
-  { month: "Sep 2024", sales: 115000, purchase: 115000 },
-  { month: "Sep 2024", sales: 90000, purchase: 140000 },
-  { month: "Sep 2024", sales: 110000, purchase: 115000 },
-  { month: "Sep 2024", sales: 87000, purchase: 135000 },]
 
 const pieData = [
   { name: "Target", value: 25, color: "#1F79B5" },
@@ -39,28 +33,104 @@ const pieData = [
 ];
 
 export default function ExpenseTrackingChart() {
-  const [categories, setCategories] = useState<string[]>([]);
+  const [brands, setBrands] = useState<string[]>([]);
+  const [stats, setStats] = useState<DASHBOARD_STATS>();
+  const [expense, setExpense] = useState<DASHBOARD_EXPENSE[]>();
+  const [income, setIncome] = useState<DASHBOARD_INCOME[]>([]);
+  const [marketData, setMarketData] = useState<MARKETDATA[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const fetchCategories = async () => {
+  const router = useRouter()
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchQuery, setSearchQuery] = useState("")
+
+  const fetchMarketData = async () => {
+    setLoading(true)
     const PAYLOAD: RequestTypes = {
-      url: `${URLS.PRODUCTS}/`,
+      url: URLS.MARKET_COMPARISON,
       method: METHODS.GET,
     };
     sendRequest(PAYLOAD).then((res) => {
-      setLoading(true)
       if (res.status === 200) {
-        const options = res?.data?.results?.map((item: any) => item.product_name);
-        setCategories(options);
+        console.log(res)
+        setMarketData(res?.data);
       }
     }).finally(() => setLoading(false));
   };
+  const fetchStats = async () => {
+    const PAYLOAD: RequestTypes = {
+      url: URLS.DASHBOARD_STATS,
+      method: METHODS.GET,
+    };
+    sendRequest(PAYLOAD).then((res) => {
+      if (res.status === 200) {
+        setStats(res?.data);
+      }
+    })
+  };
+
+  const fetchExpense = async () => {
+    const PAYLOAD: RequestTypes = {
+      url: URLS.DASHBOARD_EXPENSE_TRACKING,
+      method: METHODS.GET,
+    };
+    sendRequest(PAYLOAD).then((res) => {
+      if (res.status === 200) {
+        setExpense(res?.data);
+      }
+    })
+  };
+
+  const fetchIncome = async () => {
+    const PAYLOAD: RequestTypes = {
+      url: URLS.DASHBOARD_INCOME_BREAKDONW,
+      method: METHODS.GET,
+    };
+    sendRequest(PAYLOAD).then((res) => {
+      if (res.status === 200) {
+        const data: any = [
+          { name: "Target", value: res?.data?.target, color: "#1F79B5" },
+          { name: "Income", value: res?.data?.income, color: "#E0E0E0" },
+          { name: "Pending", value: res?.data?.pending, color: "#0D3C61" },
+        ];
+        setIncome(data);
+      }
+    });
+  };
+
+  const fetchBrands = async () => {
+    const PAYLOAD: RequestTypes = {
+      url: URLS.CATEGORES,
+      method: METHODS.GET,
+    };
+    sendRequest(PAYLOAD).then((res) => {
+      if (res.status === 200) {
+        const options = res?.data?.results?.map((item: any) => item.name);
+        setBrands(options);
+      }
+    })
+  };
+
+  const handleBrandFilter = (query: string) => {
+    setSearchQuery(query)
+    router.push(`/dashboard/?search=${query?.replaceAll(" ", "-")}`)
+    console.log(console.log(query))
+  }
 
   useEffect(() => {
-    fetchCategories()
+    console.log(window.location.href)
+    fetchMarketData()
+    fetchBrands()
+    fetchStats()
+    fetchExpense()
+    fetchIncome()
   }, [])
+
+
+
   if (loading) {
     return <div className='text-center'><Spinner /></div>;
   }
+
   return (
     <>
       <RoundedBox className="p-4 pb-5">
@@ -69,26 +139,26 @@ export default function ExpenseTrackingChart() {
           <div className=" rounded-lg bg-white shadow-lg p-4 border-blue-700 border-t-2">
             <div className="text-lg font-medium pb-3 text-blue-700">Manage in Stock</div>
             <select name="" id="" className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none">
-              <option value="868" className="">868</option>
+              <option value="868" className="">{stats?.manage_in_stock}</option>
             </select>
           </div>
           <div className=" rounded-lg bg-white shadow-lg p-4 border-t-2 border-red-600">
             <div className="text-lg font-medium pb-3 text-red-600">Sold</div>
             <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none flex items-center gap-1">
               <span className="text-gray-180">$</span>
-              <span>1.5M</span>
+              <span>{stats?.sold_amount}</span>
             </div>
           </div>
           <div className=" rounded-lg bg-white shadow-lg p-4 border-t-2 border-orange-600">
             <div className="text-lg font-medium pb-3 text-orange-600">Pending Sale</div>
             <select name="" id="" className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none">
-              <option value="868" className="">102</option>
+              <option value="868" className="">{stats?.pending_sale}</option>
             </select>
           </div>
           <div className=" rounded-lg bg-white shadow-lg p-4 border-t-2 border-green-600">
             <div className="text-lg font-medium pb-3 text-green-600">Total Orders</div>
             <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none flex items-center gap-1">
-              150
+              {stats?.total_orders}
             </div>
           </div>
         </div>
@@ -112,10 +182,18 @@ export default function ExpenseTrackingChart() {
             </div>
           </div>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={lineData} margin={{ top: 10, right: 0, left: 0, bottom: 90 }}>
+            <LineChart data={expense} margin={{ top: 10, right: 0, left: 0, bottom: 90 }}>
               <CartesianGrid vertical={false} stroke="#f0f0f0" />
               <XAxis dataKey="month" tick={{ fontSize: 12 }} padding={{ right: 10, left: 30 }} tickMargin={40} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} domain={['dataMin - 10000', 'dataMax']} />
+              <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false}
+                domain={([dataMin, dataMax]) => {
+                  if (dataMin === dataMax) {
+                    return [0, dataMax + 10000];
+                  }
+                  return [Math.max(0, dataMin - 10000), dataMax];
+                }}
+
+              />
               <Tooltip formatter={(value: any) => new Intl.NumberFormat().format(value)} />
               <Line type="monotone" dataKey="sales" stroke="#EB2F96" dot={{ r: 3 }} strokeWidth={2} />
               <Line type="monotone" dataKey="purchase" stroke="#52C41A" dot={{ r: 3 }} strokeWidth={2} />
@@ -127,14 +205,14 @@ export default function ExpenseTrackingChart() {
           <ResponsiveContainer width="100%" height={200}>
             <PieChart margin={{ top: 0 }}>
               <Pie
-                data={pieData}
+                data={income}
                 innerRadius={40}
                 outerRadius={70}
                 paddingAngle={0}
                 cornerRadius={5}
                 dataKey="value"
               >
-                {pieData.map((entry, index) => (
+                {income?.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
@@ -163,11 +241,13 @@ export default function ExpenseTrackingChart() {
               <SearchBar placeholder='Rolex Submariner 114060' icon='search'
                 inputClass='order-1 bg-transparent !h-10'
                 placeholderClass='placeholder:text-[#858D9D] placeholder:text-xs'
+                onChange={(value) => console.log(value)}
               />
             </div>
             <div className="xs:w-[167px] w-full">
               <SelectWidget
-                options={categories}
+                options={brands}
+                onValueChange={handleBrandFilter}
                 classNames={{
                   trigger: "!rounded-lg bg-transparent border !border-gray-[#F0F1F3] text-[#858D9D] font-normal text-sm",
                   base: "rounded-none",
@@ -204,19 +284,56 @@ export default function ExpenseTrackingChart() {
             </thead>
 
             <tbody>
-              <tr className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
-                <td className=' text-start py-3 px-4'>Value</td>
-              </tr>
+              {
+                marketData?.map((item, index) => (
+                  <tr key={index} className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
+                    <td className="px-4">
+                      <RoundedBox className="relative items-center justify-center flex  my-2 !bg-gray-80 p-2 h-14 w-14">
+                        {item?.image_url ? <img src={item?.image_url} width={48} alt="image" className='w-full h-full rounded-md' /> : "N/A"}
+                      </RoundedBox>
+                    </td>
+                    <td className=' text-start py-3 px-4'>{item?.buying_price?.toFixed(2)}</td>
+                    <td className=' text-start py-3 px-4'>
+                      <div className="flex items-center">
+                        {item?.sources?.ebay?.price && <span className={item?.sources?.ebay?.price > item?.buying_price ? "" : "rotate-180"}>
+                          <Icon name="arrow" stroke={item?.sources?.ebay?.price > item?.buying_price ? "" : "red"} /></span>}
+                        {item?.sources?.ebay?.price || "-"}
+                      </div>
+                    </td>
+                    <td className=' text-start py-3 px-4'>
+                      <div className="flex items-center">
+                        {item?.sources?.chrono24?.price && <span className={item?.sources?.chrono24?.price > item?.buying_price ? "" : "rotate-180"}>
+                          <Icon name="arrow" stroke={item?.sources?.chrono24?.price > item?.buying_price ? "" : "red"} /></span>}
+                        {item?.sources?.chrono24?.price || "-"}
+                      </div>
+                    </td>
+                    <td className=' text-start py-3 px-4'>
+                      <div className="flex items-center">
+                        {item?.sources?.bezel?.price && <span className={item?.sources?.bezel?.price > item?.buying_price ? "" : "rotate-180"}>
+                          <Icon name="arrow" stroke={item?.sources?.bezel?.price > item?.buying_price ? "" : "red"} /></span>}
+                        {item?.sources?.bezel?.price || "-"}
+                      </div>
+                    </td>
+                    <td className=' text-end py-3 px-4'>
+                      <div className="flex items-center justify-end">
+                        {item?.sources?.grailzee?.price && <span className={item?.sources?.grailzee?.price > item?.buying_price ? "" : "rotate-180"}>
+                          <Icon name="arrow" stroke={item?.sources?.grailzee?.price > item?.buying_price ? "" : "red"} /></span>}
+                        {item?.sources?.grailzee?.price || "-"}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
-        <div className="px-4 pb-5">
-          <Pagination
-            totalPages={34}
-            currentPage={2}
-            onPageChange={(page) => { }}
-          />
-        </div>
+        {marketData?.count > 20 &&
+          <div className="px-4 pb-5">
+            <Pagination
+              totalPages={marketData?.count}
+              currentPage={currentPage}
+              onPageChange={(page) => (setCurrentPage(page))}
+            />
+          </div>}
       </RoundedBox>
     </>
   );
