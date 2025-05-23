@@ -96,7 +96,43 @@ export type STATETYPES = {
     top_selling: TopSelling;
     low_stocks: LowStocks;
 };
+export type DASHBOARD_STATS = {
+    manage_in_stock: number;
+    pending_sale: number;
+    sold_amount: number;
+    total_orders: number;
+}
+export type DASHBOARD_EXPENSE = {
+    month: string;
+    purchases: number;
+    sales: number;
+}
+export type DASHBOARD_INCOME = {
+    income: number;
+    pending: number;
+    target: number;
+    color?:string
+}
 
+
+export interface WatchSource {
+  price: number | null;
+  trend: string | null;
+}
+
+export interface MARKETDATA {
+  reference_number: string;
+  brand: string;
+  name: string;
+  image_url: string;
+  buying_price: number;
+  sources: {
+    ebay: WatchSource;
+    chrono24: WatchSource;
+    bezel: WatchSource;
+    grailzee: WatchSource;
+  };
+}
 
 
 

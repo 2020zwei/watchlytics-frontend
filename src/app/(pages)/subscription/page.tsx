@@ -22,11 +22,16 @@ const page = () => {
     const [loading, setLoading] = useState(false)
     const [isOnline, setIsOnline] = useState(true)
     const navigate = useRouter()
+    const [error, setError] = useState<any>()
     const getSubscriptions = () => {
         setLoading(true)
         sendRequest({ url: "/plans/", method: "GET" }).then(res => {
-            setPlansTypes(res?.data)
-            setLoading(false)
+            if (res?.status === 200) {
+                setPlansTypes(res?.data)
+            }
+            else {
+                setError(res)
+            }
         }).finally(() => {
             setLoading(false)
         })
@@ -99,9 +104,10 @@ const page = () => {
                 <h1 className=' font-bold lg:text-3xl md:text-2xl text-xl text-blue-850'>Subscription Plan</h1>
                 <p className='text-gray-180'>Explore our subscription plans tailored to boost your experience.</p>
             </div>
+            {error?.code === "ERR_NETWORK" && <div className='text-center pt-5'>{error?.message}</div>}
             {
                 loading ? <div className="h-[calc(100vh-200px)] flex justify-center items-center"><Spinner /></div>
-                    : <RoundedBox className='!bg-blue-100'>
+                    : plansTypes?.plans?.length && <RoundedBox className='!bg-blue-100'>
                         <div className='grid lg:grid-cols-4 md:grid-cols-4 sm:grid-cols-2 md:gap-4 gap-8 sm:p-10 p-4 mt-10'>
                             {
                                 plansTypes?.plans?.map((item: any, index: any) => (
