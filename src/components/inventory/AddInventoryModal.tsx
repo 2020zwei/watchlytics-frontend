@@ -54,8 +54,8 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
         // @ts-ignore
         resolver: zodResolver(InventoryFormSchema),
         mode: "onChange",
-        defaultValues:{
-            quantity:1
+        defaultValues: {
+            quantity: 1
         }
     });
 
@@ -63,19 +63,22 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
         setSubmitting(true);
         const formData = new FormData();
 
-
         Object.keys(data).forEach((key) => {
             let value = data[key as keyof typeof data];
 
+            // Format date fields
             if (key === "date_sold" || key === "date_purchased") {
                 value = formatDate(value);
             }
+
+            // Skip undefined or null values
+            if (value === undefined || value === null) return;
 
             // @ts-ignore
             formData.append(key, value);
         });
 
-
+        // Conditionally handle image
         if (!fileMeta?.file) {
             formData.delete("image");
         }
@@ -83,30 +86,84 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
         const PAYLOAD = {
             url: defaultData ? URLS.UPDATE_PRODUCT + defaultData?.id + "/" : URLS.ADD_PRODUCT,
             method: defaultData ? METHODS.PATCH : METHODS.POST,
-            payload: formData
+            payload: formData,
         };
 
-        sendRequest(PAYLOAD).then((res) => {
-            if (res?.status === 200 || res?.status === 201) {
-                toast.success(defaultData ? "Product successfully updated" : "Product successfully added");
-                setFileMeta(null);
-                onOpenChange(false);
-                reset();
-                callBack()
-            }
-            if (res.status === 500) {
-                toast.error(res?.response?.data?.message || "Something went wrong");
-            }
-            const errors = res?.response?.data?.errors;
-            if (res.status === 400) {
-                Object.keys(errors).forEach((key) => {
-                    toast.error(`${key?.replaceAll("_", " ")}: ${errors[key]}`);
-                });
-            }
-        }).finally(() => {
-            setSubmitting(false);
-        });
+        sendRequest(PAYLOAD)
+            .then((res) => {
+                if (res?.status === 200 || res?.status === 201) {
+                    toast.success(defaultData ? "Product successfully updated" : "Product successfully added");
+                    setFileMeta(null);
+                    onOpenChange(false);
+                    reset();
+                    callBack();
+                }
+
+                if (res.status === 500) {
+                    toast.error(res?.response?.data?.message || "Something went wrong");
+                }
+
+                const errors = res?.response?.data?.errors;
+                if (res.status === 400 && errors) {
+                    Object.keys(errors).forEach((key) => {
+                        toast.error(`${key.replaceAll("_", " ")}: ${errors[key]}`);
+                    });
+                }
+            })
+            .finally(() => {
+                setSubmitting(false);
+            });
     };
+
+
+    // const onFormSubmit = (data: FormSchemaType) => {
+    //     setSubmitting(true);
+    //     const formData = new FormData();
+
+
+    //     Object.keys(data).forEach((key) => {
+    //         let value = data[key as keyof typeof data];
+
+    //         if (key === "date_sold" || key === "date_purchased") {
+    //             value = formatDate(value);
+    //         }
+
+    //         // @ts-ignore
+    //         formData.append(key, value);
+    //     });
+
+
+    //     if (!fileMeta?.file) {
+    //         formData.delete("image");
+    //     }
+
+    //     const PAYLOAD = {
+    //         url: defaultData ? URLS.UPDATE_PRODUCT + defaultData?.id + "/" : URLS.ADD_PRODUCT,
+    //         method: defaultData ? METHODS.PATCH : METHODS.POST,
+    //         payload: formData
+    //     };
+
+    //     sendRequest(PAYLOAD).then((res) => {
+    //         if (res?.status === 200 || res?.status === 201) {
+    //             toast.success(defaultData ? "Product successfully updated" : "Product successfully added");
+    //             setFileMeta(null);
+    //             onOpenChange(false);
+    //             reset();
+    //             callBack()
+    //         }
+    //         if (res.status === 500) {
+    //             toast.error(res?.response?.data?.message || "Something went wrong");
+    //         }
+    //         const errors = res?.response?.data?.errors;
+    //         if (res.status === 400) {
+    //             Object.keys(errors).forEach((key) => {
+    //                 toast.error(`${key?.replaceAll("_", " ")}: ${errors[key]}`);
+    //             });
+    //         }
+    //     }).finally(() => {
+    //         setSubmitting(false);
+    //     });
+    // };
 
     useEffect(() => {
         if (defaultData) {
@@ -187,7 +244,7 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
                                                 <div className="text-center text-gray-180">or</div>
                                                 <div className="text-dark-800">Browse image</div>
                                             </div>
-                                        {errors?.image?.message ? <p className="text-sm text-red-800 absolute">{errors?.image?.message}</p> : null}
+                                            {errors?.image?.message ? <p className="text-sm text-red-800 absolute -bottom-6 whitespace-nowrap">{errors?.image?.message}</p> : null}
                                         </div>
                                     </FileUploader>
 

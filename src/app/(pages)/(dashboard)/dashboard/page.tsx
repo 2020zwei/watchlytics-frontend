@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   LineChart,
   Line,
@@ -36,28 +36,32 @@ const pieData = [
 export default function ExpenseTrackingChart() {
   const [brands, setBrands] = useState<string[]>([]);
   const [stats, setStats] = useState<DASHBOARD_STATS>();
-  const [expense, setExpense] = useState<DASHBOARD_EXPENSE[]>();
+  const [expense, setExpense] = useState<DASHBOARD_EXPENSE[]>([]);
   const [income, setIncome] = useState<DASHBOARD_INCOME[]>([]);
-  const [marketData, setMarketData] = useState<MARKETDATA[]>([]);
+  const [marketData, setMarketData] = useState<{ count: number; results: MARKETDATA[] }>({ count: 0, results: [] });
   const [loading, setLoading] = useState<boolean>(false);
-  const router = useRouter()
-  const [currentPage, setCurrentPage] = useState(1)
-  const [searchQuery, setSearchQuery] = useState("")
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
-  const fetchMarketData = async () => {
-    setLoading(true)
+  const pageRef = useRef(null)
+
+  const fetchMarketData = async (query: string) => {
+    setLoading(true);
     const PAYLOAD: RequestTypes = {
-      // &${params?.replace(/\+/g, "%20")}
-      url: `${URLS.MARKET_COMPARISON}?page=${currentPage}&page_size=20&brand=${searchQuery?.replace(/\+/g, "%20")}`,
+      url: `${URLS.MARKET_COMPARISON}?${query}`,
       method: METHODS.GET,
     };
     sendRequest(PAYLOAD).then((res) => {
       if (res.status === 200) {
-        console.log(res)
-        setMarketData(res?.data);
+        setMarketData({
+          count: res.data?.count || 0,
+          results: res.data?.results || [],
+        });
       }
     }).finally(() => setLoading(false));
   };
+
   const fetchStats = async () => {
     const PAYLOAD: RequestTypes = {
       url: URLS.DASHBOARD_STATS,
@@ -67,7 +71,7 @@ export default function ExpenseTrackingChart() {
       if (res.status === 200) {
         setStats(res?.data);
       }
-    })
+    });
   };
 
   const fetchExpense = async () => {
@@ -79,7 +83,7 @@ export default function ExpenseTrackingChart() {
       if (res.status === 200) {
         setExpense(res?.data);
       }
-    })
+    });
   };
 
   const fetchIncome = async () => {
@@ -89,7 +93,7 @@ export default function ExpenseTrackingChart() {
     };
     sendRequest(PAYLOAD).then((res) => {
       if (res.status === 200) {
-        const data: any = [
+        const data = [
           { name: "Target", value: res?.data?.target, color: "#1F79B5" },
           { name: "Income", value: res?.data?.income, color: "#E0E0E0" },
           { name: "Pending", value: res?.data?.pending, color: "#0D3C61" },
@@ -109,26 +113,50 @@ export default function ExpenseTrackingChart() {
         const options = res?.data?.results?.map((item: any) => item.name);
         setBrands(options);
       }
-    })
+    });
   };
 
-  const handleBrandFilter = (query: string) => {
-    setSearchQuery(query)
-    router.push(`/dashboard/?search=${query?.replaceAll(" ", "-")}`)
-    console.log(console.log(query))
-  }
-  useEffect(() => {
-    const query=window?.location?.search?.slice(8)?.replaceAll("-"," ")
-    setSearchQuery(query)
-    fetchMarketData()
-  }, [currentPage, searchQuery])
-  useEffect(() => {
-    fetchBrands()
-    fetchStats()
-    fetchExpense()
-    fetchIncome()
-  }, [])
+  const queryGenerator = (q = "") => {
+    const urlSearchParams = new URLSearchParams(window?.location?.search);
+    const queryParam = urlSearchParams.get("search");
+    const pageParam = parseInt(urlSearchParams.get("page") || "1", 10);
+    const parsedQuery = queryParam ? queryParam.replace(/\s+/g, "-") : "";
+    const squery = q || parsedQuery ? `search=${q || parsedQuery}` : "";
 
+    const page = currentPage > 1 ? currentPage : pageParam > 1 ? pageParam : null;
+    const pquery = page ? `page=${page}&page_size=20` : "";
+    pageRef.current = pageParam
+    const combinedQuery = [squery, pquery].filter(Boolean).join("&");
+    const url = `/dashboard/?${combinedQuery}`;
+    router.push(url);
+    setSearchQuery(parsedQuery?.replace("-", " "));
+
+    return combinedQuery;
+  };
+
+
+  const handleBrandFilter = (query: string) => {
+    setCurrentPage(1)
+    pageRef.current = 1
+    const url = `/dashboard/?search=${query?.replace(/\s+/g, "-")}`;
+    router.push(url);
+    fetchMarketData(url);
+  };
+
+
+  useEffect(() => {
+    const url = queryGenerator()
+    fetchMarketData(url);
+
+  }, [currentPage]);
+
+
+  useEffect(() => {
+    fetchBrands();
+    fetchStats();
+    fetchExpense();
+    fetchIncome();
+  }, []);
 
 
   if (loading) {
@@ -138,7 +166,7 @@ export default function ExpenseTrackingChart() {
   return (
     <>
       <RoundedBox className="p-4 pb-5">
-        <Heading>Stock Tracking</Heading>
+        <Heading>Stock Tracking {pageRef?.current}</Heading>
         <div className=" grid md:grid-cols-4 xs:grid-cols-2 grid-cols-1 mt-6 gap-3">
           <div className=" rounded-lg bg-white shadow-lg p-4 border-blue-700 border-t-2">
             <div className="text-lg font-medium pb-3 text-blue-700">Manage in Stock</div>
@@ -336,7 +364,7 @@ export default function ExpenseTrackingChart() {
           <div className="px-4 pb-5">
             <Pagination
               totalPages={marketData?.count}
-              currentPage={currentPage}
+              currentPage={currentPage > 1 ? currentPage : pageRef?.current}
               onPageChange={(page) => (setCurrentPage(page))}
             />
           </div>}

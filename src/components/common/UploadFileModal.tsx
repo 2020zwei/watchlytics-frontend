@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Modal,
     ModalContent,
@@ -23,7 +23,10 @@ export default function UploadFileModal({
     isLoading?: boolean;
 }) {
     const [file, setFile] = useState<File>()
-
+    console.log(file?.name, 'file')
+    useEffect(() => {
+        return () => { setFile("") }
+    }, [isOpen])
     return (
         <Modal isOpen={isOpen} onOpenChange={onOpen} placement="center">
             <ModalContent className="max-w-[750px] px-4">
@@ -43,6 +46,8 @@ export default function UploadFileModal({
                                     Click to upload or drag and drop
                                 </p>
                                 <p className="text-sm text-gray-400 mt-1">Excel,CSV are allowed</p>
+                                <div>{file?.name}</div>
+
                                 <input
                                     id="file-upload"
                                     type="file"
