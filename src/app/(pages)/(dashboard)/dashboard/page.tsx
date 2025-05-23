@@ -24,6 +24,7 @@ import SelectWidget from "@/components/common/SelectWidget";
 import Pagination from "@/components/common/Pagination";
 import Icon from "@/components/common/Icon";
 import { useRouter } from "next/navigation";
+import Notfound from "@/components/common/Notfound";
 
 
 const pieData = [
@@ -46,7 +47,8 @@ export default function ExpenseTrackingChart() {
   const fetchMarketData = async () => {
     setLoading(true)
     const PAYLOAD: RequestTypes = {
-      url: URLS.MARKET_COMPARISON,
+      // &${params?.replace(/\+/g, "%20")}
+      url: `${URLS.MARKET_COMPARISON}?page=${currentPage}&page_size=20&brand=${searchQuery?.replace(/\+/g, "%20")}`,
       method: METHODS.GET,
     };
     sendRequest(PAYLOAD).then((res) => {
@@ -115,10 +117,12 @@ export default function ExpenseTrackingChart() {
     router.push(`/dashboard/?search=${query?.replaceAll(" ", "-")}`)
     console.log(console.log(query))
   }
-
   useEffect(() => {
-    console.log(window.location.href)
+    const query=window?.location?.search?.slice(8)?.replaceAll("-"," ")
+    setSearchQuery(query)
     fetchMarketData()
+  }, [currentPage, searchQuery])
+  useEffect(() => {
     fetchBrands()
     fetchStats()
     fetchExpense()
@@ -248,6 +252,7 @@ export default function ExpenseTrackingChart() {
               <SelectWidget
                 options={brands}
                 onValueChange={handleBrandFilter}
+                selected={searchQuery}
                 classNames={{
                   trigger: "!rounded-lg bg-transparent border !border-gray-[#F0F1F3] text-[#858D9D] font-normal text-sm",
                   base: "rounded-none",
@@ -259,72 +264,73 @@ export default function ExpenseTrackingChart() {
           </div>
         </div>
         <div className='overflow-x-auto'>
-          <table className='w-full'>
-            <thead className='h-12'>
-              <tr className='text-white text-sm font-medium bg-blue-gradient'>
-                <th className='text-start px-4 first:rounded-s-lg  overflow-hidden'>
-                  Image
-                </th>
-                <th className='text-start px-4 whitespace-nowrap'>
-                  Buying Price
-                </th>
-                <th className='text-start px-4 whitespace-nowrap'>
-                  ebay
-                </th>
-                <th className='text-start px-4 whitespace-nowrap'>
-                  Chrono24
-                </th>
-                <th className='text-start px-4 whitespace-nowrap'>
-                  Bezel
-                </th>
-                <th className='text-end px-4 last:rounded-e-lg whitespace-nowrap'>
-                  Grailzee
-                </th>
-              </tr>
-            </thead>
+          {!marketData?.results?.length ? <Notfound label={`No records found for (${searchQuery})`} /> :
+            <table className='w-full'>
+              <thead className='h-12'>
+                <tr className='text-white text-sm font-medium bg-blue-gradient'>
+                  <th className='text-start px-4 first:rounded-s-lg  overflow-hidden'>
+                    Image
+                  </th>
+                  <th className='text-start px-4 whitespace-nowrap'>
+                    Buying Price
+                  </th>
+                  <th className='text-start px-4 whitespace-nowrap'>
+                    ebay
+                  </th>
+                  <th className='text-start px-4 whitespace-nowrap'>
+                    Chrono24
+                  </th>
+                  <th className='text-start px-4 whitespace-nowrap'>
+                    Bezel
+                  </th>
+                  <th className='text-end px-4 last:rounded-e-lg whitespace-nowrap'>
+                    Grailzee
+                  </th>
+                </tr>
+              </thead>
 
-            <tbody>
-              {
-                marketData?.map((item, index) => (
-                  <tr key={index} className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
-                    <td className="px-4">
-                      <RoundedBox className="relative items-center justify-center flex  my-2 !bg-gray-80 p-2 h-14 w-14">
-                        {item?.image_url ? <img src={item?.image_url} width={48} alt="image" className='w-full h-full rounded-md' /> : "N/A"}
-                      </RoundedBox>
-                    </td>
-                    <td className=' text-start py-3 px-4'>{item?.buying_price?.toFixed(2)}</td>
-                    <td className=' text-start py-3 px-4'>
-                      <div className="flex items-center">
-                        {item?.sources?.ebay?.price && <span className={item?.sources?.ebay?.price > item?.buying_price ? "" : "rotate-180"}>
-                          <Icon name="arrow" stroke={item?.sources?.ebay?.price > item?.buying_price ? "" : "red"} /></span>}
-                        {item?.sources?.ebay?.price || "-"}
-                      </div>
-                    </td>
-                    <td className=' text-start py-3 px-4'>
-                      <div className="flex items-center">
-                        {item?.sources?.chrono24?.price && <span className={item?.sources?.chrono24?.price > item?.buying_price ? "" : "rotate-180"}>
-                          <Icon name="arrow" stroke={item?.sources?.chrono24?.price > item?.buying_price ? "" : "red"} /></span>}
-                        {item?.sources?.chrono24?.price || "-"}
-                      </div>
-                    </td>
-                    <td className=' text-start py-3 px-4'>
-                      <div className="flex items-center">
-                        {item?.sources?.bezel?.price && <span className={item?.sources?.bezel?.price > item?.buying_price ? "" : "rotate-180"}>
-                          <Icon name="arrow" stroke={item?.sources?.bezel?.price > item?.buying_price ? "" : "red"} /></span>}
-                        {item?.sources?.bezel?.price || "-"}
-                      </div>
-                    </td>
-                    <td className=' text-end py-3 px-4'>
-                      <div className="flex items-center justify-end">
-                        {item?.sources?.grailzee?.price && <span className={item?.sources?.grailzee?.price > item?.buying_price ? "" : "rotate-180"}>
-                          <Icon name="arrow" stroke={item?.sources?.grailzee?.price > item?.buying_price ? "" : "red"} /></span>}
-                        {item?.sources?.grailzee?.price || "-"}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+              <tbody>
+                {
+                  marketData?.results?.map((item, index) => (
+                    <tr key={index} className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
+                      <td className="px-4">
+                        <RoundedBox className="relative items-center justify-center flex  my-2 !bg-gray-80 p-2 h-14 w-14">
+                          {item?.image_url ? <img src={item?.image_url} width={48} alt="image" className='w-full h-full rounded-md' /> : "N/A"}
+                        </RoundedBox>
+                      </td>
+                      <td className=' text-start py-3 px-4'>{item?.buying_price?.toFixed(2)}</td>
+                      <td className=' text-start py-3 px-4'>
+                        <div className="flex items-center">
+                          {item?.sources?.ebay?.price && <span className={item?.sources?.ebay?.price > item?.buying_price ? "" : "rotate-180"}>
+                            <Icon name="arrow" stroke={item?.sources?.ebay?.price > item?.buying_price ? "" : "red"} /></span>}
+                          {item?.sources?.ebay?.price || "-"}
+                        </div>
+                      </td>
+                      <td className=' text-start py-3 px-4'>
+                        <div className="flex items-center">
+                          {item?.sources?.chrono24?.price && <span className={item?.sources?.chrono24?.price > item?.buying_price ? "" : "rotate-180"}>
+                            <Icon name="arrow" stroke={item?.sources?.chrono24?.price > item?.buying_price ? "" : "red"} /></span>}
+                          {item?.sources?.chrono24?.price || "-"}
+                        </div>
+                      </td>
+                      <td className=' text-start py-3 px-4'>
+                        <div className="flex items-center">
+                          {item?.sources?.bezel?.price && <span className={item?.sources?.bezel?.price > item?.buying_price ? "" : "rotate-180"}>
+                            <Icon name="arrow" stroke={item?.sources?.bezel?.price > item?.buying_price ? "" : "red"} /></span>}
+                          {item?.sources?.bezel?.price || "-"}
+                        </div>
+                      </td>
+                      <td className=' text-end py-3 px-4'>
+                        <div className="flex items-center justify-end">
+                          {item?.sources?.grailzee?.price && <span className={item?.sources?.grailzee?.price > item?.buying_price ? "" : "rotate-180"}>
+                            <Icon name="arrow" stroke={item?.sources?.grailzee?.price > item?.buying_price ? "" : "red"} /></span>}
+                          {item?.sources?.grailzee?.price || "-"}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>}
         </div>
         {marketData?.count > 20 &&
           <div className="px-4 pb-5">

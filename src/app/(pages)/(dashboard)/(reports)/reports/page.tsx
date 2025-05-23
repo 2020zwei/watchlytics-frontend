@@ -21,7 +21,7 @@ const page = () => {
     const fetchReports = async () => {
         setLoading(true);
         const PAYLOAD: RequestTypes = {
-            url: URLS.BEST_SELLING,
+            url: `${URLS.BEST_SELLING}?page=${currentPage}&page_size=20`,
             method: METHODS.GET,
         };
         sendRequest(PAYLOAD).then((res) => {
@@ -125,7 +125,7 @@ const page = () => {
                                 </thead>
                                 <tbody>
                                     {
-                                        expenses?.map((item: any) => (
+                                        expenses?.results?.map((item: any) => (
                                             <tr key={item?.product} className='border'>
                                                 <td className='text-gray-650 text-sm test-start px-4 py-2'>{item?.product}</td>
                                                 <td className='text-sm text text-dark-500 text-center py-2'>${item?.repairs}</td>
@@ -145,7 +145,7 @@ const page = () => {
                         <Heading className='p-3'>Best selling product</Heading>
                         <div className=" overflow-x-auto">
                             {
-                                reports.length ?
+                                reports?.results?.length ?
                                     <table className='w-full min-w-[1200px]'>
                                         <thead className='h-12'>
                                             <tr className='text-white text-sm font-medium bg-blue-gradient'>
@@ -163,7 +163,7 @@ const page = () => {
                                         </thead>
 
                                         <tbody>
-                                            {reports.map((report: any) => (
+                                            {reports?.results?.map((report: any) => (
                                                 <tr key={report?.product_id} className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
                                                     <td className=' text-start py-3 px-4 first-letter:uppercase'>{report?.product}</td>
                                                     <td>{report?.reference_number}</td>
