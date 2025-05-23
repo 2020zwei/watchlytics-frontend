@@ -67,7 +67,7 @@ export const InventoryFormFields = [
         "name": "buying_price",
         "placeholder": "Enter Buying Price",
         "fieldType": "input",
-        "type": "number"
+        "type": "text"
     },
     {
         ...quantity
@@ -91,35 +91,35 @@ export const InventoryFormFields = [
         "name": "shipping_price",
         "placeholder": "Enter Shipping Price",
         "fieldType": "input",
-        "type": "number"
+        "type": "text"
     },
     {
         "label": "Repair Cost",
         "name": "repair_cost",
         "placeholder": "Enter Repair Cost",
         "fieldType": "input",
-        "type": "number"
+        "type": "text"
     },
     {
         "label": "Fees",
         "name": "fees",
         "placeholder": "Enter Fees",
         "fieldType": "input",
-        "type": "number"
+        "type": "text"
     },
     {
         "label": "Commission",
         "name": "commission",
         "placeholder": "Enter Commission",
         "fieldType": "input",
-        "type": "number"
+        "type": "text"
     },
     {
         "label": "MSRP",
         "name": "msrp",
         "placeholder": "Enter MSRP",
         "fieldType": "input",
-        "type": "number"
+        "type": "text"
     },
     {
         "label": "Sold Price",
@@ -138,14 +138,14 @@ export const InventoryFormFields = [
         "name": "year",
         "placeholder": "Enter Year",
         "fieldType": "input",
-        "type": "number"
+        "type": "text"
     },
     {
         "label": "Website Price",
         "name": "website_price",
         "placeholder": "Enter Website Price",
         "fieldType": "input",
-        "type": "number"
+        "type": "text"
     },
     // {
     //     "label": "Profit Margin",
@@ -249,26 +249,30 @@ export const LoginFormFields = [
 
 const availabilityEnum = z.enum(["in_stock", "sold", "reserved", "in_repair"]);
 const conditionEnum = z.enum(["new", "used"]);
-
+const currentYear = new Date().getFullYear();
 export const InventoryFormSchema = z.object({
     model_name: z
         .string()
         .nonempty("Model name is required")
         .min(3, "Model name must be at least 3 characters")
-        .max(200, "Max 200 characters"),
+        .max(200, "Max 200 characters")
+        .regex(/^[a-zA-Z0-9 ]+$/, "Only letters, numbers, and spaces are allowed"),
+
     year: z.preprocess(
-        (val) => typeof val === "string" ? Number(val) : val,
+        (val) => (typeof val === "string" && val.trim() !== "" ? Number(val) : val),
         z
-            .number()
-            .min(1, "Year is required and must be greater than 0")
+            .number({ invalid_type_error: "Year must be a number" })
+            .int("Year must be a whole number")
+            .min(1900, "Year must be no earlier than 1900")
+            .max(currentYear, `Year cannot be later than ${currentYear}`)
     ),
 
     product_id: z
         .string()
         .nonempty("Reference number is required")
         .min(3, "Reference ID must be at least 3 characters")
-        .max(50, "Max 50 characters"),
-
+        .max(50, "Max 50 characters")
+        .regex(/^[a-zA-Z0-9#]+$/, "Only letters, numbers, and # are allowed"),
     category: z.union([z.string(), z.number()])
         .refine(val => val !== null && val !== undefined && val !== '', {
             message: "Brand is required",
@@ -281,7 +285,7 @@ export const InventoryFormSchema = z.object({
 
     buying_price: z
         .coerce.number()
-        .min(0.01, "Buying price is required"),
+        .min(0.01, "Buying price is required").positive("Fees must be a positive number"),
 
     quantity: z.coerce.number()
         .int({ message: "Quantity must be an integer." })
@@ -307,23 +311,64 @@ export const InventoryFormSchema = z.object({
 
 
 
-    fees: z
-        .coerce.number().optional(),
+    fees: z.preprocess(
+        (val) => {
+            if (val === null || val === undefined || val === "") return undefined;
+            return Number(val);
+        },
+        z.number()
+            .positive("Fees must be a positive number")
+            .optional()
+    ),
 
-    commission: z
-        .coerce.number().optional(),
+    commission: z.preprocess(
+        (val) => {
+            // Convert empty string or null to undefined
+            if (val === "" || val === null || val === undefined) return undefined;
+            return Number(val);
+        },
+        z.union([
+            z.number().positive("Commission must be a positive number"),
+            z.undefined()
+        ])
+    ),
+    msrp: z.preprocess(
+        (val) => {
+            // Convert empty string or null to undefined
+            if (val === "" || val === null || val === undefined) return undefined;
+            return Number(val);
+        },
+        z.union([
+            z.number().positive("MSRP must be a positive number"),
+            z.undefined()
+        ])
+    ),
 
-    msrp: z
-        .coerce.number().optional(),
-
-    website_price: z
-        .coerce.number().optional(),
+    website_price: z.preprocess(
+        (val) => {
+            // Convert empty string or null to undefined
+            if (val === "" || val === null || val === undefined) return undefined;
+            return Number(val);
+        },
+        z.union([
+            z.number().positive("Website price must be a positive number"),
+            z.undefined()
+        ])
+    ),
 
     sold_price: z.coerce.number().nullable().optional(),
     whole_price: z.coerce.number().nullable().optional(),
-    // profit_margin: z.coerce.number().nullable().optional(),
-    // profit: z.coerce.number().nullable().optional(),
-    unit: z.string().nullable().optional(),
+    unit: z.preprocess(
+        (val) => {
+            // Convert empty string or null to undefined
+            if (val === "" || val === null || val === undefined) return undefined;
+            return Number(val);
+        },
+        z.union([
+            z.number().positive("Unit must be a positive number"),
+            z.undefined()
+        ])
+    ),
     date_sold: z.preprocess(
         (val) => {
             if (val === '' || val === null) return undefined;
@@ -348,15 +393,15 @@ export const InventoryFormSchema = z.object({
     listed_on: z.string().nullable().optional(),
 
     image: z
-    .any()
-    .optional()
-    .refine(
-      (val) =>
-        val === undefined ||
-        (val instanceof File && val.size > 0) ||
-        (typeof val === "string" && val.length > 0),
-      { message: "Image must be a non-empty file or string when provided" }
-    ),
+        .any()
+        .optional()
+        .refine(
+            (val) =>
+                val === undefined || val === null || val === "" ||
+                (val instanceof File && val.size > 0) ||
+                (typeof val === "string" && val.length > 0),
+            { message: "Image must be a non-empty file or string when provided" }
+        ),
 
     serial_number: z.string().nullable().optional(),
 }).refine((data) => {
