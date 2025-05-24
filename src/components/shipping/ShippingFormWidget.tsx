@@ -1,14 +1,10 @@
 "use client"
 import React from 'react'
-import Pagination from '../common/Pagination';
-import clsx from 'clsx';
 import RoundedBox from '../common/baseButton/RoundedBox';
 import Heading from '../common/heading';
-import Link from 'next/link';
 import FormField from '../common/FormField';
 import { PackageFields, RecipientInformationFields, SenderFields } from '@/utils/mock';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@heroui/react';
 
 const defaultData = {

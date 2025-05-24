@@ -217,7 +217,7 @@ const page = () => {
                             </div>
                             {customers?.count > 20 ?
                                 <Pagination
-                                    totalPages={customers?.count}
+                                    totalPages={Math.ceil(customers?.count / 20)}
                                     currentPage={currentPage}
                                     onPageChange={(page) => setCurrentPage(page)}
                                 /> : null}

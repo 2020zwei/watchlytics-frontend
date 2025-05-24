@@ -363,7 +363,7 @@ export default function ExpenseTrackingChart() {
         {marketData?.count > 20 &&
           <div className="px-4 pb-5">
             <Pagination
-              totalPages={marketData?.count}
+              totalPages={Math.ceil(marketData?.count / 20)}
               currentPage={currentPage > 1 ? currentPage : pageRef?.current}
               onPageChange={(page) => (setCurrentPage(page))}
             />
