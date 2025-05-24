@@ -171,7 +171,7 @@ const page = () => {
                                 </li>
                             )
                         })}
-                        {Object.keys(filters)?.length ? <li className='rounded-md border !border-gray-70 h-10 px-4 flex items-center justify-center cursor-pointer' onClick={() => { setFilters({}); navigate.push("/customers");getCustomers() }}>Clear</li> : null}
+                        {Object.keys(filters)?.length ? <li className='rounded-md border !border-gray-70 h-10 px-4 flex items-center justify-center cursor-pointer' onClick={() => { setFilters({}); navigate.push("/customers"); getCustomers() }}>Clear</li> : null}
                     </ul>
                     <div className='lg-xl:w-auto w-full text-end'>
                         <Link href="/customers/add" className='bg-blue-gradient ms-auto text-white rounded-lg text-sm h-10 w-[128px] flex items-center justify-center'>Add Customer</Link>
@@ -262,13 +262,12 @@ const page = () => {
                                     </tbody>
                                 </table>
                             </div>
-                            {/* {customers?.count > 20 && */}
-                            <Pagination
-                                totalPages={20}
-                                // totalPages={Math.ceil(customers?.count / 20)}
-                                currentPage={currentPage > 1 ? currentPage : pageRef.current}
-                                onPageChange={(page) => handlePagination(page)}
-                            />
+                            {customers?.count > 20 &&
+                                <Pagination
+                                    totalPages={Math.ceil(customers?.count / 20)}
+                                    currentPage={currentPage > 1 ? currentPage : pageRef.current}
+                                    onPageChange={(page) => handlePagination(page)}
+                                />}
                         </>
                     }
                 </div>
