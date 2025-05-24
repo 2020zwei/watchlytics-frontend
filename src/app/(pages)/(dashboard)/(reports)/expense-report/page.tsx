@@ -3,19 +3,23 @@
 import RoundedBox from '@/components/common/baseButton/RoundedBox';
 import Heading from '@/components/common/heading';
 import Icon from '@/components/common/Icon';
+import Notfound from '@/components/common/Notfound';
 import Pagination from '@/components/common/Pagination';
 import ReportFilters from '@/components/common/ReportFilters';
-import { RequestTypes } from '@/types';
+import { REPOT_TYPES, RequestTypes } from '@/types';
 import { sendRequest } from '@/utils/apis';
 import { METHODS, URLS } from '@/utils/constants';
 import { Spinner } from '@heroui/react';
-import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useRef, useState } from 'react'
 
 const page = () => {
-    const [reports, setReports] = useState([])
+    const [reports, setReports] = useState<REPOT_TYPES>()
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
-    const fetchReports = async () => {
+    const router = useRouter()
+    const pageRef = useRef(1)
+    const fetchReports = async (currentPage: number) => {
         setLoading(true);
         const PAYLOAD: RequestTypes = {
             url: `${URLS.REPORTS_EXPENSES}?page=${currentPage}&page_size=20`,
@@ -29,8 +33,11 @@ const page = () => {
     };
 
     useEffect(() => {
-        fetchReports()
-    }, [])
+        pageRef.current = parseInt(window.location.search?.slice(13)) || currentPage
+        currentPage > 1 && router.push(`/expense-report/?page_number=${currentPage}`)
+        fetchReports(currentPage > 1 ? currentPage : pageRef.current)
+    }, [currentPage])
+
     if (loading) {
         return <div className='text-center'><Spinner /></div>;
     }
@@ -40,6 +47,7 @@ const page = () => {
                 <Heading as='h3' className=' md:text-2xl text-lg w-full'>Expense Report</Heading>
                 <ReportFilters selectedReport='Expense Report' />
             </div>
+            {!reports?.results?.length?<Notfound/>:
             <RoundedBox>
                 <div className=''>
                     <table className='w-full'>
@@ -88,15 +96,15 @@ const page = () => {
                         </tbody>
                     </table>
                 </div>
-                {reports?.count > 20 &&
+                {reports?.count! > 20 &&
                     <div className="px-4 pb-5">
                         <Pagination
-                            totalPages={Math.ceil(reports?.count / 20)}
-                            currentPage={currentPage}
+                            totalPages={Math.ceil(reports?.count! / 20)}
+                            currentPage={currentPage > 1 ? currentPage : pageRef?.current}
                             onPageChange={(page) => setCurrentPage(page)}
                         />
                     </div>}
-            </RoundedBox>
+            </RoundedBox>}
         </>
     )
 }

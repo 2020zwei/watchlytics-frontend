@@ -3,7 +3,7 @@ import { Button } from '@/components/common/baseButton/BaseButton'
 import RoundedBox from '@/components/common/baseButton/RoundedBox'
 import Heading from '@/components/common/heading'
 import clsx from 'clsx'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Checkbox, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner, useDisclosure } from "@heroui/react";
 import { TransparentButton } from '@/components/common/baseButton/TransparentButton'
 import Pagination from '@/components/common/Pagination'
@@ -39,8 +39,10 @@ const Inventory = () => {
     const [stats, setStats] = useState<STATETYPES>()
     const searchParams = useSearchParams();
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-    const params = searchParams?.toString()
+    const params = searchParams
     const navigate = useRouter()
+
+    const pageRef=useRef(1)
 
     const fetchCategories = async () => {
         const PAYLOAD: RequestTypes = {
@@ -62,9 +64,9 @@ const Inventory = () => {
     const fetchData = async (payload: any = null, page_number = 1) => {
         setApiLoading(true)
         // @ts-ignore
-        
+
         const PAYLOAD: RequestTypes = {
-            url: `${URLS.PRODUCTS}/?page_number=${currentPage}&${params?.replace(/\+/g, "%20")}&page_size=20/`,
+            url: `${URLS.PRODUCTS}/?${params?.toString()?.replace(/\+/g, "%20")}&page_size=20/`,
             method: METHODS.GET,
         }
         sendRequest(PAYLOAD).then((res) => {
@@ -86,7 +88,6 @@ const Inventory = () => {
             method: METHODS.DELETE,
         }
         sendRequest(PAYLOAD).then((res) => {
-            console.log(res)
             if (res?.status == 200 || res?.status == 204) {
                 toast.success("Product deleted successfully")
                 fetchData()
@@ -118,9 +119,9 @@ const Inventory = () => {
                 toast.success("File uploaded successfully")
                 fetchData()
             }
-            else{
-                Object.keys(res?.response?.data).forEach((key)=>{
-                  toast.error(res?.response?.data[key]||"Something went wrong")  
+            else {
+                Object.keys(res?.response?.data).forEach((key) => {
+                    toast.error(res?.response?.data[key] || "Something went wrong")
                 })
             }
         }).finally(() => {
@@ -128,10 +129,9 @@ const Inventory = () => {
         })
     }
 
-    useEffect(() => {
-        fetchCategories()
-        fetchStats()
-    }, [])
+    const applyFilter=(filters:any)=>{
+        pageRef.current=1
+    }
 
     useEffect(() => {
         if (!isOpen) {
@@ -142,11 +142,16 @@ const Inventory = () => {
     useEffect(() => {
         fetchCategories();
         fetchStats();
+         pageRef.current=parseInt(params.get("page_number")!)
     }, []);
 
     useEffect(() => {
+        currentPage > 1 && navigate.push(`/inventory/?page_number=${currentPage}`)
+    }, [currentPage])
+
+    useEffect(() => {
         fetchData();
-    }, [searchParams, currentPage]);
+    }, [searchParams]);
 
 
     return (
@@ -205,8 +210,8 @@ const Inventory = () => {
                 <div className='flex items-center justify-between md:flex-row flex-col'>
                     <Heading className='text-start md:w-auto w-full md:-order-1 order-1'>Products</Heading>
                     <ul className='flex items-center gap-3 md:mb-0 mb-5 md:flex-nowrap flex-wrap md:w-auto w-full inventory-btns'>
-                        <li className='xs:w-auto w-[48%]'><Button title='Add Product' className='h-10 ' onPress={onOpen} /></li>
-                        <li className='xs:w-auto w-[48%]'><InventoryFilterModal brands={categories} /></li>
+                        <li className='xs:w-auto w-[48%]'><Button title='Add Product' className='h-10 ' onPress={onOpen} /></li>                        
+                        <li className='xs:w-auto w-[48%]'><InventoryFilterModal brands={categories} onApplyFilter={applyFilter}/></li>
                         <li className='xs:w-auto w-[48%]'>
                             <Dropdown className='!rounded-lg'>
                                 <DropdownTrigger>
@@ -349,7 +354,7 @@ const Inventory = () => {
                                 products?.count > 10 ?
                                     <Pagination
                                         totalPages={Math.ceil(products?.count / 10)}
-                                        currentPage={currentPage}
+                                        currentPage={pageRef.current > 1?pageRef.current:currentPage}
                                         onPageChange={(page) => setCurrentPage(page)}
                                     /> : null}
                         </div>}

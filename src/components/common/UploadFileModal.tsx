@@ -23,7 +23,6 @@ export default function UploadFileModal({
     isLoading?: boolean;
 }) {
     const [file, setFile] = useState<File>()
-    console.log(file?.name, 'file')
     useEffect(() => {
         return () => { setFile("") }
     }, [isOpen])

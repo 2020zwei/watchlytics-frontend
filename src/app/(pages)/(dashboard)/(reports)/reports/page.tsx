@@ -5,27 +5,29 @@ import Icon from '@/components/common/Icon';
 import Notfound from '@/components/common/Notfound';
 import Pagination from '@/components/common/Pagination';
 import ReportFilters from '@/components/common/ReportFilters';
-import { RequestTypes } from '@/types';
+import { REPOT_TYPES, RequestTypes } from '@/types';
 import { sendRequest } from '@/utils/apis';
 import { METHODS, URLS } from '@/utils/constants';
 import { Spinner } from '@heroui/react'
-import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useRef, useState } from 'react'
 
 const page = () => {
-    const [reports, setReports] = useState([])
+    const [reports, setReports] = useState<REPOT_TYPES>()
     const [states, setStates] = useState<any>({})
     const [expenses, setExpenses] = useState<any>([])
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
+    const router = useRouter()
+    const pageRef = useRef(1)
 
-    const fetchReports = async () => {
+    const fetchReports = async (currentPage: number) => {
         setLoading(true);
         const PAYLOAD: RequestTypes = {
             url: `${URLS.BEST_SELLING}?page=${currentPage}&page_size=20`,
             method: METHODS.GET,
         };
         sendRequest(PAYLOAD).then((res) => {
-            console.log(res)
             if (res.status === 200) {
                 setReports(res?.data);
             }
@@ -57,10 +59,14 @@ const page = () => {
     };
 
     useEffect(() => {
-        fetchReports()
         fetchReportState()
         fetchExpensesState()
     }, [])
+    useEffect(() => {
+        pageRef.current = parseInt(window.location.search?.slice(13)) || currentPage
+        currentPage > 1 && router.push(`/reports/?page_number=${currentPage}`)
+        fetchReports(currentPage > 1 ? currentPage : pageRef.current)
+    }, [currentPage])
     if (loading) {
         return <div className='text-center'><Spinner /></div>;
     }
@@ -185,11 +191,12 @@ const page = () => {
                     </RoundedBox>
                 </div>
                 {
-                    reports?.count > 20 ?
+                    reports?.count! > 20 ?
                         <div>
                             <Pagination
-                                totalPages={Math.ceil(reports?.count / 20)}
-                                currentPage={currentPage}
+
+                                totalPages={Math.ceil(reports?.count! / 20)}
+                                currentPage={currentPage > 1 ? currentPage : pageRef.current}
                                 onPageChange={(page) => setCurrentPage(page)}
                             />
                         </div>
