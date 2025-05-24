@@ -9,7 +9,7 @@ import { RequestTypes } from '@/types';
 import { sendRequest } from '@/utils/apis';
 import { METHODS, URLS } from '@/utils/constants';
 import { Spinner } from '@heroui/react';
-import React, {useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 const page = () => {
     const [reports, setReports] = useState([])
@@ -70,7 +70,7 @@ const page = () => {
                         </thead>
 
                         <tbody>
-                            {reports?.results?.map((report: any,index) => (
+                            {reports?.results?.map((report: any, index) => (
                                 <tr key={index} className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
                                     <td className=' text-start py-3 px-4 first-letter:uppercase'>{report?.product}</td>
                                     <td>{report?.reference_number}</td>
@@ -91,7 +91,7 @@ const page = () => {
                 {reports?.count > 20 &&
                     <div className="px-4 pb-5">
                         <Pagination
-                            totalPages={reports?.count}
+                            totalPages={Math.ceil(reports?.count / 20)}
                             currentPage={currentPage}
                             onPageChange={(page) => setCurrentPage(page)}
                         />

@@ -188,7 +188,7 @@ const page = () => {
                     reports?.count > 20 ?
                         <div>
                             <Pagination
-                                totalPages={reports?.count}
+                                totalPages={Math.ceil(reports?.count / 20)}
                                 currentPage={currentPage}
                                 onPageChange={(page) => setCurrentPage(page)}
                             />
