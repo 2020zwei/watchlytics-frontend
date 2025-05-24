@@ -146,6 +146,7 @@ export default function ExpenseTrackingChart() {
 
   useEffect(() => {
     const url = queryGenerator()
+    console.log(url,'url')
     fetchMarketData(url);
 
   }, [currentPage]);
@@ -292,7 +293,7 @@ export default function ExpenseTrackingChart() {
           </div>
         </div>
         <div className='overflow-x-auto'>
-          {!marketData?.results?.length ? <Notfound label={`No records found for (${searchQuery})`} /> :
+          {!marketData?.results?.length ? <Notfound label={`No records found ${searchQuery}`} /> :
             <table className='w-full'>
               <thead className='h-12'>
                 <tr className='text-white text-sm font-medium bg-blue-gradient'>

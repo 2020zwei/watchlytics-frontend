@@ -62,7 +62,7 @@ const Inventory = () => {
     const fetchData = async (payload: any = null, page_number = 1) => {
         setApiLoading(true)
         // @ts-ignore
-
+        
         const PAYLOAD: RequestTypes = {
             url: `${URLS.PRODUCTS}/?page_number=${currentPage}&${params?.replace(/\+/g, "%20")}&page_size=20/`,
             method: METHODS.GET,
@@ -346,9 +346,9 @@ const Inventory = () => {
                                 </table>
                             </div>
                             {
-                                products?.count > 20 ?
+                                products?.count > 10 ?
                                     <Pagination
-                                        totalPages={Math.ceil(products?.count / 20)}
+                                        totalPages={Math.ceil(products?.count / 10)}
                                         currentPage={currentPage}
                                         onPageChange={(page) => setCurrentPage(page)}
                                     /> : null}
