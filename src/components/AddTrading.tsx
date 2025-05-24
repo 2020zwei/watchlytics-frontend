@@ -5,7 +5,7 @@ import Icon from '@/components/common/Icon';
 import { DROPDWONOPTION, RequestTypes } from '@/types';
 import { sendRequest } from '@/utils/apis';
 import { METHODS, URLS } from '@/utils/constants';
-import { Button } from '@heroui/react';
+import { Button, Spinner } from '@heroui/react';
 import clsx from 'clsx';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
@@ -89,8 +89,8 @@ const AddTrading = () => {
         };
         sendRequest(PAYLOAD).then((res) => {
             if (res.status === 200) {
-                const filtered=res?.data?.results.filter(el=>el?.quantity>0)
-                const options = (id?res?.data?.results:filtered)?.map((item: any) => ({
+                const filtered = res?.data?.results.filter(el => el?.quantity > 0)
+                const options = (id ? res?.data?.results : filtered)?.map((item: any) => ({
                     value: item.id,
                     label: item.model_name,
                 }));
@@ -274,7 +274,9 @@ const AddTrading = () => {
             });
         }
     };
-
+    if (loading) {
+        return <div className='text-center mt-5'><Spinner /></div>
+    }
     return (
         <RoundedBox>
             <div className='flex items-center justify-between px-4 pt-7 pb-3 border-b border-[#F0F1F3]'>

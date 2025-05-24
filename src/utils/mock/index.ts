@@ -264,7 +264,7 @@ export const InventoryFormSchema = z.object({
             .number({ invalid_type_error: "Year must be a number" })
             .int("Year must be a whole number")
             .min(1900, "Year must be no earlier than 1900")
-            .max(currentYear, `Year cannot be later than ${currentYear}`)
+            .max(currentYear, `Year cannot be greater than ${currentYear}`)
     ),
 
     product_id: z
@@ -272,7 +272,7 @@ export const InventoryFormSchema = z.object({
         .nonempty("Reference number is required")
         .min(3, "Reference ID must be at least 3 characters")
         .max(50, "Max 50 characters")
-        .regex(/^[a-zA-Z0-9#]+$/, "Only letters, numbers, and # are allowed"),
+        .regex(/^[a-zA-Z0-9#. ]+$/, "Only letters, numbers, #, spaces, and dots are allowed"),
     category: z.union([z.string(), z.number()])
         .refine(val => val !== null && val !== undefined && val !== '', {
             message: "Brand is required",
