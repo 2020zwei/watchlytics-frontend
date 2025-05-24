@@ -2,7 +2,7 @@
 import RoundedBox from '@/components/common/baseButton/RoundedBox'
 import Heading from '@/components/common/heading'
 import clsx from 'clsx'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@heroui/react";
 import Pagination from '@/components/common/Pagination'
 import Link from 'next/link'
@@ -34,6 +34,8 @@ const page = () => {
     const [deleteAlert, setDeleteAlert] = useState(false);
     const [note, setNote] = useState();
     const navigate = useRouter()
+    const pageRef = useRef(1)
+
 
     const closeUploadModal = () => {
         setIsUploadModalOpen(false);
@@ -48,13 +50,7 @@ const page = () => {
         setDeleteAlert(true)
 
     }
-    const updateFilter = (key: string, value: string) => {
-        const newFilters = { ...filters, [key]: value };
-        setFilters(newFilters);
 
-        const query = new URLSearchParams(newFilters).toString();
-        navigate.push(`?${query}`);
-    };
 
     const comfirmDelete = () => {
         const PAYLOAD: RequestTypes = {
@@ -63,7 +59,7 @@ const page = () => {
         }
         sendRequest(PAYLOAD).then((res) => {
             if (res?.status === 204) {
-                getCustomers()
+                getCustomers(currentPage)
                 toast.success("Customer successfully deleted");
             }
             else {
@@ -73,17 +69,68 @@ const page = () => {
             toast.error("An error occurred while deleting customer.");
         }).finally(() => setDeleteAlert(false))
     }
-    const getCustomers = () => {
+    const getCustomers = (query: string = "") => {
         setLoading(true)
-        const queryString = new URLSearchParams(filters).toString();
-        sendRequest({ url: `${URLS.CUSTOMERS}?${queryString}` }).then((res) => {
+        sendRequest({ url: `${URLS.CUSTOMERS}${query}` }).then((res) => {
             setCustomers(res?.data)
         }).finally(() => {
             setLoading(false)
         });
     }
 
-    useEffect(() => { getCustomers() }, [filters])
+    const updateFilter = (key: string, value: string) => {
+        navigate.push(`/customers`);
+        setTimeout(() => {
+            const newFilters = { ...filters, [key]: value };
+            delete newFilters.page_number;
+
+            const query = new URLSearchParams(newFilters);
+            navigate.push(`/customers/?${query.toString()}`);
+            getCustomers(`?${query.toString()}&page_size=20`);
+            setFilters(newFilters);
+            pageRef.current = 1;
+            setCurrentPage(1);
+        }, 2000)
+    };
+    const handlePagination = (page: number) => {
+        const params = new URLSearchParams(window.location.search);
+        // const page = parseInt(params.get("page_number")!) > currentPage ? parseInt(params.get("page_number")!) : currentPage
+        const queries: any = {}
+        pageRef.current = page
+        for (const [key, value] of params.entries()) {
+            if (key !== "page_number") {
+                queries[key] = value;
+            }
+        }
+        const query = new URLSearchParams(queries).toString()
+        setCurrentPage(page)
+        navigate.push(`/customers/?${query}&page_number=${page}`)
+        getCustomers(`?${query}&page=${page}&page_size=20`)
+    }
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const page = parseInt(params.get("page_number")!) > currentPage ? parseInt(params.get("page_number")!) : currentPage
+        const queries: any = {}
+        pageRef.current = page
+        for (const [key, value] of params.entries()) {
+            if (key !== "page_number") {
+                queries[key] = value;
+            }
+        }
+        const query = new URLSearchParams(queries).toString()
+        getCustomers(`?${query}&page=${page}&page_size=20`)
+        // if (currentPage === 1 && pageRef.current == 1) {
+        //     getCustomers(`?${query}&page=${1}&page_size=20`)
+        //     page > 1 && navigate.push(`/customers/?${query}`)
+        // }
+        // else {
+        //     page > 1 && navigate.push(`/customers/?${query}&page_number=${page}`)
+        //     getCustomers(`?${query}&page=${page}&page_size=20`)
+        // }
+    }, []
+    )
+
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const initialFilters: { [key: string]: string } = {};
@@ -110,7 +157,7 @@ const page = () => {
                                 <li key={index} className={`min-w-[103px] filter-option${index}`}>
                                     <SelectWidget
                                         selected={filters[key]}
-                                        onValueChange={(value) => { console.log(value); updateFilter(key, value); }}
+                                        onValueChange={(value) => { updateFilter(key, value); }}
                                         placeholder={key}
                                         options={buttons[key]}
 
@@ -124,7 +171,7 @@ const page = () => {
                                 </li>
                             )
                         })}
-                        {Object.keys(filters)?.length ? <li className='rounded-md border !border-gray-70 h-10 px-4 flex items-center justify-center cursor-pointer' onClick={() => { setFilters({}); navigate.push("/customers"); }}>Clear</li> : null}
+                        {Object.keys(filters)?.length ? <li className='rounded-md border !border-gray-70 h-10 px-4 flex items-center justify-center cursor-pointer' onClick={() => { setFilters({}); navigate.push("/customers");getCustomers() }}>Clear</li> : null}
                     </ul>
                     <div className='lg-xl:w-auto w-full text-end'>
                         <Link href="/customers/add" className='bg-blue-gradient ms-auto text-white rounded-lg text-sm h-10 w-[128px] flex items-center justify-center'>Add Customer</Link>
@@ -215,12 +262,13 @@ const page = () => {
                                     </tbody>
                                 </table>
                             </div>
-                            {customers?.count > 20 ?
-                                <Pagination
-                                    totalPages={Math.ceil(customers?.count / 20)}
-                                    currentPage={currentPage}
-                                    onPageChange={(page) => setCurrentPage(page)}
-                                /> : null}
+                            {/* {customers?.count > 20 && */}
+                            <Pagination
+                                totalPages={20}
+                                // totalPages={Math.ceil(customers?.count / 20)}
+                                currentPage={currentPage > 1 ? currentPage : pageRef.current}
+                                onPageChange={(page) => handlePagination(page)}
+                            />
                         </>
                     }
                 </div>

@@ -134,5 +134,12 @@ export interface MARKETDATA {
   };
 }
 
+export type REPOT_TYPES={
+    count:number,
+    results:any[]
+    previous:string,
+    next:string,
+}
+
 
 

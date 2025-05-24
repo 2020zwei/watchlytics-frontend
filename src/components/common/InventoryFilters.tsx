@@ -18,10 +18,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 interface InventoryFilterModalTypes {
     brands: { value: string; label: string }[];
+    onApplyFilter?: (value: any) => void
 }
 
 const InventoryFilterModal: React.FC<InventoryFilterModalTypes> = ({
-    brands,
+    brands, onApplyFilter = () => { }
 }) => {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const router = useRouter();
@@ -69,14 +70,13 @@ const InventoryFilterModal: React.FC<InventoryFilterModalTypes> = ({
 
     const applyFilters = () => {
         const params = new URLSearchParams();
-
         selectedBrands.forEach((brand) => params.append("brand", brand));
         if (startDate) params.set("start_date", startDate);
         if (endDate) params.set("end_date", endDate);
         if (condition) params.set("condition", condition);
         if (buyer) params.set("buyer", buyer);
         if (seller) params.set("seller", seller);
-
+        onApplyFilter(params)
         router.push(`/inventory?${params.toString()}`);
     };
 
@@ -89,6 +89,30 @@ const InventoryFilterModal: React.FC<InventoryFilterModalTypes> = ({
         setSeller(null);
         router.push("/inventory");
     };
+    const clearFilter = () => {
+        setSelectedBrands([]);
+        setStartDate(null);
+        setEndDate(null);
+        setCondition(null);
+        setBuyer(null);
+        setSeller(null);
+
+        // Clear URL params
+        router.push("/inventory");
+    };
+
+    const hasActiveFilters = () => {
+        return (
+            selectedBrands.length > 0 ||
+            startDate !== null ||
+            endDate !== null ||
+            condition !== null ||
+            buyer !== null ||
+            seller !== null
+        );
+    };
+
+
 
     useEffect(() => {
         const currentParams = new URLSearchParams(searchParams.toString());
@@ -99,16 +123,34 @@ const InventoryFilterModal: React.FC<InventoryFilterModalTypes> = ({
         setBuyer(currentParams.get("buyer") || null);
         setSeller(currentParams.get("seller") || null);
     }, [searchParams]);
+    useEffect(() => {
+        hasActiveFilters(); // not necessary unless you're tracking this separately
+    }, [selectedBrands, startDate, endDate, condition, buyer, seller]);
+
+
 
     return (
         <>
-            <TransparentButton
-                onPress={onOpen}
-                title="Filters"
-                className="h-10 !text-[#1C274C] !border-[#1C274C]"
-                icon="filter"
-                iconStroke="#1C274C"
-            />
+            <div className="flex items-center gap-3">
+                {hasActiveFilters() && (
+                    <Button
+                        title="Clear"
+                        variant="bordered"
+                        className="bg-transparent h-10 border-1 !text-[#1C274C] !border-[#1C274C]"
+                        onPress={clearFilter}
+                    >
+                        Clear
+                    </Button>
+                )}
+                <TransparentButton
+                    onPress={onOpen}
+                    title="Filters"
+                    className="h-10 !text-[#1C274C] !border-[#1C274C]"
+                    icon="filter"
+                    iconStroke="#1C274C"
+                />
+            </div>
+
 
             <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
                 <ModalContent className="max-w-[750px] px-4">
@@ -159,7 +201,7 @@ const InventoryFilterModal: React.FC<InventoryFilterModalTypes> = ({
                                                     type="date"
                                                     className={clsx(
                                                         "border rounded-lg px-3 h-9 w-full text-gray-180 text-xs border-gray-70"
-                                                         ,startDate?"!text-dark-800 !text-base":"text-gray-180"
+                                                        , startDate ? "!text-dark-800 !text-base" : "text-gray-180"
                                                     )}
                                                     value={startDate || ""}
                                                     onChange={(e) =>
@@ -185,7 +227,7 @@ const InventoryFilterModal: React.FC<InventoryFilterModalTypes> = ({
                                                     type="date"
                                                     className={clsx(
                                                         "border rounded-lg px-3 h-9 w-full  text-xs border-gray-70"
-                                                        ,endDate?"!text-dark-800 !text-base":"text-gray-180"
+                                                        , endDate ? "!text-dark-800 !text-base" : "text-gray-180"
                                                     )}
                                                     value={endDate || ""}
                                                     onChange={(e) =>

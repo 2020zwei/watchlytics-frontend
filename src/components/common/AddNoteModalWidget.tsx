@@ -25,7 +25,6 @@ const AddNoteModalWidget: React.FC<AddNoteModalWidgetTypes> = ({
     const [value, setValue] = useState();
     const [submitting, setSubmitting] = useState(false);
     const navigate = useRouter()
-    console.log(note)
     const onSubmit = () => {
         setSubmitting(true);
         const DATA = {

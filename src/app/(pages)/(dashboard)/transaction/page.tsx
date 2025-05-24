@@ -11,24 +11,30 @@ import { RequestTypes } from '@/types'
 import { sendRequest } from '@/utils/apis'
 import { METHODS, URLS } from '@/utils/constants'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import React, { useEffect, useRef, useState } from 'react'
 
 const page = () => {
 
     const [apiLoading, setApiLoading] = React.useState(false)
     const [tradings, setTradings] = React.useState<any>([])
     const [currentPage, setCurrentPage] = useState(1)
+    const pageRef = useRef(1)
+    const router = useRouter()
 
-    const PAYLOAD: RequestTypes = {
-        url: `${URLS.TRANSACTIONS}`,
-        method: METHODS.GET,
-    }
-    const fetchTradeDetails = async () => {
+    const fetchTradeDetails = async (currentPage: number) => {
+        const PAYLOAD: RequestTypes = {
+            url: `${URLS.TRANSACTIONS}?page=${currentPage}`,
+            method: METHODS.GET,
+        }
         setApiLoading(true)
         try {
             const res = await sendRequest(PAYLOAD)
             if (res?.status === 200) {
                 setTradings(res.data)
+            }
+            else {
+                setTradings([])
             }
         } catch (error) {
             console.error('Error fetching trade details:', error)
@@ -37,7 +43,9 @@ const page = () => {
         }
     }
     useEffect(() => {
-        fetchTradeDetails();
+        pageRef.current = parseInt(window.location.search?.slice(13)) || currentPage
+        currentPage > 1 && router.push(`/transaction/?page_number=${currentPage}`)
+        fetchTradeDetails(currentPage > 1 ? currentPage : pageRef.current)
     }, [currentPage]);
 
     if (apiLoading) return <LoaderWidget />
@@ -79,13 +87,12 @@ const page = () => {
                         </tbody>
                     </table>}
             </div>
-            {
-                tradings?.results?.count > 30 ?
-                    <Pagination
-                        totalPages={Math.ceil(tradings?.results?.count / 30)}
-                        currentPage={currentPage}
-                        onPageChange={(page) => setCurrentPage(page)}
-                    /> : null}
+            {tradings?.results?.count > 20 &&
+                <Pagination
+                    totalPages={Math.ceil(tradings?.results?.count / 20)}
+                    currentPage={currentPage > 1 ? currentPage : pageRef.current}
+                    onPageChange={(page) => setCurrentPage(page)}
+                />}
         </RoundedBox>
     )
 }
