@@ -193,6 +193,7 @@ export default function ProfilePage() {
                           : "password"
                         : field.type
                     }
+                    field={field}
                     key={field.label}
                     isDisabled={field?.type === "email" ? true : !isEditing}
                     label={field.label}

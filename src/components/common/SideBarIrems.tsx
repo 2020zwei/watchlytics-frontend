@@ -37,14 +37,15 @@ const SideBarItems = () => {
                     <li
                         key={item.label}
                         className={clsx(
-                            'hover:bg-white/10 duration-300 px-4 xl:py-4 py-3 rounded-lg font-medium relative',
-                            isActive ? 'bg-white/10 text-white' : 'text-gray-200'
+                            'hover:bg-white/10 duration-300 rounded-lg font-medium relative',
+                            isActive ? 'bg-white/10 text-white' : 'text-gray-200',
+                            item.href !== '#'?"px-4 xl:py-4 py-3":""
                         )}
                     >
 
 
                         {item.href === '#' ? (
-                            <button onClick={handleLogout} className='flex-1 flex items-center gap-4'>
+                            <button onClick={handleLogout} className='flex-1 flex items-center gap-4 px-4 xl:py-4 py-3 w-full h-full'>
                                 <Icon name={item.icon} />
                                 {item.label}
                             </button>

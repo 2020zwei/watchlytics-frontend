@@ -166,7 +166,7 @@ export default function ExpenseTrackingChart() {
   return (
     <>
       <RoundedBox className="p-4 pb-5">
-        <Heading>Stock Tracking {pageRef?.current}</Heading>
+        <Heading>Stock Tracking</Heading>
         <div className=" grid md:grid-cols-4 xs:grid-cols-2 grid-cols-1 mt-6 gap-3">
           <div className=" rounded-lg bg-white shadow-lg p-4 border-blue-700 border-t-2">
             <div className="text-lg font-medium pb-3 text-blue-700">Manage in Stock</div>
@@ -364,6 +364,7 @@ export default function ExpenseTrackingChart() {
           <div className="px-4 pb-5">
             <Pagination
               totalPages={Math.ceil(marketData?.count / 20)}
+              // @ts-ignore
               currentPage={currentPage > 1 ? currentPage : pageRef?.current}
               onPageChange={(page) => (setCurrentPage(page))}
             />

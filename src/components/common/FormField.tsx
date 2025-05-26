@@ -15,7 +15,7 @@ interface StyleProps {
     fill?: string,
     iconClass?: ""
     iconSize?: string,
-    isDisabled?: boolean
+    isDisabled?: boolean,
     onPasswordToggle?: (value: string) => void
 }
 interface Option {
@@ -34,7 +34,8 @@ interface FormFieldProps extends StyleProps {
     options?: Option[];
     min?: any,
     max?: any,
-    isSearch?: boolean
+    isSearch?: boolean,
+    field?: any,
 
 }
 
@@ -61,6 +62,7 @@ const FormField: React.FC<FormFieldProps> = ({
     isDisabled = false,
     placeholderClass = "",
     isSearch = false,
+    field,
     ...rest
 }) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
@@ -69,7 +71,8 @@ const FormField: React.FC<FormFieldProps> = ({
             <label htmlFor={name} className={clsx("min-w-[130px] text-base font-medium text-dark-300 pt-3 flex items-center gap-x-1",
                 errors[name] && errors[name] && "text-red-800", labelClass
             )}>
-                {label} {name === "client_id" && <Icon name="exclamation" size="1.2rem"/>}
+                {label} {name === "client_id" && <Icon name="exclamation" size="1.2rem" />}
+                {field?.required && <sup><Icon name="star" fill="red" size="0.5rem" /></sup>}
             </label>
             <div className={inputContainer}>
                 <div className={clsx("relative flex items-center", type === "checkbox" ? "gap-2" : "justify-between")}
@@ -152,6 +155,7 @@ const FormField: React.FC<FormFieldProps> = ({
                                                             "shadow-md rounded-lg min-h-11 w-full",
                                                             isSearch ? "ps-10 pe-3" : "px-3"
                                                         )}
+                                                        // @ts-ignore
                                                         ref={(e) => {
                                                             field.ref(e);
                                                             inputRef.current = e;
@@ -177,7 +181,7 @@ const FormField: React.FC<FormFieldProps> = ({
                     />
 
                     {icon ?
-                        <button type="button" onClick={icon ? () => onPasswordToggle(name) : undefined} className=" absolute right-3"><Icon name={icon} stroke={stroke} fill={fill} className={iconClass} size={iconSize} /></button> : null}
+                        <button type="button" onClick={icon ? () => onPasswordToggle(name) : undefined} className=" absolute right-3"><Icon name={icon} stroke={stroke} fill={"#A4A4A4"} className={iconClass} size={iconSize} /></button> : null}
                 </div>
                 {errors[name] && (
                     <p className="text-sm text-red-800">{errors[name]?.message as string}</p>

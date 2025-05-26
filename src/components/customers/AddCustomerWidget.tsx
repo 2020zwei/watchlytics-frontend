@@ -27,28 +27,32 @@ const fields = [
         name: "name",
         placeholder: "Enter name",
         fieldType: "input",
-        type: "text"
+        type: "text",
+        required: true
     },
     {
         label: "Email",
         name: "email",
         placeholder: "Enter email",
         fieldType: "input",
-        type: "email"
+        type: "email",
+        required: true
     },
     {
         label: "Phone number:",
         name: "phone",
         placeholder: "Enter number",
         fieldType: "input",
-        type: "text"
+        type: "text",
+        required: true
     },
     {
         label: "Address:",
         name: "address",
         placeholder: "Enter address",
         fieldType: "input",
-        type: "text"
+        type: "text",
+        required: true
     },
 ]
 type FormSchemaType = z.infer<typeof FormFieldsSchema>;
@@ -134,6 +138,7 @@ const AddCustomerWidget = () => {
                                 key={field.label}
                                 type={field?.type}
                                 label={field.label}
+                                field={field}
                                 name={field.name}
                                 control={control}
                                 placeholder={field.placeholder}

@@ -6,7 +6,8 @@ export const name = {
     name: "first_name",
     placeholder: "Enter Name",
     fieldType: "input",
-    type: "text"
+    type: "text",
+    required: true
 }
 export const phone = {
     label: "Phone",
@@ -19,21 +20,24 @@ export const email = {
     name: "email",
     placeholder: "Enter Email",
     fieldType: "input",
-    type: "email"
+    type: "email",
+    required: true
 }
 export const password = {
     label: "Password",
     name: "password",
     placeholder: "Enter Password",
     fieldType: "input",
-    type: "password"
+    type: "password",
+    required: true
 }
 export const confirmpassword = {
     label: "Confirm Password",
     name: "confirm_password",
-    placeholder: "Confirm Password",
+    placeholder: "Confirm  new password",
     fieldType: "input",
-    type: "password"
+    type: "password",
+    required: true
 }
 export const clientId = {
     label: "IFS Client ID",
@@ -63,19 +67,22 @@ export const InventoryFormFields = [
         "label": "Model Name",
         "name": "model_name",
         "placeholder": "Enter Model Name",
-        "fieldType": "input"
+        "fieldType": "input",
+        required: true
     },
     {
         "label": "Reference Number",
         "name": "product_id",
         "placeholder": "Enter reference number",
-        "fieldType": "input"
+        "fieldType": "input",
+        required: true
     },
     {
         "label": "Brand",
         "name": "category",
         "placeholder": "Select product brand",
-        "fieldType": "select"
+        "fieldType": "select",
+        required: true
     },
     {
         "label": "Availability",
@@ -94,7 +101,8 @@ export const InventoryFormFields = [
         "name": "buying_price",
         "placeholder": "Enter Buying Price",
         "fieldType": "input",
-        "type": "text"
+        "type": "text",
+        required: true
     },
     {
         ...quantity
@@ -104,7 +112,8 @@ export const InventoryFormFields = [
         "name": "date_purchased",
         "placeholder": "Enter Date Purchased",
         "fieldType": "input",
-        "type": "date"
+        "type": "date",
+        required: true
     },
     {
         "label": "Date Sold",
@@ -165,7 +174,8 @@ export const InventoryFormFields = [
         "name": "year",
         "placeholder": "Enter Year",
         "fieldType": "input",
-        "type": "text"
+        "type": "text",
+        required: true
     },
     {
         "label": "Website Price",
@@ -174,20 +184,6 @@ export const InventoryFormFields = [
         "fieldType": "input",
         "type": "text"
     },
-    // {
-    //     "label": "Profit Margin",
-    //     "name": "profit_margin",
-    //     "placeholder": "Enter Profit Margin",
-    //     "fieldType": "input",
-    //     "type": "number"
-    // },
-    // {
-    //     "label": "Profit",
-    //     "name": "profit",
-    //     "placeholder": "Enter profit",
-    //     "fieldType": "input",
-    //     "type": "number"
-    // },
     {
         "label": "Unit",
         "name": "unit",
@@ -231,251 +227,14 @@ export const ProfileFormFields = [
     { ...name },
     { ...email },
     { ...phone },
-    { ...password },
-    { ...confirmpassword },
+    { ...password, required: false },
+    { ...confirmpassword, required: false },
     { ...clientId },
 ];
 export const LoginFormFields = [
     email,
     password
 ]
-
-
-const availabilityEnum = z.enum(["in_stock", "sold", "reserved", "in_repair"]);
-const conditionEnum = z.enum(["new", "used"]);
-const currentYear = new Date().getFullYear();
-export const InventoryFormSchema = z.object({
-    model_name: z
-        .string()
-        .nonempty("Model name is required")
-        .min(3, "Model name must be at least 3 characters")
-        .max(200, "Max 200 characters")
-        .regex(/^[a-zA-Z0-9 ]+$/, "Only letters, numbers, and spaces are allowed"),
-
-    year: z.preprocess(
-        (val) => (typeof val === "string" && val.trim() !== "" ? Number(val) : val),
-        z
-            .number({ invalid_type_error: "Year must be a number" })
-            .int("Year must be a whole number")
-            .min(1900, "Year must be no earlier than 1900")
-            .max(currentYear, `Year cannot be greater than ${currentYear}`)
-    ),
-
-    product_id: z
-        .string()
-        .nonempty("Reference number is required")
-        .min(3, "Reference ID must be at least 3 characters")
-        .max(50, "Max 50 characters")
-        .regex(/^[a-zA-Z0-9#. ]+$/, "Only letters, numbers, #, spaces, and dots are allowed"),
-    category: z.union([z.string(), z.number()])
-        .refine(val => val !== null && val !== undefined && val !== '', {
-            message: "Brand is required",
-        }),
-
-    availability: z.preprocess(
-        (val) => (val === "" ? undefined : val),
-        availabilityEnum.optional().default("in_stock")
-    ),
-
-    buying_price: z
-        .coerce.number()
-        .min(0.01, "Buying price is required").positive("Fees must be a positive number"),
-
-    quantity: z.coerce.number()
-        .int({ message: "Quantity must be an integer." })
-        .min(1, { message: "Quantity must be at least 1." })
-        .default(1),
-
-    date_purchased: z.preprocess(
-        (val) => {
-            if (typeof val === "string") {
-                const date = new Date(val);
-                return isNaN(date.getTime()) ? undefined : date;
-            }
-            return val;
-        },
-        z.date({
-            required_error: "Purchase date is required",
-            invalid_type_error: "Invalid date format",
-        })
-    ),
-
-    shipping_price: z.coerce.number().nullable().optional(),
-    repair_cost: z.coerce.number().nullable().optional(),
-
-
-
-    fees: z.preprocess(
-        (val) => {
-            if (val === null || val === undefined || val === "") return undefined;
-            return Number(val);
-        },
-        z.number()
-            .positive("Fees must be a positive number")
-            .optional()
-    ),
-
-    commission: z.preprocess(
-        (val) => {
-            // Convert empty string or null to undefined
-            if (val === "" || val === null || val === undefined) return undefined;
-            return Number(val);
-        },
-        z.union([
-            z.number().positive("Commission must be a positive number"),
-            z.undefined()
-        ])
-    ),
-    msrp: z.preprocess(
-        (val) => {
-            // Convert empty string or null to undefined
-            if (val === "" || val === null || val === undefined) return undefined;
-            return Number(val);
-        },
-        z.union([
-            z.number().positive("MSRP must be a positive number"),
-            z.undefined()
-        ])
-    ),
-
-    website_price: z.preprocess(
-        (val) => {
-            // Convert empty string or null to undefined
-            if (val === "" || val === null || val === undefined) return undefined;
-            return Number(val);
-        },
-        z.union([
-            z.number().positive("Website price must be a positive number"),
-            z.undefined()
-        ])
-    ),
-
-    sold_price: z.coerce.number().nullable().optional(),
-    whole_price: z.coerce.number().nullable().optional(),
-    unit: z.preprocess(
-        (val) => {
-            // Convert empty string or null to undefined
-            if (val === "" || val === null || val === undefined) return undefined;
-            return Number(val);
-        },
-        z.union([
-            z.number().positive("Unit must be a positive number"),
-            z.undefined()
-        ])
-    ),
-    date_sold: z.preprocess(
-        (val) => {
-            if (val === '' || val === null) return undefined;
-
-            if (typeof val === 'string') {
-                const date = new Date(val);
-                return isNaN(date.getTime()) ? undefined : date;
-            }
-            return val;
-        },
-        z.date().optional()
-    ),
-
-    source_of_sale: z.string().nullable().optional(),
-    delivery_content: z.string().nullable().optional(),
-    condition: z.preprocess(
-        (val) => (val === "" ? undefined : val),
-        conditionEnum.optional().default("new")
-    ),
-    purchased_from: z.string().nullable().optional(),
-    sold_source: z.string().nullable().optional(),
-    listed_on: z.string().nullable().optional(),
-
-    image: z
-        .any()
-        .optional()
-        .refine(
-            (val) =>
-                val === undefined || val === null || val === "" ||
-                (val instanceof File && val.size > 0) ||
-                (typeof val === "string" && val.length > 0),
-            { message: "Image must be a non-empty file or string when provided" }
-        ),
-
-    serial_number: z.string().nullable().optional(),
-}).refine((data) => {
-    if (!data.date_sold) return true;
-    return new Date(data.date_purchased) <= new Date(data.date_sold);
-}, {
-    message: "Date Purchased must be less than Date Sold",
-    path: ["date_sold"],
-});
-
-
-
-export const ProfileFormSchema = z.object({
-    first_name: z.string().min(1, "Name is required"),
-    email: z.string().email("Invalid email address"),
-    profile_picture: z.any().optional(),
-    date_joined: z.any().optional(),
-    phone_number: z.string()
-        .min(10, "Phone number must be at least 10 digits")
-        .max(15, "Phone number can't be more than 15 digits")
-        .or(z.literal("")).optional(),
-
-    password: z.string()
-        .optional()
-        .refine(val => !val || val.length >= 6, {
-            message: "Password must be at least 6 characters",
-        }),
-
-    confirm_password: z.string()
-        .optional()
-        .refine(val => !val || val.length >= 6, {
-            message: "Confirm Password must be at least 6 characters",
-        }),
-    client_id: z
-        .string()
-        .optional()
-        .refine((val) => {
-            if (!val) return true;
-            return /^\d{8,10}$/.test(val);
-        }, {
-            message: "Client ID must be between 8 and 10 digits",
-        }),
-
-
-})
-    .refine((data) => {
-        if (!data.password && !data.confirm_password) return true;
-        return data.password === data.confirm_password;
-    }, {
-        path: ["confirm_password"],
-        message: "Passwords do not match",
-    });
-
-
-export const RegistrationFormSchema = z.object({
-    name: z.string().min(1, "Name is required"),
-    email: z.string().email("Invalid email address"),
-
-    password: z.string().min(6, "Password must be at least 6 characters"),
-
-    confirm_password: z.string().min(6, "Confirm Password must be at least 6 characters"),
-
-    client_id: z
-        .string()
-        .optional()
-        .refine((val) => {
-            if (!val) return true;
-            return /^\d{8,10}$/.test(val);
-        }, {
-            message: "Client ID must be between 8 and 10 digits",
-        }),
-
-
-
-
-}).refine((data) => data.password === data.confirm_password, {
-    path: ["confirm_password"],
-    message: "Passwords do not match",
-});
-
 
 export const SidebarItems = [
     {
@@ -846,9 +605,8 @@ export const InvoiceFormFields = [
 
 ]
 
-
 export const InvoiceFormFieldsSchema = z.object({
-    name: z.string().min(1, "Product name is required"),
+    name: z.string().min(3, "Product name must be at least 3 characters"),
     email: z.string().email("Invalid email").min(1, "Email is required"),
     date: z.preprocess(
         (val) => {
@@ -872,6 +630,255 @@ export const InvoiceFormFieldsSchema = z.object({
         .default(1),
     city: z.string().min(1, "City is required"),
 });
+
+const availabilityEnum = z.enum(["in_stock", "sold", "reserved", "in_repair"]);
+const conditionEnum = z.enum(["new", "used"]);
+const currentYear = new Date().getFullYear();
+
+export const InventoryFormSchema = z.object({
+    model_name: z
+        .string()
+        .nonempty("Model name is required")
+        .min(3, "Model name must be at least 3 characters")
+        .max(200, "Max 200 characters")
+        .regex(/^[a-zA-Z0-9 ]+$/, "Only letters, numbers, and spaces are allowed"),
+
+    year: z.preprocess(
+        (val) => (typeof val === "string" && val.trim() !== "" ? Number(val) : val),
+        z
+            .number({ invalid_type_error: "Year must be a number" })
+            .int("Year must be a whole number")
+            .min(1900, "Year must be no earlier than 1900")
+            .max(currentYear, `Year cannot be greater than ${currentYear}`)
+    ),
+
+    product_id: z
+        .string()
+        .nonempty("Reference number is required")
+        .min(3, "Reference ID must be at least 3 characters")
+        .max(50, "Max 50 characters")
+        .regex(/^[a-zA-Z0-9#. ]+$/, "Only letters, numbers, #, spaces, and dots are allowed"),
+    category: z.union([z.string(), z.number()])
+        .refine(val => val !== null && val !== undefined && val !== '', {
+            message: "Brand is required",
+        }),
+
+    availability: z.preprocess(
+        (val) => (val === "" ? undefined : val),
+        availabilityEnum.optional().default("in_stock")
+    ),
+
+    buying_price: z
+        .coerce.number()
+        .min(0.01, "Buying price is required").positive("Fees must be a positive number"),
+
+    quantity: z.coerce.number()
+        .int({ message: "Quantity must be an integer." })
+        .min(1, { message: "Quantity must be at least 1." })
+        .default(1),
+
+    date_purchased: z.preprocess(
+        (val) => {
+            if (typeof val === "string") {
+                const date = new Date(val);
+                return isNaN(date.getTime()) ? undefined : date;
+            }
+            return val;
+        },
+        z.date({
+            required_error: "Purchase date is required",
+            invalid_type_error: "Invalid date format",
+        })
+    ),
+
+    shipping_price: z.coerce.number().nullable().optional(),
+    repair_cost: z.coerce.number().nullable().optional(),
+
+
+
+    fees: z.preprocess(
+        (val) => {
+            if (val === null || val === undefined || val === "") return undefined;
+            return Number(val);
+        },
+        z.number()
+            .positive("Fees must be a positive number")
+            .optional()
+    ),
+
+    commission: z.preprocess(
+        (val) => {
+            // Convert empty string or null to undefined
+            if (val === "" || val === null || val === undefined) return undefined;
+            return Number(val);
+        },
+        z.union([
+            z.number().positive("Commission must be a positive number"),
+            z.undefined()
+        ])
+    ),
+    msrp: z.preprocess(
+        (val) => {
+            // Convert empty string or null to undefined
+            if (val === "" || val === null || val === undefined) return undefined;
+            return Number(val);
+        },
+        z.union([
+            z.number().positive("MSRP must be a positive number"),
+            z.undefined()
+        ])
+    ),
+
+    website_price: z.preprocess(
+        (val) => {
+            // Convert empty string or null to undefined
+            if (val === "" || val === null || val === undefined) return undefined;
+            return Number(val);
+        },
+        z.union([
+            z.number().positive("Website price must be a positive number"),
+            z.undefined()
+        ])
+    ),
+
+    sold_price: z.coerce.number().nullable().optional(),
+    whole_price: z.coerce.number().nullable().optional(),
+    unit: z.preprocess(
+        (val) => {
+            // Convert empty string or null to undefined
+            if (val === "" || val === null || val === undefined) return undefined;
+            return Number(val);
+        },
+        z.union([
+            z.number().positive("Unit must be a positive number"),
+            z.undefined()
+        ])
+    ),
+    date_sold: z.preprocess(
+        (val) => {
+            if (val === '' || val === null) return undefined;
+
+            if (typeof val === 'string') {
+                const date = new Date(val);
+                return isNaN(date.getTime()) ? undefined : date;
+            }
+            return val;
+        },
+        z.date().optional()
+    ),
+
+    source_of_sale: z.string().nullable().optional(),
+    delivery_content: z.string().nullable().optional(),
+    condition: z.preprocess(
+        (val) => (val === "" ? undefined : val),
+        conditionEnum.optional().default("new")
+    ),
+    purchased_from: z.string().nullable().optional(),
+    sold_source: z.string().nullable().optional(),
+    listed_on: z.string().nullable().optional(),
+
+    image: z
+        .any()
+        .optional()
+        .refine(
+            (val) =>
+                val === undefined || val === null || val === "" ||
+                (val instanceof File && val.size > 0) ||
+                (typeof val === "string" && val.length > 0),
+            { message: "Image must be a non-empty file or string when provided" }
+        ),
+
+    serial_number: z.string().nullable().optional(),
+}).refine((data) => {
+    if (!data.date_sold) return true;
+    return new Date(data.date_purchased) <= new Date(data.date_sold);
+}, {
+    message: "Date Purchased must be less than Date Sold",
+    path: ["date_sold"],
+});
+
+
+
+export const ProfileFormSchema = z.object({
+    first_name: z.string().min(3, "Name must be at least 3 characters"),
+    email: z.string().email("Invalid email address"),
+    profile_picture: z.any().optional(),
+    date_joined: z.any().optional(),
+    phone_number: z.string()
+        .min(10, "Phone number must be at least 10 digits")
+        .max(15, "Phone number can't be more than 15 digits")
+        .or(z.literal("")).optional(),
+
+    password: z.string()
+        .optional()
+        .refine(val => !val || val.length >= 6, {
+            message: "Password must be at least 6 characters",
+        }),
+
+    confirm_password: z.string()
+        .optional()
+        .refine(val => !val || val.length >= 6, {
+            message: "Confirm Password must be at least 6 characters",
+        }),
+    client_id: z
+        .string()
+        .optional()
+        .refine((val) => {
+            if (!val) return true;
+            return /^\d{8,10}$/.test(val);
+        }, {
+            message: "Client ID must be between 8 and 10 digits",
+        }),
+
+
+})
+    .refine((data) => {
+        if (!data.password && !data.confirm_password) return true;
+        return data.password === data.confirm_password;
+    }, {
+        path: ["confirm_password"],
+        message: "Passwords do not match",
+    });
+
+
+export const RegistrationFormSchema = z.object({
+    name: z.string().min(3, "Name must be at least 3 characters"),
+    email: z.string().email("Invalid email address"),
+
+    password: z.string().min(6, "Password must be at least 6 characters"),
+
+    confirm_password: z.string().min(6, "Confirm Password must be at least 6 characters"),
+
+    client_id: z
+        .string()
+        .optional()
+        .refine((val) => {
+            if (!val) return true;
+            return /^\d{8,10}$/.test(val);
+        }, {
+            message: "Client ID must be between 8 and 10 digits",
+        }),
+
+
+
+
+}).refine((data) => data.password === data.confirm_password, {
+    path: ["confirm_password"],
+    message: "Passwords do not match",
+});
+
+export const SignInSchema = z.object({
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+})
+export const ResetsswordSchema = z.object({
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirm_password: z.string().min(6, "Confirm Password must be at least 6 characters"),
+}).refine((data) => data.password === data.confirm_password, {
+    path: ["confirm_password"],
+    message: "Passwords do not match",
+});
+
 
 
 

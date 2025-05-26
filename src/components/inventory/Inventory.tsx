@@ -42,7 +42,7 @@ const Inventory = () => {
     const params = searchParams
     const navigate = useRouter()
 
-    const pageRef=useRef(1)
+    const pageRef = useRef(1)
 
     const fetchCategories = async () => {
         const PAYLOAD: RequestTypes = {
@@ -129,8 +129,8 @@ const Inventory = () => {
         })
     }
 
-    const applyFilter=(filters:any)=>{
-        pageRef.current=1
+    const applyFilter = (filters: any) => {
+        pageRef.current = 1
     }
 
     useEffect(() => {
@@ -142,7 +142,7 @@ const Inventory = () => {
     useEffect(() => {
         fetchCategories();
         fetchStats();
-         pageRef.current=parseInt(params.get("page_number")!)
+        pageRef.current = parseInt(params.get("page_number")!)
     }, []);
 
     useEffect(() => {
@@ -210,8 +210,8 @@ const Inventory = () => {
                 <div className='flex items-center justify-between md:flex-row flex-col'>
                     <Heading className='text-start md:w-auto w-full md:-order-1 order-1'>Products</Heading>
                     <ul className='flex items-center gap-3 md:mb-0 mb-5 md:flex-nowrap flex-wrap md:w-auto w-full inventory-btns'>
-                        <li className='xs:w-auto w-[48%]'><Button title='Add Product' className='h-10 ' onPress={onOpen} /></li>                        
-                        <li className='xs:w-auto w-[48%]'><InventoryFilterModal brands={categories} onApplyFilter={applyFilter}/></li>
+                        <li className='xs:w-auto w-[48%]'><Button title='Add Product' className='h-10 ' onPress={onOpen} /></li>
+                        <li className='xs:w-auto w-[48%]'><InventoryFilterModal brands={categories} onApplyFilter={applyFilter} /></li>
                         <li className='xs:w-auto w-[48%]'>
                             <Dropdown className='!rounded-lg'>
                                 <DropdownTrigger>
@@ -336,11 +336,12 @@ const Inventory = () => {
                                                             }
                                                         >
                                                             <div className={clsx("whitespace-nowrap px-4 text-center")}>{
-                                                                col == "profit_margin" ? row?.[col] ? `${row?.[col]}%` : "-" : col == "hold_time" ? `~${row?.[col]}` : col == "is_sold" ?
-                                                                    <div className={clsx("min-w-5 mx-auto w-5 h-5 rounded border flex items-center justify-between", row?.is_sold ? "bg-blue-850" : "")}>
-                                                                        <Icon name='checkmark' className=' text-white text-lg' />
-                                                                    </div> :
-                                                                    row?.[col] || "-"}</div>
+                                                                col == "buying_price" ? row?.[col] ? <span className='flex items-center'><Icon name='doller' size='1rem'/> {row?.[col]}</span> : "-" :
+                                                                    col == "profit_margin" ? row?.[col] ? `${row?.[col]}%` : "-" : col == "hold_time" ? `~${row?.[col]}` : col == "is_sold" ?
+                                                                        <div className={clsx("min-w-5 mx-auto w-5 h-5 rounded border flex items-center justify-between", row?.is_sold ? "bg-blue-850" : "")}>
+                                                                            <Icon name='checkmark' className=' text-white text-lg' />
+                                                                        </div> :
+                                                                        row?.[col] || "-"}</div>
                                                         </td> : null
                                                 ))}
 
@@ -351,10 +352,10 @@ const Inventory = () => {
                                 </table>
                             </div>
                             {
-                                products?.count > 10 ?
+                                products?.count > 20 ?
                                     <Pagination
-                                        totalPages={Math.ceil(products?.count / 10)}
-                                        currentPage={pageRef.current > 1?pageRef.current:currentPage}
+                                        totalPages={Math.ceil(products?.count / 20)}
+                                        currentPage={currentPage > 1 ? currentPage : pageRef?.current}
                                         onPageChange={(page) => setCurrentPage(page)}
                                     /> : null}
                         </div>}

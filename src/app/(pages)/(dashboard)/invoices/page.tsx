@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link';
 import RoundedBox from '@/components/common/baseButton/RoundedBox';
 import Heading from '@/components/common/heading';
@@ -13,9 +13,10 @@ import Notfound from '@/components/common/Notfound';
 import { Spinner } from '@heroui/react';
 
 const page = () => {
-    const navigate = useRouter()
     const [loading, setLoading] = useState(false)
     const [invoices, setInvoices] = useState<any>([])
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageRef = useRef(1)
     const getInvoices = () => {
         setLoading(true)
         const PAYLOAD: RequestTypes = {
@@ -83,9 +84,9 @@ const page = () => {
             </div>
             {invoices?.count > 20 && <div className='px-5 py-4'>
                 <Pagination
-                    totalPages={12}
-                    currentPage={12}
-                    onPageChange={(page) => { }}
+                    totalPages={Math.ceil(invoices?.count! / 20)}
+                    currentPage={currentPage > 1 ? currentPage : pageRef?.current}
+                    onPageChange={(page) => setCurrentPage(page)}
                 />
             </div>}
         </RoundedBox>
