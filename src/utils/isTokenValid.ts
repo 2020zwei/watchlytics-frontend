@@ -7,7 +7,7 @@ interface DecodedToken {
 }
 
 export const isTokenValid = (token?: string) => {
-  if (!token) return false;
+  if (!token || token === undefined || token === "undefined") return false;
 
   try {
     const decoded = jwtDecode<DecodedToken>(token);

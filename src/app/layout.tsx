@@ -36,8 +36,8 @@
 // }
 
 import type { Metadata } from "next";
-import { Archivo, Inter } from "next/font/google";
-import { Providers } from "./providers";
+import { Archivo, Inter, Poppins } from "next/font/google";
+import { Providers } from "../providers/providers";
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 import clsx from "clsx";
@@ -51,6 +51,11 @@ const archivo = Archivo({
 });
 const inter = Inter({
   variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
@@ -68,7 +73,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="light" style={{ colorScheme: "light" }}>
       <body
-        className={clsx("antialiased", archivo.variable,inter.variable)}
+        className={clsx("antialiased", archivo.variable, inter.variable, poppins.variable)}
       >
         <Providers>{children}</Providers>
         <ToastContainer />

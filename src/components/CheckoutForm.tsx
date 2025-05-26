@@ -32,9 +32,9 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
     const stripeInputStyle = {
         base: {
             fontSize: "16px",
-            color: "#ACACAC",
+            color: "#808080",
             "::placeholder": {
-                color: "#ACACAC",
+                color: "#808080",
             },
         },
         invalid: {
@@ -74,21 +74,31 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
             setIsSubmitting(false);
         } else {
             const PAYLOAD = {
+                card_holder_name:name,
                 plan_name: planName,
                 price_id: priceId,
                 payment_method_token: paymentMethod?.id,
             };
 
             sendRequest({ url: "/subscribe/", method: "POST", payload: PAYLOAD })
-                .then((res) => {
+                .then(async (res) => {
                     if (res?.data?.success) {
-                        toast.success(res.data.message);
-                        navigate.push("/UI/profile")
+                        toast.success(res?.data?.message);
+                        const isLoggedIn = JSON.parse(localStorage.getItem("isLoggedin") || "false");
+                        if (isLoggedIn) {
+                            navigate.push("/dashboard");
+                        }
+                        else {
+                            await fetch('/api/logout')
+                            navigate.push("/login")
+                        }
                     } else {
-                        if (res?.response?.data) {
-                            toast.error(res?.response?.data?.message);
+                        if (res?.status === 400 || res?.status == 500) {
+                            toast.error(res?.response?.data?.message || "Something went wrong");
                         }
                     }
+                }).catch((err) => {
+                    toast.error("Something went wrong")
                 })
                 .finally(() => {
                     setIsSubmitting(false);
@@ -117,7 +127,7 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                 <div className="rounded-lg border border-gray-180 px-3 flex items-center gap-3 h-14">
                     <span><Icon name="user" /></span>
                     <input
-                        className="bg-transparent w-full text-gray-180 placeholder:text-gray-180 outline-none"
+                        className="bg-transparent w-full text-[#808080] placeholder:text-[#808080] outline-none"
                         required
                         placeholder="Card holder name"
                         onChange={(e: any) => setName(e.target.value)}
