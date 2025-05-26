@@ -35,7 +35,6 @@ const page = () => {
             method: METHODS.GET,
         };
         sendRequest(PAYLOAD).then((res) => {
-            console.log(res)
             if (res.status === 200) {
                 const options = res?.data?.results?.map((item: any) => ({
                     value: item.id,
@@ -47,7 +46,6 @@ const page = () => {
     };
     useEffect(() => { fetchProducts() }, [])
     const onSubmit = (data: FormSchemaType) => {
-        console.log(data)
         setLoading(true)
         const PAYLOAD: RequestTypes = {
             url: `${URLS.INVOICE}`,
@@ -55,7 +53,6 @@ const page = () => {
             payload: data
         };
         sendRequest(PAYLOAD).then((res) => {
-            console.log(res)
             if (res.status === 200) {
                 toast.success("fd")
             }

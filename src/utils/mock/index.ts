@@ -1,19 +1,46 @@
 
 import { z } from "zod";
 
-const email = {
+export const name = {
+    label: "Name",
+    name: "first_name",
+    placeholder: "Enter Name",
+    fieldType: "input",
+    type: "text"
+}
+export const phone = {
+    label: "Phone",
+    name: "phone_number",
+    placeholder: "Enter Phone",
+    fieldType: "input"
+}
+export const email = {
     label: "Email",
     name: "email",
     placeholder: "Enter Email",
     fieldType: "input",
     type: "email"
 }
-const password = {
+export const password = {
     label: "Password",
     name: "password",
     placeholder: "Enter Password",
     fieldType: "input",
     type: "password"
+}
+export const confirmpassword = {
+    label: "Confirm Password",
+    name: "confirm_password",
+    placeholder: "Confirm Password",
+    fieldType: "input",
+    type: "password"
+}
+export const clientId = {
+    label: "IFS Client ID",
+    name: "client_id",
+    placeholder: "Enter Client ID",
+    fieldType: "input",
+    type: "text"
 }
 const city = {
     "label": "City:",
@@ -201,45 +228,12 @@ export const InventoryFormFields = [
 ]
 
 export const ProfileFormFields = [
-    {
-        label: "Name",
-        name: "first_name",
-        placeholder: "Enter Name",
-        fieldType: "input",
-    },
-    {
-        label: "Email",
-        name: "email",
-        placeholder: "Enter Email",
-        fieldType: "input",
-        type: "email"
-    },
-    {
-        label: "Phone",
-        name: "phone_number",
-        placeholder: "Enter Phone",
-        fieldType: "input"
-    },
-    {
-        label: "Password",
-        name: "password",
-        placeholder: "Enter Password",
-        fieldType: "input",
-        type: "password"
-    },
-    {
-        label: "Confirm Password",
-        name: "confirm_password",
-        placeholder: "Confirm Password",
-        fieldType: "input",
-        type: "password"
-    },
-    {
-        label: "Client ID",
-        name: "client_id",
-        placeholder: "Enter Client ID",
-        fieldType: "input"
-    }
+    { ...name },
+    { ...email },
+    { ...phone },
+    { ...password },
+    { ...confirmpassword },
+    { ...clientId },
 ];
 export const LoginFormFields = [
     email,
@@ -435,13 +429,16 @@ export const ProfileFormSchema = z.object({
         .refine(val => !val || val.length >= 6, {
             message: "Confirm Password must be at least 6 characters",
         }),
-
     client_id: z
         .string()
         .optional()
-        .refine((val) => !val || /^\d{1,10}$/.test(val), {
-            message: "Client ID must be up to 10 digits",
+        .refine((val) => {
+            if (!val) return true;
+            return /^\d{8,10}$/.test(val);
+        }, {
+            message: "Client ID must be between 8 and 10 digits",
         }),
+
 
 })
     .refine((data) => {
@@ -451,6 +448,34 @@ export const ProfileFormSchema = z.object({
         path: ["confirm_password"],
         message: "Passwords do not match",
     });
+
+
+export const RegistrationFormSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Invalid email address"),
+
+    password: z.string().min(6, "Password must be at least 6 characters"),
+
+    confirm_password: z.string().min(6, "Confirm Password must be at least 6 characters"),
+
+    client_id: z
+        .string()
+        .optional()
+        .refine((val) => {
+            if (!val) return true;
+            return /^\d{8,10}$/.test(val);
+        }, {
+            message: "Client ID must be between 8 and 10 digits",
+        }),
+
+
+
+
+}).refine((data) => data.password === data.confirm_password, {
+    path: ["confirm_password"],
+    message: "Passwords do not match",
+});
+
 
 export const SidebarItems = [
     {

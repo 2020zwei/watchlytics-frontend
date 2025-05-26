@@ -46,9 +46,7 @@ export default function ProfilePage() {
     handleSubmit,
     reset,
     getValues,
-    trigger,
     setValue,
-    watch,
     formState: { errors, isDirty, isValid },
   } = useForm<FormSchemaType>({
     resolver: zodResolver(ProfileFormSchema),
@@ -136,14 +134,6 @@ export default function ProfilePage() {
     getProfileInfo()
   }, [])
 
-
-  const password = watch("password");
-  const confirmPassword = watch("confirm_password");
-  useEffect(() => {
-    if (confirmPassword || !password) {
-      trigger("confirm_password");
-    }
-  }, [password, confirmPassword, trigger]);
   const isFormReady = isValid && (isDirty || fileMeta?.file);
 
   if (apiLoading) {
