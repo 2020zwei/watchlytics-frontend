@@ -118,10 +118,10 @@ export default function ExpenseTrackingChart() {
 
   const queryGenerator = (q = "") => {
     const urlSearchParams = new URLSearchParams(window?.location?.search);
-    const queryParam = urlSearchParams.get("search");
+    const queryParam = urlSearchParams.get("brand");
     const pageParam = parseInt(urlSearchParams.get("page") || "1", 10);
     const parsedQuery = queryParam ? queryParam.replace(/\s+/g, "-") : "";
-    const squery = q || parsedQuery ? `search=${q || parsedQuery}` : "";
+    const squery = q || parsedQuery ? `brand=${q || parsedQuery}` : "";
 
     const page = currentPage > 1 ? currentPage : pageParam > 1 ? pageParam : null;
     const pquery = page ? `page=${page}&page_size=20` : "";
@@ -138,15 +138,14 @@ export default function ExpenseTrackingChart() {
   const handleBrandFilter = (query: string) => {
     setCurrentPage(1)
     pageRef.current = 1
-    const url = `/dashboard/?search=${query?.replace(/\s+/g, "-")}`;
+    const url = `/dashboard/?brand=${query?.replace(/\s+/g, "-")}`;
     router.push(url);
-    fetchMarketData(url);
+    fetchMarketData(`brand=${query?.replace(/\s+/g, "-")}`);
   };
 
 
   useEffect(() => {
     const url = queryGenerator()
-    console.log(url,'url')
     fetchMarketData(url);
 
   }, [currentPage]);

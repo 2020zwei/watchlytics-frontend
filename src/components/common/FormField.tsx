@@ -66,10 +66,10 @@ const FormField: React.FC<FormFieldProps> = ({
     const inputRef = useRef<HTMLInputElement | null>(null);
     return (
         <div className={clsx("", containerClass)} id={name}>
-            <label htmlFor={name} className={clsx("min-w-[130px] text-base font-medium text-dark-300 pt-3 ",
+            <label htmlFor={name} className={clsx("min-w-[130px] text-base font-medium text-dark-300 pt-3 flex items-center gap-x-1",
                 errors[name] && errors[name] && "text-red-800", labelClass
             )}>
-                {label}
+                {label} {name === "client_id" && <Icon name="exclamation" size="1.2rem"/>}
             </label>
             <div className={inputContainer}>
                 <div className={clsx("relative flex items-center", type === "checkbox" ? "gap-2" : "justify-between")}

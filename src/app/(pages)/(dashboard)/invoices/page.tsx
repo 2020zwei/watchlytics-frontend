@@ -25,9 +25,7 @@ const page = () => {
 
         delete PAYLOAD?.payload?.product
         sendRequest(PAYLOAD).then((res) => {
-            console.log(res)
             if (res.status === 200) {
-                console.log()
                 setInvoices(res?.data)
             }
         }).finally(() => setLoading(false));

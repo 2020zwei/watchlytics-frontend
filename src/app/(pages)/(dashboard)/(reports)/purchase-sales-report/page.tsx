@@ -23,7 +23,6 @@ const Page = () => {
         sendRequest(PAYLOAD)
             .then((res) => {
                 if (res.status === 200) {
-                    console.log(res)
                     setReports(res?.data?.chart_data);
                 }
             }).finally(() => setLoading(false))
