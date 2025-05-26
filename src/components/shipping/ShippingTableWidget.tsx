@@ -52,13 +52,13 @@ const ShippingTableWidget = () => {
                     </tbody>
                 </table>
             </div>
-            <div className='px-5 py-4'>
+            {/* <div className='px-5 py-4'>
                 <Pagination
                     totalPages={12}
                     currentPage={12}
                     onPageChange={(page) => { }}
                 />
-            </div>
+            </div> */}
         </RoundedBox>
     )
 }

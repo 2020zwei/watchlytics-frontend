@@ -5,7 +5,7 @@ import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -79,6 +79,7 @@ export default function Signup() {
         const errors = error?.response?.data?.errors;
         if (errors && typeof errors === "object") {
           Object.entries(errors).forEach(([field, message]) => {
+            // @ts-ignore
             setError(field, { type: "server", message: message as string });
           });
         }
@@ -106,6 +107,7 @@ export default function Signup() {
           {
             fields.map((field) => (
               <FormField
+                field={field}
                 fieldType={field.fieldType}
                 type={
                   field.type === "password"

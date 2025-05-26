@@ -287,7 +287,9 @@ const AddTrading = () => {
                 <div className='pt-5 px-4 pb-8 flex flex-col gap-3'>
                     {/* Name of Trade */}
                     <div className='flex items-center'>
-                        <label className='min-w-[160px] text-sm font-medium text-dark-700'>Name Of Transaction:</label>
+                        <label className='min-w-[160px] text-sm font-medium text-dark-700 flex items-center'>Name Of Transaction:
+                            <sup><Icon name="star" fill="red" size="0.5rem" /></sup>
+                        </label>
                         <div className="flex-1 max-w-[320px]">
                             <input
                                 {...register("name_of_trade")}
@@ -301,7 +303,9 @@ const AddTrading = () => {
 
                     {/* Product Select */}
                     <div className='flex items-center'>
-                        <label className='min-w-[160px] text-sm font-medium text-dark-700'>Add Watches:</label>
+                        <label className='min-w-[160px] text-sm font-medium text-dark-700 flex items-center'>Add Watches:
+                            <sup><Icon name="star" fill="red" size="0.5rem"/></sup>
+                        </label>
                         <div className='flex items-center relative flex-1'>
                             <span className='start-2 z-10 absolute'><Icon name='search' size='1.3rem' /></span>
                             <Controller
@@ -355,7 +359,7 @@ const AddTrading = () => {
 
                     {/* Date Input */}
                     <div className='flex items-center'>
-                        <label className='min-w-[160px] text-sm font-medium text-dark-700'>Transaction Date:</label>
+                        <label className='min-w-[160px] text-sm font-medium text-dark-700 flex items-center'>Transaction Date:<sup><Icon name="star" fill="red" size="0.5rem"/></sup></label>
                         <div className="flex-1 max-w-[320px] relative">
                             <Controller
                                 name="date"
@@ -390,7 +394,7 @@ const AddTrading = () => {
 
                     {/* Purchase Price */}
                     <div className='flex items-center'>
-                        <label className='min-w-[160px] text-sm font-medium text-dark-700'>Purchase Price:</label>
+                        <label className='min-w-[160px] text-sm font-medium text-dark-700 flex items-center'>Purchase Price:<sup><Icon name="star" fill="red" size="0.5rem"/></sup></label>
                         <div className="flex-1 max-w-[320px]">
                             <input {...register("purchase_price", { valueAsNumber: true })} type="number"
                                 className='w-full outline-none font-normal border text-sm rounded-lg px-3 h-[34px] border-gray-70 text-dark-800' />
@@ -400,7 +404,7 @@ const AddTrading = () => {
 
                     {/* Sale Price */}
                     <div className='flex items-center'>
-                        <label className='min-w-[160px] text-sm font-medium text-dark-700'>Sale Price:</label>
+                        <label className='min-w-[160px] text-sm font-medium text-dark-700 flex items-center'>Sale Price:<sup><Icon name="star" fill="red" size="0.5rem"/></sup></label>
                         <div className="flex-1 max-w-[320px]">
                             <input {...register("sale_price", { valueAsNumber: true })} type="number"
                                 className='w-full outline-none font-normal border text-sm rounded-lg px-3 h-[34px] border-gray-70 text-dark-800' />
@@ -412,7 +416,7 @@ const AddTrading = () => {
                     <div className='border-t border-[#F0F1F3] mt-1'>
                         <h4 className='font-semibold text-dark-800 my-4'>Buyer Details</h4>
                         <div className='flex items-center'>
-                            <label className='min-w-[160px] text-sm font-medium text-dark-700'>Name:</label>
+                            <label className='min-w-[160px] text-sm font-medium text-dark-700 flex items-center'>Name:<sup><Icon name="star" fill="red" size="0.5rem"/></sup></label>
                             <div className='flex flex-col w-full'>
                                 <div className='flex items-center relative flex-1'>
                                     <span className='start-2 z-10 absolute'><Icon name='search' size='1.3rem' /></span>
