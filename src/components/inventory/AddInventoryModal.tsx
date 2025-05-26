@@ -262,6 +262,7 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
                                                         name={field.name}
                                                         control={control}
                                                         placeholder={field.placeholder}
+                                                        labelClass="!min-w-[160px]"
                                                         field={field}
                                                         min={
                                                             field.name === "date_sold" && purchaseDate

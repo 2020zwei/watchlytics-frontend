@@ -123,8 +123,8 @@ const AddTrading = () => {
                     id: el?.product,
                     image: el?.product_details?.image,
                     model_name: el?.product_details?.model_name,
-                    sold_price: Number(el?.sale_price),
-                    buying_price: Number(el?.purchase_price),
+                    sold_price: Number(el?.product_details?.sale_price),
+                    buying_price: Number(el?.product_details?.buying_price),
                     quantity: Number(el?.quantity),
                     isExisting: true
                 }));
@@ -258,6 +258,7 @@ const AddTrading = () => {
         setValue('purchase_price', sumOfPurchesPrice);
         setValue("sale_price", sumOfSalePrice);
     }, [quantities, product])
+    
     const handleSelectionChange = (removedItem?: OptionType) => {
         const exist = previousProducts.find(item => item.id == removedItem?.value)
         if (removedItem && exist) {
