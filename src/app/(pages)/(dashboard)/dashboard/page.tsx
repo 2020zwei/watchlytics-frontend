@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import {
   LineChart,
   Line,
@@ -15,16 +15,18 @@ import {
 
 import { DASHBOARD_EXPENSE, DASHBOARD_INCOME, DASHBOARD_STATS, MARKETDATA, RequestTypes } from "@/types";
 import { sendRequest } from "@/utils/apis";
+import _ from 'lodash';
+
 import { METHODS, URLS } from "@/utils/constants";
 import { Spinner } from "@heroui/react";
 import RoundedBox from "@/components/common/baseButton/RoundedBox";
 import Heading from "@/components/common/heading";
-import SearchBar from "@/components/common/SearchBar";
 import SelectWidget from "@/components/common/SelectWidget";
 import Pagination from "@/components/common/Pagination";
 import Icon from "@/components/common/Icon";
 import { useRouter } from "next/navigation";
 import Notfound from "@/components/common/Notfound";
+import clsx from "clsx";
 
 
 const pieData = [
@@ -42,6 +44,7 @@ export default function ExpenseTrackingChart() {
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [inputSearch, setInputSearch] = useState("");
   const router = useRouter();
 
   const pageRef = useRef(null)
@@ -118,10 +121,12 @@ export default function ExpenseTrackingChart() {
 
   const queryGenerator = (q = "") => {
     const urlSearchParams = new URLSearchParams(window?.location?.search);
-    const queryParam = urlSearchParams.get("brand");
+    const key = urlSearchParams.get("brand") ? "brand" : "search"
+    const queryParam = key == "brand" ? urlSearchParams.get(key) : urlSearchParams.get(key);
+    console.log(key, "fdfsd")
     const pageParam = parseInt(urlSearchParams.get("page") || "1", 10);
     const parsedQuery = queryParam ? queryParam.replace(/\s+/g, "-") : "";
-    const squery = q || parsedQuery ? `brand=${q || parsedQuery}` : "";
+    const squery = q || parsedQuery ? `${key}=${q || parsedQuery}` : "";
 
     const page = currentPage > 1 ? currentPage : pageParam > 1 ? pageParam : null;
     const pquery = page ? `page=${page}&page_size=20` : "";
@@ -130,18 +135,28 @@ export default function ExpenseTrackingChart() {
     const url = `/dashboard/?${combinedQuery}`;
     router.push(url);
     setSearchQuery(parsedQuery?.replace("-", " "));
-
+    if (key === "search") {
+      setInputSearch(queryParam)
+    }
     return combinedQuery;
   };
 
 
-  const handleBrandFilter = (query: string) => {
+  const handleBrandFilter = (query: string, key = "brand") => {
     setCurrentPage(1)
     pageRef.current = 1
-    const url = `/dashboard/?brand=${query?.replace(/\s+/g, "-")}`;
+    const url = `/dashboard/?${key}=${query?.replace(/\s+/g, "-")}`;
     router.push(url);
-    fetchMarketData(`brand=${query?.replace(/\s+/g, "-")}`);
+    fetchMarketData(`${key}=${query?.replace(/\s+/g, "-")}`);
   };
+
+  const debouncedSearch = useCallback(
+    _.debounce((value) => {
+      console.log('Searching for:', value);
+      handleBrandFilter(value, "search")
+    }, 500),
+    []
+  );
 
 
   useEffect(() => {
@@ -270,11 +285,10 @@ export default function ExpenseTrackingChart() {
           </div>
           <div className="flex items-center sm:mb-0 mb-5 sm:mt-0 mt-3 sm:w-auto w-full xs:flex-row flex-col gap-3">
             <div className='sm:min-w-[320px] w-full flex items-center border rounded-lg placeholder: flex-1 ps-3 border-[#F0F1F3] font-normal'>
-              <SearchBar placeholder='Rolex Submariner 114060' icon='search'
-                inputClass='order-1 bg-transparent !h-10'
-                placeholderClass='placeholder:text-[#858D9D] placeholder:text-xs'
-                onChange={(value) => console.log(value)}
-              />
+              <>
+                <input value={inputSearch} onChange={(e) => { setInputSearch(e.target.value); debouncedSearch(e.target.value) }} type="text" className={clsx("border-0 placeholder:text-[#858D9D] order-1 !h-10 placeholder:text-xs focus:outline-none px-3 w-full bg-transparent")} placeholder="" />
+                <span><Icon name="search" size="1.3rem" className={clsx("ms-2")} /></span>
+              </>
             </div>
             <div className="xs:w-[167px] w-full">
               <SelectWidget

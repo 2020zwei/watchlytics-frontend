@@ -11,6 +11,7 @@ const FileUploader: React.FC<FileUploader> = ({ children, multiple = false, onCh
 
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
+
     multiple: multiple,
     onDrop: (acceptedFiles) => {
       const file = acceptedFiles[0];
@@ -27,7 +28,7 @@ const FileUploader: React.FC<FileUploader> = ({ children, multiple = false, onCh
   return (
     <div className="flex flex-col items-center">
       <div {...getRootProps()} className="border-dashed p-4 cursor-pointer">
-        <input {...getInputProps()} />
+        <input {...getInputProps()} accept=".png,.jpg,.jpeg" />
         {isDragActive ? (
           children
         ) : (

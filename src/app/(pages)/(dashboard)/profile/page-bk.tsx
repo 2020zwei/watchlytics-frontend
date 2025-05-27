@@ -377,7 +377,7 @@ export default function ProfilePage() {
                   type="file"
                   ref={fileInputRef}
                   className="hidden"
-                  accept="image/*"
+                  accept=".png,.jpg,.jpeg"
                   onChange={handleImageChange}
                   disabled={!isEditing}
                 />
