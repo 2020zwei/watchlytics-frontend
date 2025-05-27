@@ -89,7 +89,7 @@ const AddTrading = () => {
         };
         sendRequest(PAYLOAD).then((res) => {
             if (res.status === 200) {
-                const filtered = res?.data?.results.filter(el => el?.quantity > 0)
+                const filtered = res?.data?.results.filter((el:any) => el?.quantity > 0)
                 const options = (id ? res?.data?.results : filtered)?.map((item: any) => ({
                     value: item.id,
                     label: item.model_name,
@@ -307,7 +307,7 @@ const AddTrading = () => {
                         <label className='min-w-[160px] text-sm font-medium text-dark-700 flex items-center'>Add Watches:
                             <sup><Icon name="star" fill="red" size="0.5rem"/></sup>
                         </label>
-                        <div className='flex items-center relative flex-1'>
+                        <div className='flex items-center relative flex-1 z-[99]'>
                             <span className='start-2 z-10 absolute'><Icon name='search' size='1.3rem' /></span>
                             <Controller
                                 name="product"
@@ -325,6 +325,7 @@ const AddTrading = () => {
                                         }}
                                         classNamePrefix="searchbale-select"
                                         placeholder="Add Watches"
+                                        // @ts-ignore
                                         style={{ container: (base) => ({ ...base, width: "100%", maxWidth: "320px" }) }}
                                     />
                                 )}

@@ -26,6 +26,7 @@ const SearchBar: React.FC<PropsType> = ({ icon = "", iconClass, inputClass, rese
             params.set("search", value);
         }
         router.push(`${pathName}?${params.toString()}`);
+        onChange(value)
     };
 
     return (
