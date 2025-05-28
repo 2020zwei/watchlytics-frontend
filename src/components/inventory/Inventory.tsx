@@ -18,6 +18,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Notfound from '../common/Notfound'
 import Link from 'next/link'
 import UploadFileModal from '../common/UploadFileModal'
+import { formatCurrency } from '@/utils/formatCurrency'
 
 const holdTimeColors = {
     "94": "#DA3E33", // hold time greter then 94 then use this color
@@ -153,6 +154,18 @@ const Inventory = () => {
         fetchData();
     }, [searchParams]);
 
+    const currencyFields = [
+        "buying_price",
+        "sold_price",
+        "wholesale_price",
+        "profit",
+        "shipping_price",
+        "repair_cost",
+        "fees",
+        "msrp",
+        "website_price"
+    ];
+
 
     return (
 
@@ -247,7 +260,7 @@ const Inventory = () => {
                                     <thead className="bg-blue-gradient text-white">
                                         <tr>
                                             <th className="px-4 rounded-tl-lg rounded-bl-lg text-sm font-medium py-3">Actions</th>
-                                            <th className="w-7"></th>
+                                            {/* <th className="w-7"></th> */}
                                             <th className="w-7">Image</th>
                                             {columns?.map((col, index) => (
                                                 col !== 'id' && col !== "image" && col !== "category" && col !== "availability" && col !== "owner" ?
@@ -272,54 +285,54 @@ const Inventory = () => {
                                                 className="border-b border-gray-200 last:border-b-0 text-sm font-medium text-dark-700"
                                             >
                                                 <td className='text-center'>
-                                                    <Dropdown className='!rounded-lg'>
-                                                        <DropdownTrigger>
-                                                            <button className='p-3'><Icon name='more' /></button>
-                                                        </DropdownTrigger>
-                                                        <DropdownMenu aria-label="Dropdown menu with description" variant="faded">
-                                                            <DropdownItem
-                                                                onPress={() => navigate.push(`inventory/${row?.id}`)}
-                                                                key="eye"
-                                                                className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
-                                                                startContent={<Icon name='filledEye' size='1.1rem' stroke='#acacac' />}>
-                                                                View
-                                                            </DropdownItem>
-                                                            <DropdownItem
-                                                                onPress={() => { onOpen(); setProduct(row) }}
-                                                                key="edit"
-                                                                className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
-                                                                startContent={<Icon name='edit' stroke='#acacac' />}>
-                                                                Edit
-                                                            </DropdownItem>
-                                                            <DropdownItem
-                                                                onPress={() => handleDelete(row)}
-                                                                key="delete"
-                                                                className='text-gray-180 text-sm font-medium hover:!bg-transparent hover:!border-transparent'
-                                                                startContent={<Icon name='trash' stroke='#acacac' />}>
-                                                                Delete
-                                                            </DropdownItem>
-                                                        </DropdownMenu>
-                                                    </Dropdown>
-                                                </td>
-                                                <td>
-                                                    <div>
-                                                        <Checkbox value={row?.id}
-                                                            checked={product?.id === row?.id}
-                                                        />
+                                                    <div className='flex items-center'>
+                                                        <div>
+                                                            <Checkbox value={row?.id}
+                                                                checked={product?.id === row?.id}
+                                                            />
+                                                        </div>
+                                                        <Dropdown className='!rounded-lg'>
+                                                            <DropdownTrigger>
+                                                                <button className='p-3'><Icon name='more' /></button>
+                                                            </DropdownTrigger>
+                                                            <DropdownMenu aria-label="Dropdown menu with description" variant="faded">
+                                                                <DropdownItem
+                                                                    onPress={() => navigate.push(`inventory/${row?.id}`)}
+                                                                    key="eye"
+                                                                    className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
+                                                                    startContent={<Icon name='filledEye' size='1.1rem' stroke='#acacac' />}>
+                                                                    View
+                                                                </DropdownItem>
+                                                                <DropdownItem
+                                                                    onPress={() => { onOpen(); setProduct(row) }}
+                                                                    key="edit"
+                                                                    className='text-gray-180 text-sm font-medium ps-1 hover:!bg-transparent hover:!border-transparent'
+                                                                    startContent={<Icon name='edit' stroke='#acacac' />}>
+                                                                    Edit
+                                                                </DropdownItem>
+                                                                <DropdownItem
+                                                                    onPress={() => handleDelete(row)}
+                                                                    key="delete"
+                                                                    className='text-gray-180 text-sm font-medium hover:!bg-transparent hover:!border-transparent'
+                                                                    startContent={<Icon name='trash' stroke='#acacac' />}>
+                                                                    Delete
+                                                                </DropdownItem>
+                                                            </DropdownMenu>
+                                                        </Dropdown>
                                                     </div>
                                                 </td>
-
                                                 <td>
                                                     <RoundedBox className="relative items-center justify-center flex  my-2 !bg-gray-80 p-2 h-14 w-14">
                                                         {row?.image ? <img src={row?.image} width={48} alt="image" className='w-full h-full rounded-md' /> : "N/A"}
                                                     </RoundedBox>
                                                 </td>
 
+
                                                 {columns.map((col, colIndex) => (
-                                                    col !== 'id' && col !== "image" && col !== "category" && col !== "availability" && col !== "owner" ?
+                                                    col !== 'id' && col !== "image" && col !== "category" && col !== "availability" && col !== "owner" ? (
                                                         <td
                                                             key={colIndex}
-                                                            className={clsx("py-5", colIndex === 0 && "w-14")}
+                                                            className={clsx("py-5 px-4", colIndex === 0 && "w-14")}
                                                             style={
                                                                 col === "hold_time"
                                                                     ? {
@@ -335,15 +348,27 @@ const Inventory = () => {
                                                                     : {}
                                                             }
                                                         >
-                                                            <div className={clsx("whitespace-nowrap px-4 text-center")}>{
-                                                                col == "buying_price" ? row?.[col] ? <span className='flex items-center'><Icon name='doller' size='1rem'/> {row?.[col]}</span> : "-" :
-                                                                    col == "profit_margin" ? row?.[col] ? `${row?.[col]}%` : "-" : col == "hold_time" ? `~${row?.[col]}` : col == "is_sold" ?
-                                                                        <div className={clsx("min-w-5 mx-auto w-5 h-5 rounded border flex items-center justify-between", row?.is_sold ? "bg-blue-850" : "")}>
-                                                                            <Icon name='checkmark' className=' text-white text-lg' />
-                                                                        </div> :
-                                                                        row?.[col] || "-"}</div>
-                                                        </td> : null
+                                                            <div className={clsx("whitespace-nowrap px-4 text-center")}>
+                                                                {
+                                                                    currencyFields.includes(col)
+                                                                        ? row?.[col]
+                                                                            ? <span className="flex items-center">{formatCurrency(row?.[col], 'en-US', 'USD')}</span>
+                                                                            : "-"
+                                                                        : col === "profit_margin"
+                                                                            ? row?.[col] ? `${row?.[col]}%` : "-"
+                                                                            : col === "hold_time"
+                                                                                ? `~${row?.[col]}`
+                                                                                : col === "is_sold"
+                                                                                    ? <div className={clsx("min-w-5 mx-auto w-5 h-5 rounded border flex items-center justify-between", row?.is_sold ? "bg-blue-850" : "")}>
+                                                                                        <Icon name='checkmark' className=' text-white text-lg' />
+                                                                                    </div>
+                                                                                    : row?.[col] || "-"
+                                                                }
+                                                            </div>
+                                                        </td>
+                                                    ) : null
                                                 ))}
+
 
                                                 <td className={clsx("first-letter:capitalize text-center", STOCKCOLORS[row.availability])}>{row?.availability?.replaceAll("_", " ")}</td>
                                             </tr>

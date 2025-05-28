@@ -30,7 +30,7 @@ export async function middleware(request: NextRequest, response: NextResponse) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (token && isRootPath) {
+  if (token && isInvalidToken && isRootPath) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 

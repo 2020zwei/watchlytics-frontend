@@ -120,18 +120,21 @@ const AddTrading = () => {
                     product: data.product || [],
                     date: data.date
                 });
+                console.log(data?.items,'data?.items')
                 const selectedProducts = data?.items.map((el: any) => ({
                     id: el?.product,
                     image: el?.product_details?.image,
                     model_name: el?.product_details?.model_name,
+                    brand: el?.product_details?.brand,
                     sold_price: Number(el?.product_details?.sale_price),
                     buying_price: Number(el?.product_details?.buying_price),
+                    reference_num: Number(el?.product_details?.product_id),
                     quantity: Number(el?.quantity),
                     isExisting: true
                 }));
                 const selectedOptions = selectedProducts.map((p: any) => ({
                     // label: p.model_name,
-                    label: `${p?.brand}-${p.model_name}-${p?.product_id}`,
+                    label: `${p?.brand}-${p?.model_name}-${p?.reference_num}`,
                     value: p.id,
                 }));
                 setValue('product', selectedOptions);
