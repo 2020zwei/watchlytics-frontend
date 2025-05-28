@@ -344,7 +344,7 @@ export default function ExpenseTrackingChart() {
                         </RoundedBox>
                       </td>
                       <td className=' text-start py-3 px-4'>
-                        <div className="flex items-center">547975949754</div>
+                        <div className="flex items-center">{item?.reference_number}</div>
                       </td>
                       <td className=' text-start py-3 px-4'>
                         {item?.buying_price ? formatCurrency(item?.buying_price, 'en-US', 'USD') : "-"}
@@ -355,7 +355,6 @@ export default function ExpenseTrackingChart() {
                             <Icon name="arrow" stroke={item?.sources?.ebay?.price > item?.buying_price ? "" : "red"} /></span>}
                           <div className="flex items-center">
                             {item?.sources?.ebay?.price ? formatCurrency(item?.sources?.ebay?.price, 'en-US', 'USD') : "-"}
-                            {/* {item?.sources?.ebay?.price ? <> <Icon name="doller" size="1rem" />{item?.sources?.ebay?.price?.toFixed(2)}</> : "-"} */}
                           </div>
                         </div>
                       </td>
@@ -363,21 +362,21 @@ export default function ExpenseTrackingChart() {
                         <div className="flex items-center">
                           {item?.sources?.chrono24?.price && <span className={item?.sources?.chrono24?.price > item?.buying_price ? "" : "rotate-180"}>
                             <Icon name="arrow" stroke={item?.sources?.chrono24?.price > item?.buying_price ? "" : "red"} /></span>}
-                          {item?.sources?.chrono24?.price ? <> <Icon name="doller" size="1rem" />{item?.sources?.chrono24?.price?.toFixed(2)}</> : "-"}
+                          {item?.sources?.chrono24?.price ? formatCurrency(item?.sources?.chrono24?.price, 'en-US', 'USD') : "-"}
                         </div>
                       </td>
                       <td className=' text-start py-3 px-4'>
                         <div className="flex items-center">
                           {item?.sources?.bezel?.price && <span className={item?.sources?.bezel?.price > item?.buying_price ? "" : "rotate-180"}>
                             <Icon name="arrow" stroke={item?.sources?.bezel?.price > item?.buying_price ? "" : "red"} /></span>}
-                          {item?.sources?.bezel?.price ? <> <Icon name="doller" size="1rem" />{item?.sources?.bezel?.price?.toFixed(2)}</> : "-"}
+                          {item?.sources?.bezel?.price ? formatCurrency(item?.sources?.bezel?.price, 'en-US', 'USD') : "-"}
                         </div>
                       </td>
                       <td className=' text-end py-3 px-4'>
                         <div className="flex items-center justify-end">
                           {item?.sources?.grailzee?.price && <span className={item?.sources?.grailzee?.price > item?.buying_price ? "" : "rotate-180"}>
                             <Icon name="arrow" stroke={item?.sources?.grailzee?.price > item?.buying_price ? "" : "red"} /></span>}
-                          {item?.sources?.grailzee?.price ? <> <Icon name="doller" size="1rem" />{item?.sources?.grailzee?.price?.toFixed(2)}</> : "-"}
+                          {item?.sources?.grailzee?.price ? formatCurrency(item?.sources?.grailzee?.price, 'en-US', 'USD') : "-"}
                         </div>
                       </td>
                     </tr>

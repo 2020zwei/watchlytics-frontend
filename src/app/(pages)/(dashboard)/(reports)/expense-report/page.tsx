@@ -9,6 +9,7 @@ import ReportFilters from '@/components/common/ReportFilters';
 import { REPOT_TYPES, RequestTypes } from '@/types';
 import { sendRequest } from '@/utils/apis';
 import { METHODS, URLS } from '@/utils/constants';
+import { formatCurrency } from '@/utils/formatCurrency';
 import { Spinner } from '@heroui/react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react'
@@ -47,64 +48,70 @@ const page = () => {
                 <Heading as='h3' className=' md:text-2xl text-lg w-full'>Expense Report</Heading>
                 <ReportFilters selectedReport='Expense Report' />
             </div>
-            {!reports?.results?.length?<Notfound/>:
-            <RoundedBox>
-                <div className=''>
-                    <table className='w-full'>
-                        <thead className='h-12'>
-                            <tr className='text-white text-sm font-medium bg-blue-gradient'>
-                                <th className='text-start ps-4 first:rounded-s-lg  overflow-hidden'>
-                                    Product
-                                </th>
-                                <th className='text-start  overflow-hidden'>
-                                    Reference number
-                                </th>
-                                <th className='text-start  overflow-hidden'>
-                                    Purchase Price
-                                </th>
-                                <th className='text-start  overflow-hidden'>
-                                    Repairs
-                                </th>
-                                <th className='text-start  overflow-hidden'>
-                                    Shipping
-                                </th>
-                                <th className='text-start  overflow-hidden'>
-                                    Impact
-                                </th>
-                                <th className='text-end pe-4 last:rounded-e-lg overflow-hidden w-[85px]'>
-                                    Total Cost
-                                </th>
-                            </tr>
-                        </thead>
+            {!reports?.results?.length ? <Notfound /> :
+                <RoundedBox>
+                    <div className=''>
+                        <table className='w-full'>
+                            <thead className='h-12'>
+                                <tr className='text-white text-sm font-medium bg-blue-gradient'>
+                                    <th className='text-start ps-4 first:rounded-s-lg  overflow-hidden'>
+                                        Product
+                                    </th>
+                                    <th className='text-start  overflow-hidden'>
+                                        Brand
+                                    </th>
+                                    <th className='text-start  overflow-hidden'>
+                                        Reference number
+                                    </th>
+                                    <th className='text-start  overflow-hidden'>
+                                        Purchase Price
+                                    </th>
+                                    <th className='text-start  overflow-hidden'>
+                                        Repairs
+                                    </th>
+                                    <th className='text-start  overflow-hidden'>
+                                        Shipping
+                                    </th>
+                                    <th className='text-start  overflow-hidden'>
+                                        Impact
+                                    </th>
+                                    <th className='text-end pe-4 last:rounded-e-lg overflow-hidden w-[85px]'>
+                                        Total Cost
+                                    </th>
+                                </tr>
+                            </thead>
 
-                        <tbody>
-                            {reports?.results?.map((report: any, index) => (
-                                <tr key={index} className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
-                                    <td className=' text-start py-3 px-4 first-letter:uppercase'>{report?.model}</td>
-                                    <td>{report?.reference_number}</td>
-                                    <td className='first-letter:uppercase'>{report?.purchase_price}</td>
-                                    <td>{report?.repairs}</td>
-                                    <td>{report?.shipping}</td>
-                                    <td className={report?.impact < 0 ? "text-red-500" : "text-green-500"}>
-                                        <div className='flex items-center'>
-                                            <span className={report?.impact < 0 ? " rotate-180" : ""}><Icon name='arrow' stroke={report?.impact < 0 ? "#da3e33" : "#10a760"} /></span>
-                                            {report?.impact}%
-                                        </div>
-                                    </td>
-                                    <td>{report?.total_cost}</td>
-                                </tr>))}
-                        </tbody>
-                    </table>
-                </div>
-                {reports?.count! > 20 &&
-                    <div className="px-4 pb-5">
-                        <Pagination
-                            totalPages={Math.ceil(reports?.count! / 20)}
-                            currentPage={currentPage > 1 ? currentPage : pageRef?.current}
-                            onPageChange={(page) => setCurrentPage(page)}
-                        />
-                    </div>}
-            </RoundedBox>}
+                            <tbody>
+                                {reports?.results?.map((report: any, index) => (
+                                    <tr key={index} className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
+                                        <td className=' text-start py-3 px-4 first-letter:uppercase'>{report?.model}</td>
+                                        <td>{report?.brand}</td>
+                                        <td>{report?.reference_number}</td>
+                                        <td className='first-letter:uppercase'>{report?.purchase_price ? formatCurrency(report?.purchase_price, 'en-US', 'USD') : "-"}</td>
+                                        <td>{report?.repairs ? formatCurrency(report?.repairs, 'en-US', 'USD') : "-"}</td>
+                                        <td>{report?.shipping ? formatCurrency(report?.shipping, 'en-US', 'USD') : "-"}</td>
+                                        <td className={report?.impact < 0 ? "text-red-500" : "text-green-500"}>
+                                            <div className='flex items-center'>
+                                                <span className={report?.impact < 0 ? " rotate-180" : ""}><Icon name='arrow' stroke={report?.impact < 0 ? "#da3e33" : "#10a760"} /></span>
+                                                {report?.impact}%
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {report?.total_cost ? formatCurrency(report?.total_cost, 'en-US', 'USD') : "-"}
+                                        </td>
+                                    </tr>))}
+                            </tbody>
+                        </table>
+                    </div>
+                    {reports?.count! > 20 &&
+                        <div className="px-4 pb-5">
+                            <Pagination
+                                totalPages={Math.ceil(reports?.count! / 20)}
+                                currentPage={currentPage > 1 ? currentPage : pageRef?.current}
+                                onPageChange={(page) => setCurrentPage(page)}
+                            />
+                        </div>}
+                </RoundedBox>}
         </>
     )
 }
