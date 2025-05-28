@@ -80,7 +80,7 @@ const page = () => {
                         <tbody>
                             {reports?.results?.map((report: any, index) => (
                                 <tr key={index} className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
-                                    <td className=' text-start py-3 px-4 first-letter:uppercase'>{report?.product}</td>
+                                    <td className=' text-start py-3 px-4 first-letter:uppercase'>{report?.model}</td>
                                     <td>{report?.reference_number}</td>
                                     <td className='first-letter:uppercase'>{report?.purchase_price}</td>
                                     <td>{report?.repairs}</td>
