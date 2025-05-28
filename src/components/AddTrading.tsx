@@ -89,10 +89,11 @@ const AddTrading = () => {
         };
         sendRequest(PAYLOAD).then((res) => {
             if (res.status === 200) {
-                const filtered = res?.data?.results.filter((el:any) => el?.quantity > 0)
+                console.log(res?.data?.results)
+                const filtered = res?.data?.results.filter((el: any) => el?.quantity > 0)
                 const options = (id ? res?.data?.results : filtered)?.map((item: any) => ({
                     value: item.id,
-                    label: item.model_name,
+                    label: `${item?.brand}-${item.model_name}-${item?.product_id}`,
                 }));
                 setProducts(res?.data?.results);
                 setCategories(options);
@@ -129,7 +130,8 @@ const AddTrading = () => {
                     isExisting: true
                 }));
                 const selectedOptions = selectedProducts.map((p: any) => ({
-                    label: p.model_name,
+                    // label: p.model_name,
+                    label: `${p?.brand}-${p.model_name}-${p?.product_id}`,
                     value: p.id,
                 }));
                 setValue('product', selectedOptions);
@@ -258,7 +260,7 @@ const AddTrading = () => {
         setValue('purchase_price', sumOfPurchesPrice);
         setValue("sale_price", sumOfSalePrice);
     }, [quantities, product])
-    
+
     const handleSelectionChange = (removedItem?: OptionType) => {
         const exist = previousProducts.find(item => item.id == removedItem?.value)
         if (removedItem && exist) {
@@ -305,7 +307,7 @@ const AddTrading = () => {
                     {/* Product Select */}
                     <div className='flex items-center'>
                         <label className='min-w-[160px] text-sm font-medium text-dark-700 flex items-center'>Add Watches:
-                            <sup><Icon name="star" fill="red" size="0.5rem"/></sup>
+                            <sup><Icon name="star" fill="red" size="0.5rem" /></sup>
                         </label>
                         <div className='flex items-center relative flex-1 z-[99]'>
                             <span className='start-2 z-10 absolute'><Icon name='search' size='1.3rem' /></span>
@@ -361,7 +363,7 @@ const AddTrading = () => {
 
                     {/* Date Input */}
                     <div className='flex items-center'>
-                        <label className='min-w-[160px] text-sm font-medium text-dark-700 flex items-center'>Transaction Date:<sup><Icon name="star" fill="red" size="0.5rem"/></sup></label>
+                        <label className='min-w-[160px] text-sm font-medium text-dark-700 flex items-center'>Transaction Date:<sup><Icon name="star" fill="red" size="0.5rem" /></sup></label>
                         <div className="flex-1 max-w-[320px] relative">
                             <Controller
                                 name="date"
@@ -396,7 +398,7 @@ const AddTrading = () => {
 
                     {/* Purchase Price */}
                     <div className='flex items-center'>
-                        <label className='min-w-[160px] text-sm font-medium text-dark-700 flex items-center'>Purchase Price:<sup><Icon name="star" fill="red" size="0.5rem"/></sup></label>
+                        <label className='min-w-[160px] text-sm font-medium text-dark-700 flex items-center'>Purchase Price:<sup><Icon name="star" fill="red" size="0.5rem" /></sup></label>
                         <div className="flex-1 max-w-[320px]">
                             <input {...register("purchase_price", { valueAsNumber: true })} type="number"
                                 className='w-full outline-none font-normal border text-sm rounded-lg px-3 h-[34px] border-gray-70 text-dark-800' />
@@ -406,7 +408,7 @@ const AddTrading = () => {
 
                     {/* Sale Price */}
                     <div className='flex items-center'>
-                        <label className='min-w-[160px] text-sm font-medium text-dark-700 flex items-center'>Sale Price:<sup><Icon name="star" fill="red" size="0.5rem"/></sup></label>
+                        <label className='min-w-[160px] text-sm font-medium text-dark-700 flex items-center'>Sale Price:<sup><Icon name="star" fill="red" size="0.5rem" /></sup></label>
                         <div className="flex-1 max-w-[320px]">
                             <input {...register("sale_price", { valueAsNumber: true })} type="number"
                                 className='w-full outline-none font-normal border text-sm rounded-lg px-3 h-[34px] border-gray-70 text-dark-800' />
@@ -418,7 +420,7 @@ const AddTrading = () => {
                     <div className='border-t border-[#F0F1F3] mt-1'>
                         <h4 className='font-semibold text-dark-800 my-4'>Buyer Details</h4>
                         <div className='flex items-center'>
-                            <label className='min-w-[160px] text-sm font-medium text-dark-700 flex items-center'>Name:<sup><Icon name="star" fill="red" size="0.5rem"/></sup></label>
+                            <label className='min-w-[160px] text-sm font-medium text-dark-700 flex items-center'>Name:<sup><Icon name="star" fill="red" size="0.5rem" /></sup></label>
                             <div className='flex flex-col w-full'>
                                 <div className='flex items-center relative flex-1'>
                                     <span className='start-2 z-10 absolute'><Icon name='search' size='1.3rem' /></span>
