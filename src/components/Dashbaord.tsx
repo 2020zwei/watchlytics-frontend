@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import _ from "lodash";
 
-import { useExpense, useIncome, useMarketData, useStats, useBrands } from "@/hooks/useDashboard";
+import {useMarketData, useStats, useBrands } from "@/hooks/useDashboard";
 import { Spinner } from "@heroui/react";
 import RoundedBox from "@/components/common/baseButton/RoundedBox";
 import Heading from "@/components/common/heading";
