@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
 
   const isPublicRoute = publicRoutes.includes(pathname);
   const isPrivateRoute = privateRoutes.includes(pathname);
-
+  // ✅ Authenticated users accessing private routes → check subscription
   const redirectTo = (path: string) => {
     const url = new URL(path, request.url);
     if (url.pathname !== pathname) {
@@ -40,18 +40,6 @@ export async function middleware(request: NextRequest) {
     }
     return NextResponse.next();
   };
-
-  // 🚫 Prevent unauthenticated access to private routes
-  if (isPrivateRoute && !isAuthenticated) {
-    return redirectTo("/login");
-  }
-
-  // 🚫 Prevent authenticated users from accessing public routes
-  if (isPublicRoute && isAuthenticated) {
-    return redirectTo("/dashboard");
-  }
-
-  // ✅ Authenticated users accessing private routes → check subscription
   if (isAuthenticated && isPrivateRoute) {
     const meResponse = await fetch(`${baseURL}/api/me`, {
       headers: {
@@ -65,6 +53,19 @@ export async function middleware(request: NextRequest) {
       return redirectTo("/subscription");
     }
   }
+
+
+  // 🚫 Prevent unauthenticated access to private routes
+  if (isPrivateRoute && !isAuthenticated) {
+    return redirectTo("/login");
+  }
+
+  // 🚫 Prevent authenticated users from accessing public routes
+  if (isPublicRoute && isAuthenticated) {
+    return redirectTo("/dashboard");
+  }
+
+
 
   return NextResponse.next();
 }

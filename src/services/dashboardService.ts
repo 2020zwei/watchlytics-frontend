@@ -13,6 +13,11 @@ export const expense = () => {
 export const brands = () => {
     return apiClient.get(URLS.CATEGORES).then(res => res);
 }
-export const marketData = (params?: Record<string, any>) => {
-    return apiClient.get(URLS.MARKET_COMPARISON, { params }).then(res => res);
-}
+export const marketData = (params: Record<string, any> = {}) => {
+    const finalParams = {
+        page_size: 20,
+        ...params,
+    };
+    return apiClient.get(URLS.MARKET_COMPARISON, { params: finalParams }).then(res => res);
+};
+

@@ -28,8 +28,6 @@ const page = () => {
         if (item?.name?.toLowerCase() === "free") {
             try {
                 const response = await createSubscription({ plan_name: "free" });
-                console.log(response)
-
                 if (response?.status === 400) {
                     toast.info(response?.response?.data?.message || "Already subscribed.");
                 } else if (response?.status === 200 || response?.status === 201) {
@@ -48,7 +46,7 @@ const page = () => {
                 toast.error(error?.response?.data?.message || "Subscription failed.");
             }
         } else {
-            if (!data?.data?.has_card) {
+            if (data?.data?.has_card) {
                 navigate.push(`/payments/?id=${item.id}`);
             } else {
                 navigate.push(`/checkout/${item.id}`);

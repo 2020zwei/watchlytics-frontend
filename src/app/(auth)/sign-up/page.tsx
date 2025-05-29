@@ -5,7 +5,7 @@ import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,6 +37,8 @@ export default function Signup() {
     control,
     handleSubmit,
     setError,
+    watch,
+    trigger,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(RegistrationFormSchema),
@@ -49,6 +51,13 @@ export default function Signup() {
       [fieldName]: !prev[fieldName],
     }));
   };
+
+  const [password, confirmPassword] = watch(["password", "confirm_password"]);
+  useEffect(() => {
+    if (password || confirmPassword) {
+      trigger(["password", "confirm_password"]);
+    }
+  }, [password, confirmPassword, trigger]);
 
   const onSubmit = async (data: FormData) => {
     console.log(data)

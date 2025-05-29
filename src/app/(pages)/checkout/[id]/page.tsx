@@ -26,13 +26,12 @@ const page = () => {
     const [paymentType, setPaymentType] = useState<boolean>(true);
 
     useEffect(() => {
-        console.log(process.env.NEXT_PUBLIC_STRIPE_PUBLISH_KEY )
+        console.log(process.env.NEXT_PUBLIC_STRIPE_PUBLISH_KEY)
         loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISH_KEY as string)
             .then((stripeObj) => {
                 setStripe(stripeObj);
             })
             .catch((err) => {
-                console.log(err)
                 toast.error("Failed to load Stripe.");
             });
     }, []);
