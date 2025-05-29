@@ -1,10 +1,9 @@
 "use client";
-import React, { useState, useEffect, useCallback, useRef, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";  // useSearchParams hook for reading query params
-import { toast } from "react-toastify";
+import React, { useState, useEffect, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import _ from "lodash";
 
-import { useExpense, useIncome, useMarketData, useStats, useBrands } from "@/hooks/useDashboard";
+import {useMarketData, useStats, useBrands } from "@/hooks/useDashboard";
 import { Spinner } from "@heroui/react";
 import RoundedBox from "@/components/common/baseButton/RoundedBox";
 import Heading from "@/components/common/heading";
@@ -21,6 +20,7 @@ export default function Dashboard() {
   const initialBrand = searchParams.get("brand") || "";
   const initialSearch = searchParams.get("search") || "";
   const initialPage = Number(searchParams.get("page") || "1");
+
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [searchQuery, setSearchQuery] = useState(initialBrand || initialSearch);
   const [inputSearch, setInputSearch] = useState(initialSearch || initialBrand);
@@ -32,75 +32,72 @@ export default function Dashboard() {
     return params;
   });
 
-  const { data: stats, isLoading: statsLoading, isError: statsError, error: statsErr } = useStats();
-  const { data: brands, isLoading: brandLoading, isError: brandError, error: brandErr } = useBrands();
-  const { data: expense, isLoading: expenseLoading, isError: expenseError, error: expenseErr } = useExpense();
-  const { data: income, isLoading: incomeLoading, isError: incomeError, error: incomeErr } = useIncome();
-  const { data: marketData, isLoading: marketDataLoading, isError: marketDataError, error: marketDataErr } = useMarketData(marketParams);
-  
+  const { data: stats, isLoading: statsLoading } = useStats();
+  const { data: brands, isLoading: brandLoading } = useBrands();
+  const { data: marketData, isLoading: marketDataLoading } = useMarketData(marketParams);
 
-  // useEffect(() => {
-  //     if (brandError && (brandErr as any)?.code === "ECONNABORTED") {
-  //       toast.error("Brands request timed out. Please try again.");
-  //     }
-  //     if (statsError && (statsErr as any)?.code === "ECONNABORTED") {
-  //       toast.error("Stats request timed out. Please try again.");
-  //     }
-  //     if (expenseError && (expenseErr as any)?.code === "ECONNABORTED") {
-  //       toast.error("Expense data request timed out.");
-  //     }
-  //     if (incomeError && (incomeErr as any)?.code === "ECONNABORTED") {
-  //       toast.error("Income data request timed out.");
-  //     }
-  //     if (marketDataError && (marketDataErr as any)?.code === "ECONNABORTED") {
-  //       toast.error("Market data request timed out.");
-  //     }
-  //   }, [statsError, expenseError, incomeError, marketDataError, brandError]);
+  const updateFilters = (
+    newParams: Record<string, any>,
+    options?: { reset?: boolean; includePage?: boolean }
+  ) => {
+    const pageSize = 20;
+    setInputSearch("");
 
-  const updateFilters = (newParams: Record<string, any>) => {
-    setMarketParams(newParams);
-    if (newParams.brand) {
-      setSearchQuery(newParams.brand);
-      setInputSearch(newParams.brand);
-    } else if (newParams.search) {
-      setSearchQuery(newParams.search);
-      setInputSearch(newParams.search);
-    } else {
-      setSearchQuery("");
-      setInputSearch("");
+    const { reset = false, includePage = true } = options || {};
+
+    const apiParams: Record<string, any> = {
+      ...newParams,
+      page_size: pageSize,
+    };
+
+    if (includePage && !newParams.page) {
+      apiParams.page = 1;
     }
-    if (newParams.page) {
-      setCurrentPage(Number(newParams.page));
-    } else {
-      setCurrentPage(1);
+
+    const uiParams = { ...newParams };
+    if (!includePage) {
+      delete uiParams.page;
     }
+
+    setMarketParams(apiParams);
+    setSearchQuery(uiParams?.brand || "");
+    setInputSearch(uiParams?.brand || "");
+    setCurrentPage(Number(uiParams?.page || 1));
+
     const query = new URLSearchParams();
-    Object.entries(newParams).forEach(([key, value]) => {
+    Object.entries(uiParams).forEach(([key, value]) => {
       if (value) query.set(key, value.toString());
     });
+
     router.replace(`/dashboard?${query.toString()}`, { scroll: false });
   };
+
+
+
   const handleBrandFilter = (query: string, key = "brand") => {
     const formatted = query?.replace(/\s+/g, "-");
-    const newParams = { ...marketParams, [key]: formatted, page: 1 };
-    updateFilters(newParams);
+    updateFilters({ [key]: formatted, page: 1 }, { reset: true, includePage: false });
   };
-  const onPageChange = (page: number) => {
-    const newParams = { ...marketParams, page };
-    updateFilters(newParams);
-  };
+
   const debouncedSearch = useCallback(
     _.debounce((value: string) => {
-      handleBrandFilter(value, "search");
+      const formatted = value?.replace(/\s+/g, "-");
+      updateFilters({ search: formatted }, { reset: true, includePage: false });
     }, 500),
-    [marketParams]
+    []
   );
+
+
+
   useEffect(() => {
     const brand = searchParams.get("brand") || "";
     const search = searchParams.get("search") || "";
-    setInputSearch(search || brand || "");
+    const page = Number(searchParams.get("page") || "1");
+    setInputSearch(search || "");
+    setCurrentPage(page);
   }, [searchParams]);
-  if (statsLoading || expenseLoading || incomeLoading || marketDataLoading || brandLoading) {
+
+  if (statsLoading || marketDataLoading || brandLoading) {
     return (
       <div className="text-center">
         <Spinner />
@@ -108,8 +105,7 @@ export default function Dashboard() {
     );
   }
 
-
-  const market_data = marketData?.data
+  const market_data = marketData?.data;
 
   return (
     <>
@@ -161,15 +157,15 @@ export default function Dashboard() {
             <div className="xs:w-[167px] w-full">
               <SelectWidget
                 options={brands?.data?.results?.map((item: any) => item.name)}
-                onValueChange={handleBrandFilter}
-                selected={searchQuery}
+                onValueChange={(value) => handleBrandFilter(value, "brand")}
+                selected={marketParams.brand?.replaceAll("-", " ") || ""}
                 classNames={{
                   trigger: "!rounded-lg bg-transparent border !border-gray-[#F0F1F3] text-[#858D9D] font-normal text-sm",
                   base: "rounded-none",
                   popoverContent: "rounded-none",
-
                 }}
               />
+
             </div>
           </div>
         </div>
@@ -255,10 +251,11 @@ export default function Dashboard() {
         {market_data?.count > 20 &&
           <div className="px-4 pb-5">
             <Pagination
-              totalPages={Math.ceil(market_data?.count / 2)}
-              // @ts-ignore
-              currentPage={currentPage > 1 ? currentPage : pageRef?.current}
-              onPageChange={(page) => (setCurrentPage(page))}
+              totalPages={Math.ceil(market_data?.count / 20)}
+              currentPage={currentPage}
+              onPageChange={(page) => {
+                updateFilters({ ...marketParams, page });
+              }}
             />
           </div>}
       </RoundedBox>

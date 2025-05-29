@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { isTokenValid } from "./utils/isTokenValid";
 
 const baseURL = process.env.NEXT_PUBLIC_FRONTEND_BASE_URL;
 
+// Publicly accessible routes
 const publicRoutes = [
   "/login",
   "/sign-up",
@@ -11,16 +12,18 @@ const publicRoutes = [
   "/reset-password",
 ];
 
-const privateRoutes = [
-  "/",
+
+const privateRoutePrefixes = [
   "/dashboard",
   "/profile",
   "/inventory",
   "/subscriptions",
+  "/transaction",
   "/subscription",
   "/reports",
   "/trading",
   "/add-trading",
+  "/customers",
 ];
 
 export async function middleware(request: NextRequest) {
@@ -30,8 +33,10 @@ export async function middleware(request: NextRequest) {
   const tokenIsValid = token ? isTokenValid(token) : false;
   const isAuthenticated = Boolean(tokenIsValid);
 
-  const isPublicRoute = publicRoutes.includes(pathname);
-  const isPrivateRoute = privateRoutes.includes(pathname);
+  const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
+
+  const isPrivateRoute =
+    pathname === "/" || privateRoutePrefixes.some((route) => pathname.startsWith(route));
 
   const redirectTo = (path: string) => {
     const url = new URL(path, request.url);
@@ -41,29 +46,34 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   };
 
-  // 🚫 Prevent unauthenticated access to private routes
+  
   if (isPrivateRoute && !isAuthenticated) {
     return redirectTo("/login");
   }
 
-  // 🚫 Prevent authenticated users from accessing public routes
-  if (isPublicRoute && isAuthenticated) {
-    return redirectTo("/dashboard");
+  
+  if (isAuthenticated && isPrivateRoute) {
+    try {
+      const meResponse = await fetch(`${baseURL}/api/me`, {
+        headers: {
+          Cookie: `access_token=${token}`,
+        },
+      });
+
+      const res = await meResponse.json();
+
+      if (!res?.isSubscribed && !pathname.startsWith("/subscription")) {
+        return redirectTo("/subscription");
+      }
+    } catch (error) {
+      console.error("Error validating subscription:", error);
+      return redirectTo("/login");
+    }
   }
 
-  // ✅ Authenticated users accessing private routes → check subscription
-  if (isAuthenticated && isPrivateRoute) {
-    const meResponse = await fetch(`${baseURL}/api/me`, {
-      headers: {
-        Cookie: `access_token=${token}`,
-      },
-    });
-
-    const res = await meResponse.json();
-
-    if (!res?.isSubscribed && !pathname.startsWith("/subscription")) {
-      return redirectTo("/subscription");
-    }
+  
+  if (isPublicRoute && isAuthenticated) {
+    return redirectTo("/dashboard");
   }
 
   return NextResponse.next();
@@ -76,13 +86,16 @@ export const config = {
     "/sign-up",
     "/forgot-password",
     "/reset-password",
-    "/inventory",
-    "/reports",
+    "/dashboard",
     "/profile",
-    "/subscriptions",
+    "/inventory/:path*",
+    "/subscriptions/:path*",
+    "/transaction/:path*",
     "/subscription",
-    "/trading",
+    "/reports/:path*",
+    "/trading/:path*",
     "/add-trading",
+    "/customers/:path*",
     {
       source:
         "/((?!api|_next/static|_next/image|favicon.ico|.*.png|.*.svg|.*.jpg).*)",

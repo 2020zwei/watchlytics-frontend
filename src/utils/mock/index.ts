@@ -853,9 +853,21 @@ export const RegistrationFormSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters"),
     email: z.string().email("Invalid email address"),
 
-    password: z.string().min(6, "Password must be at least 6 characters"),
+    password: z.string()
+        .refine(val => !val || val.length >= 8, {
+            message: "Password must be at least 8 characters",
+        })
+        .refine(val => !val || /[A-Z]/.test(val), {
+            message: "Password must contain at least 1 uppercase letter",
+        })
+        .refine(val => !val || /[!@#$%^&*(),.?":{}|<>]/.test(val), {
+            message: "Password must contain at least 1 special character",
+        }),
 
-    confirm_password: z.string().min(6, "Confirm Password must be at least 6 characters"),
+    confirm_password: z.string()
+        .refine(val => !val || val.length >= 8, {
+            message: "Confirm Password must be at least 8 characters",
+        }),
 
     client_id: z
         .string()
@@ -870,19 +882,37 @@ export const RegistrationFormSchema = z.object({
 
 
 
-}).refine((data) => data.password === data.confirm_password, {
+}).refine((data) => {
+    if (!data.password && !data.confirm_password) return true;
+    return data.password === data.confirm_password;
+}, {
     path: ["confirm_password"],
     message: "Passwords do not match",
 });
-
 export const SignInSchema = z.object({
     email: z.string().email("Invalid email address"),
     password: z.string().min(6, "Password must be at least 6 characters"),
 })
 export const ResetsswordSchema = z.object({
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirm_password: z.string().min(6, "Confirm Password must be at least 6 characters"),
-}).refine((data) => data.password === data.confirm_password, {
+    password: z.string()
+        .refine(val => !val || val.length >= 8, {
+            message: "Password must be at least 8 characters",
+        })
+        .refine(val => !val || /[A-Z]/.test(val), {
+            message: "Password must contain at least 1 uppercase letter",
+        })
+        .refine(val => !val || /[!@#$%^&*(),.?":{}|<>]/.test(val), {
+            message: "Password must contain at least 1 special character",
+        }),
+
+    confirm_password: z.string()
+        .refine(val => !val || val.length >= 8, {
+            message: "Confirm Password must be at least 8 characters",
+        }),
+}).refine((data) => {
+    if (!data.password && !data.confirm_password) return true;
+    return data.password === data.confirm_password;
+}, {
     path: ["confirm_password"],
     message: "Passwords do not match",
 });
