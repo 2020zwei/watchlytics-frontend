@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@heroui/react";
+import axios from "axios";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -10,24 +11,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { confirmpassword, password, ResetsswordSchema } from "@/utils/mock";
 import FormField from "@/components/common/FormField";
 import { useRouter } from "next/navigation";
-import { usePasswordReset } from "@/hooks/useAuth";
 type FormData = z.infer<typeof ResetsswordSchema>;
 
 export default function SignIn() {
   const router = useRouter()
-  const [link, setLink] = useState<string>("");
-  const { mutateAsync: passwordReset, isPending, error: apiError } = usePasswordReset();
+  const [link, setLink] = useState<string | boolean>("");
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const linkParam = params.get("link") ?? "";
+    const linkParam = params.get("link") ?? false;
     setLink(linkParam);
   }, []);
-
+  const [loading, setLoading] = useState<boolean>(false);
   const [togglePassType, setTogglePassType] = useState<{ [key: string]: boolean }>({
     password: false,
     confirm_password: false,
   });
-
   const {
     control,
     handleSubmit,
@@ -36,7 +34,6 @@ export default function SignIn() {
     resolver: zodResolver(ResetsswordSchema),
     mode: "onChange",
   });
-
   const handleTogglePasswordType = (fieldName: string) => {
     setTogglePassType((prev) => ({
       ...prev,
@@ -49,13 +46,18 @@ export default function SignIn() {
       return
     }
     else {
+      setLoading(true);
+
       try {
-        const res = await passwordReset({ payload: data, id: link })
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/password-reset-confirm/${link}`;
+        const res = await axios.post(url, data);
         toast.success("Password reset successfully!");
         router.push("/login");
       } catch (error: any) {
         console.error("API error:", error?.response?.data?.password[0]);
         toast.error(error?.response?.data?.password[0]);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -116,7 +118,7 @@ export default function SignIn() {
 
           <Button
             type="submit"
-            isLoading={isPending}
+            isLoading={loading}
             radius="sm"
             size="lg"
             color="primary"

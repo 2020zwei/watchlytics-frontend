@@ -18,10 +18,9 @@ import { AddInventoryModalTypes, FileMetaTypes } from "@/types";
 import { TransparentButton } from "../common/baseButton/TransparentButton";
 import FormField from "../common/FormField";
 import clsx from "clsx";
-import { sendRequest } from "@/utils/apis";
-import { METHODS, URLS } from "@/utils/constants";
 import { toast } from "react-toastify";
 import { formatDate } from "@/utils/dateFormater";
+import { useCreateProduct, useUpdateProduct } from "@/hooks/useInventory";
 
 
 type FormSchemaType = z.infer<typeof InventoryFormSchema>;
@@ -34,8 +33,10 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
     defaultData,
     callBack = () => { },
 }) => {
-    const [submitting, setSubmitting] = useState(false);
     const [fileMeta, setFileMeta] = useState<FileMetaTypes | null>(null);
+    const { mutateAsync: updateProductMutation, isPending } = useUpdateProduct();
+    const { mutateAsync: createProductMutation, isPending: createPending } = useCreateProduct();
+
     const dropdwonOptions = {
         category: options,
         availability: availabilities,
@@ -58,112 +59,57 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
             quantity: 1
         }
     });
-
     const onFormSubmit = (data: FormSchemaType) => {
-        setSubmitting(true);
         const formData = new FormData();
 
         Object.keys(data).forEach((key) => {
             let value = data[key as keyof typeof data];
-
-            // Format date fields
             if (key === "date_sold" || key === "date_purchased") {
                 value = formatDate(value);
             }
-
-            // Skip undefined or null values
             if (value === undefined || value === null) return;
 
             // @ts-ignore
             formData.append(key, value);
         });
 
-        // Conditionally handle image
         if (!fileMeta?.file) {
             formData.delete("image");
         }
 
-        const PAYLOAD = {
-            url: defaultData ? URLS.UPDATE_PRODUCT + defaultData?.id + "/" : URLS.ADD_PRODUCT,
-            method: defaultData ? METHODS.PATCH : METHODS.POST,
-            payload: formData,
-        };
-
-        sendRequest(PAYLOAD)
-            .then((res) => {
-                if (res?.status === 200 || res?.status === 201) {
-                    toast.success(defaultData ? "Product successfully updated" : "Product successfully added");
-                    setFileMeta(null);
-                    onOpenChange(false);
-                    reset();
-                    callBack();
+        if (defaultData) {
+            updateProductMutation(
+                { id: defaultData.id, formData },
+                {
+                    onSuccess: () => {
+                        toast.success("Product successfully updated");
+                        resetAll();
+                        callBack?.();
+                    },
+                    onError: (error: any) => {
+                        toast.error(
+                            error?.response?.data?.errors?.product_ids || "Something went wrong"
+                        );
+                    },
                 }
-
-                if (res.status === 500) {
-                    toast.error(res?.response?.data?.message || "Something went wrong");
-                }
-
-                const errors = res?.response?.data?.errors;
-                if (res.status === 400 && errors) {
-                    Object.keys(errors).forEach((key) => {
-                        toast.error(`${key.replaceAll("_", " ")}: ${errors[key]}`);
-                    });
-                }
-            })
-            .finally(() => {
-                setSubmitting(false);
+            );
+        } else {
+            createProductMutation(formData, {
+                onSuccess: () => {
+                    toast.success("Product successfully created");
+                    resetAll();
+                    callBack?.();
+                },
+                onError: (error: any) => {
+                    const errorMessage = Object.values(error?.response?.data?.errors || {})[0];
+                    if (errorMessage) {
+                        toast.error(String(errorMessage));
+                    }
+                },
             });
+        }
     };
 
-
-    // const onFormSubmit = (data: FormSchemaType) => {
-    //     setSubmitting(true);
-    //     const formData = new FormData();
-
-
-    //     Object.keys(data).forEach((key) => {
-    //         let value = data[key as keyof typeof data];
-
-    //         if (key === "date_sold" || key === "date_purchased") {
-    //             value = formatDate(value);
-    //         }
-
-    //         // @ts-ignore
-    //         formData.append(key, value);
-    //     });
-
-
-    //     if (!fileMeta?.file) {
-    //         formData.delete("image");
-    //     }
-
-    //     const PAYLOAD = {
-    //         url: defaultData ? URLS.UPDATE_PRODUCT + defaultData?.id + "/" : URLS.ADD_PRODUCT,
-    //         method: defaultData ? METHODS.PATCH : METHODS.POST,
-    //         payload: formData
-    //     };
-
-    //     sendRequest(PAYLOAD).then((res) => {
-    //         if (res?.status === 200 || res?.status === 201) {
-    //             toast.success(defaultData ? "Product successfully updated" : "Product successfully added");
-    //             setFileMeta(null);
-    //             onOpenChange(false);
-    //             reset();
-    //             callBack()
-    //         }
-    //         if (res.status === 500) {
-    //             toast.error(res?.response?.data?.message || "Something went wrong");
-    //         }
-    //         const errors = res?.response?.data?.errors;
-    //         if (res.status === 400) {
-    //             Object.keys(errors).forEach((key) => {
-    //                 toast.error(`${key?.replaceAll("_", " ")}: ${errors[key]}`);
-    //             });
-    //         }
-    //     }).finally(() => {
-    //         setSubmitting(false);
-    //     });
-    // };
 
     useEffect(() => {
         if (defaultData) {
@@ -295,8 +241,7 @@ const AddInventoryModal: React.FC<AddInventoryModalTypes> = ({
                                     type="submit"
                                     title={defaultData ? "Update Product" : "Add Product"}
                                     className="h-10"
-                                    // isDisabled={!isValid}
-                                    isLoading={submitting}
+                                    isLoading={isPending || createPending}
                                 />
                             </ModalFooter>
                         </form>

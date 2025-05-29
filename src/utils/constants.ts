@@ -1,9 +1,9 @@
 export const URLS = {
   HOME_PAGE_VEDIO: "shared/global_variables/?key=HOME_PAGE_VIDEO",
-  REGISTER: "auth/register/",
-  LOGIN: "/auth/login/",
-  FORGOT_PASSWORD: "/auth/forgot_password/",
-  RESET_PASSWORD: "/auth/reset_password/",
+  REGISTER: "/auth/signup/",
+  LOGIN: "/auth/signin/",
+  FORGOT_PASSWORD: "/auth/forgot-password/",
+  RESET_PASSWORD: "/auth/password-reset-confirm/MQ/",
   TRAINERS: "auth/users/?account_type=TRAINER&is_verified=True",
   PROGRAMS: "/program",
   TRAINER_BIOGRAPHY_BIDEO: "/auth/users/?account_type=TRAINER&is_verified=True",
@@ -51,6 +51,10 @@ export const URLS = {
   // DASHBOARD_DETAILED_ANALYTICS: "/v1/dashboard/detailed-analytics/",
   // MARKET_COMPARISON: "/v1/market-insightsmarket-comparison/",
   MARKET_COMPARISON: "/v1//market-data/inventory_based_comparison/",
+  PLANS: "/plans/",
+  SUBSCRBE: "/subscribe/",
+  SUBSCRIPTION_DETAILS: "/subscription/details/",
+  MARKAS_SOLD: "/v1/inventory/bulk-mark-sold/",
 };
 
 export const METHODS = {

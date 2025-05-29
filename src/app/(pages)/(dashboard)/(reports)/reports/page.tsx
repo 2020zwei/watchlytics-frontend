@@ -5,70 +5,32 @@ import Icon from '@/components/common/Icon';
 import Notfound from '@/components/common/Notfound';
 import Pagination from '@/components/common/Pagination';
 import ReportFilters from '@/components/common/ReportFilters';
-import { REPOT_TYPES, RequestTypes } from '@/types';
-import { sendRequest } from '@/utils/apis';
-import { METHODS, URLS } from '@/utils/constants';
+import { useReportStat, useBestSelling, useExpense } from '@/hooks/useReportHooks';
 import { Spinner } from '@heroui/react'
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react'
 
 const page = () => {
-    const [reports, setReports] = useState<REPOT_TYPES>()
-    const [states, setStates] = useState<any>({})
-    const [expenses, setExpenses] = useState<any>([])
-    const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
-    const router = useRouter()
+    const [currentPage, setCurrentPage] = useState(1)
     const pageRef = useRef(1)
+    const router = useRouter()
 
-    const fetchReports = async (currentPage: number) => {
-        setLoading(true);
-        const PAYLOAD: RequestTypes = {
-            url: `${URLS.BEST_SELLING}?page=${currentPage}&page_size=20`,
-            method: METHODS.GET,
-        };
-        sendRequest(PAYLOAD).then((res) => {
-            if (res.status === 200) {
-                setReports(res?.data);
-            }
-        }).finally(() => { setLoading(false) });
-    };
-    const fetchReportState = async () => {
-        setLoading(true);
-        const PAYLOAD: RequestTypes = {
-            url: URLS.REPORT_STATE,
-            method: METHODS.GET,
-        };
-        sendRequest(PAYLOAD).then((res) => {
-            if (res.status === 200) {
-                setStates(res.data)
-            }
-        }).finally(() => { setLoading(false) });
-    };
-    const fetchExpensesState = async () => {
-        setLoading(true);
-        const PAYLOAD: RequestTypes = {
-            url: URLS.EXPENSES,
-            method: METHODS.GET,
-        };
-        sendRequest(PAYLOAD).then((res) => {
-            if (res.status === 200) {
-                setExpenses(res.data)
-            }
-        }).finally(() => { setLoading(false) });
-    };
+    const { data: stats, isLoading: loadingStats } = useReportStat()
+    const { data: expensesData, isLoading: loadingExpenses } = useExpense()
+    const { data: reports, isLoading: loadingReports } = useBestSelling(currentPage)
 
     useEffect(() => {
-        fetchReportState()
-        fetchExpensesState()
-    }, [])
-    useEffect(() => {
-        pageRef.current = parseInt(window.location.search?.slice(13)) || currentPage
-        currentPage > 1 && router.push(`/reports/?page_number=${currentPage}`)
-        fetchReports(currentPage > 1 ? currentPage : pageRef.current)
+        const pageNumber = parseInt(window.location.search?.slice(13)) || currentPage
+        pageRef.current = pageNumber
+        if (currentPage > 1) {
+            router.push(`/reports/?page_number=${currentPage}`)
+        }
     }, [currentPage])
+
+    const loading = loadingStats || loadingExpenses || loadingReports
+
     if (loading) {
-        return <div className='text-center'><Spinner /></div>;
+        return <div className='text-center'><Spinner /></div>
     }
     return (
         <div className='flex flex-col gap-5'>
@@ -83,34 +45,34 @@ const page = () => {
                         <Heading as='h3'>Overview</Heading>
                         <div className=' grid grid-cols-3 pt-5'>
                             <div className=' text-sm text-gray-500'>
-                                <div>${states?.total_profit}</div>
+                                <div>${stats?.total_profit}</div>
                                 <div className=' text-sm font-medium text-dark-600 mt-3'>Total Profit</div>
                             </div>
                             <div className=' text-sm text-gray-500'>
-                                <div>${states?.revenue}</div>
+                                <div>${stats?.revenue}</div>
                                 <div className=' text-sm font-medium text-orange-700 mt-3'>Revenue</div>
                             </div>
                             <div className=' text-sm text-gray-500'>
-                                <div>${states?.sales}</div>
+                                <div>${stats?.sales}</div>
                                 <div className=' text-sm font-medium text-pink-500 mt-3'>Sales</div>
                             </div>
                         </div>
                     </div>
                     <div className='flex justify-between px-3 pb-5 gap-3'>
                         <div className="">
-                            <div className='text-gray-600 text-sm '>${states?.total_profit}</div>
+                            <div className='text-gray-600 text-sm '>${stats?.total_profit}</div>
                             <div className=' text-sm font-medium text-dark-500 mt-3'>Total Profit</div>
                         </div>
                         <div className="">
-                            <div className='text-gray-600 text-sm '>${states?.net_sales_value}</div>
+                            <div className='text-gray-600 text-sm '>${stats?.net_sales_value}</div>
                             <div className=' text-sm font-medium text-dark-500 mt-3'>Net sales value</div>
                         </div>
                         <div className="md:pe-6">
-                            <div className='text-gray-600 text-sm '>${states?.mom_profit}</div>
+                            <div className='text-gray-600 text-sm '>${stats?.mom_profit}</div>
                             <div className=' text-sm font-medium text-dark-500 mt-3'>MoM Profit</div>
                         </div>
                         <div className="md:pe-6">
-                            <div className='text-gray-600 text-sm '>${states?.yoy_profit}</div>
+                            <div className='text-gray-600 text-sm '>${stats?.yoy_profit}</div>
                             <div className=' text-sm font-medium text-dark-500 mt-3'>YoY Profit</div>
                         </div>
                     </div>
@@ -131,7 +93,7 @@ const page = () => {
                                 </thead>
                                 <tbody>
                                     {
-                                        expenses?.results?.map((item: any) => (
+                                        expensesData?.data?.results?.map((item: any) => (
                                             <tr key={item?.product} className='border'>
                                                 <td className='text-gray-650 text-sm test-start px-4 py-2'>{item?.product}</td>
                                                 <td className='text-sm text text-dark-500 text-center py-2'>${item?.repairs}</td>
@@ -151,7 +113,7 @@ const page = () => {
                         <Heading className='p-3'>Best selling product</Heading>
                         <div className=" overflow-x-auto">
                             {
-                                reports?.results?.length ?
+                                reports?.data?.results?.length ?
                                     <table className='w-full min-w-[1200px]'>
                                         <thead className='h-12'>
                                             <tr className='text-white text-sm font-medium bg-blue-gradient'>
@@ -169,7 +131,7 @@ const page = () => {
                                         </thead>
 
                                         <tbody>
-                                            {reports?.results?.map((report: any) => (
+                                            {reports?.data?.results?.map((report: any) => (
                                                 <tr key={report?.product_id} className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
                                                     <td className=' text-start py-3 px-4 first-letter:uppercase'>{report?.product}</td>
                                                     <td>{report?.reference_number}</td>
@@ -191,11 +153,11 @@ const page = () => {
                     </RoundedBox>
                 </div>
                 {
-                    reports?.count! > 20 ?
+                    reports?.data?.count! > 20 ?
                         <div>
                             <Pagination
 
-                                totalPages={Math.ceil(reports?.count! / 20)}
+                                totalPages={Math.ceil(reports?.data?.count! / 20)}
                                 currentPage={currentPage > 1 ? currentPage : pageRef.current}
                                 onPageChange={(page) => setCurrentPage(page)}
                             />

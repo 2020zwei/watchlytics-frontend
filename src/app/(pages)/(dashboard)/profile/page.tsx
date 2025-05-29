@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import { FileMetaTypes, RequestTypes } from "@/types";
 import { ProfileFormFields, ProfileFormSchema } from "@/utils/mock";
@@ -13,21 +13,22 @@ import clsx from "clsx";
 import Heading from "@/components/common/heading";
 import { Button } from "@/components/common/baseButton/BaseButton";
 import { TransparentButton } from "@/components/common/baseButton/TransparentButton";
-import { sendRequest } from "@/utils/apis";
 import { URLS, METHODS } from "@/utils/constants";
 import { Spinner } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useAppContext } from "@/providers/AppContextProvider";
 import Icon from "@/components/common/Icon";
+import { useMe, useUpdateProfile } from "@/hooks/useprofile";
 
 type FormSchemaType = z.infer<typeof ProfileFormSchema>;
 export default function ProfilePage() {
   const { setCurrentUser } = useAppContext();
   const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [apiLoading, setApiLoading] = useState<boolean>(true);
   const navigate = useRouter()
+  const { data: user, isLoading, isError, error } = useMe();
+
+  const { mutateAsync: updateProfile, isPending } = useUpdateProfile();
   const [togglePassType, setTogglePassType] = useState<{ [key: string]: boolean }>({
     password: false,
     confirm_password: false,
@@ -47,6 +48,8 @@ export default function ProfilePage() {
     reset,
     getValues,
     setValue,
+    trigger,
+    watch,
     formState: { errors, isDirty, isValid },
   } = useForm<FormSchemaType>({
     resolver: zodResolver(ProfileFormSchema),
@@ -56,8 +59,14 @@ export default function ProfilePage() {
     }
   });
 
+  const [password, confirmPassword] = watch(["password", "confirm_password"]);
+  useEffect(() => {
+    if (password || confirmPassword) {
+      trigger(["password", "confirm_password"]);
+    }
+  }, [password, confirmPassword, trigger]);
+
   const onSubmit = async (data: any) => {
-    setLoading(true)
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
       if (value instanceof File || value instanceof Blob) {
@@ -68,77 +77,83 @@ export default function ProfilePage() {
         formData.append(key, String(value));
       }
     });
-    formData.delete("profile_picture")
-    formData.delete("email")
-    fileMeta?.file && formData.append("profile_picture", fileMeta?.file)
-    const PAYLOAD: RequestTypes = {
-      url: URLS.UPDATE_PROFILE,
-      payload: formData,
-      method: METHODS.PUT,
+
+    formData.delete("profile_picture");
+    formData.delete("email");
+
+    if (fileMeta?.file) {
+      formData.append("profile_picture", fileMeta.file);
     }
-    const res = await sendRequest(PAYLOAD)
-    if (res?.status === 200) {
-      setIsEditing(false)
+
+    try {
+      await updateProfile(formData);
+
+      setIsEditing(false);
+
       // @ts-ignore
-      fileMeta?.file && setFileMeta((prev) => ({ ...prev, file: null }))
+      fileMeta?.file && setFileMeta((prev) => ({ ...prev, file: null }));
+
       // @ts-ignore
-      formData.get("confirm_password") && setValue("confirm_password", formData.get("confirm_password"))
-      fileMeta?.url && setCurrentUser({ image: fileMeta?.url })
+      formData.get("confirm_password") && setValue("confirm_password", formData.get("confirm_password"));
+
+      fileMeta?.url && setCurrentUser({ image: fileMeta.url });
+
       if (formData.get("confirm_password")) {
-        localStorage.removeItem("isLoggedin")
-        await fetch('/api/logout')
-        formData.get("confirm_password") && navigate.push("/login")
+        localStorage.removeItem("isLoggedin");
+        await fetch('/api/logout');
+        navigate.push("/login");
       }
-      toast.success(res?.data?.message)
+
+      toast.success(res?.data?.message || "Profile updated successfully");
+    } catch (err: any) {
+      const errors = err?.response?.data;
+      if (errors && typeof errors === 'object') {
+        Object.keys(errors).forEach((key) => {
+          toast.error(errors[key][0] || "Failed to update profile");
+        });
+      } else {
+        toast.error("Something went wrong while updating the profile");
+      }
     }
-    else {
-      Object.keys(res.response.data).forEach(key => {
-        toast.error(res.response.data[key][0] || "Failed to update profile")
-      })
-    }
-    setLoading(false)
   };
+
+
+
   const handleReset = () => {
     reset()
     setIsEditing(false);
     setFileMeta(null)
     setFileMeta(getValues("profile_picture"))
   }
-  useEffect(() => {
-
-    const getProfileInfo = async () => {
-      // @ts-ignore
-      const PAYLOAD: RequestTypes = {
-        url: URLS.ME,
-        method: METHODS.GET,
-      }
-
-      sendRequest(PAYLOAD).then((res) => {
-        if (res?.data) {
-          setFileMeta(res?.data?.data?.profile_picture)
-          const data: any = {}
-          Object.keys(res?.data?.data)?.forEach((key) => {
-            if (res?.data?.data[key]) {
-              data[key] = res?.data?.data[key]
-            }
-          })
-          setCurrentUser({ image: res?.data?.data?.profile_picture })
-          reset(data, { keepDirty: false, keepIsValid: false });
-        }
-      }).finally(() => {
-        setApiLoading(false)
-      })
-
-    }
-
-    getProfileInfo()
-  }, [])
 
   const isFormReady = isValid && (isDirty || fileMeta?.file);
+  useEffect(() => {
+    if (user) {
+      setFileMeta(user?.data.profile_picture || null);
 
-  if (apiLoading) {
-    return <div className="h-[calc(100vh-200px)] flex justify-center items-center"><Spinner /></div>
+      const formData: any = {};
+      Object.keys(user?.data).forEach((key) => {
+        if (user[key] !== null) {
+          formData[key] = user?.data[key];
+        }
+      });
+      reset(formData);
+      trigger();
+      setCurrentUser({ image: user?.data.profile_picture });
+    }
+  }, [user]);
+
+
+  if (isError || error) {
+    console.log(isError, error)
+    toast.error(error?.message)
   }
+
+  if (isLoading) {
+    return <div className="text-center mt-5"><Spinner /></div>
+  }
+
+
   return (
     <>
       <RoundedBox>
@@ -217,7 +232,7 @@ export default function ProfilePage() {
               }
             </fieldset>
             {isEditing ? <div className="flex items-center gap-3 mt-6">
-              <Button isLoading={loading} title='Update' type="submit" className='h-10' isDisabled={!isFormReady} />
+              <Button isLoading={isPending} title='Update' type="submit" className='h-10' isDisabled={!isFormReady} />
               <TransparentButton title='Cancel' className='h-10' onPress={handleReset} />
             </div> : null}
           </form>

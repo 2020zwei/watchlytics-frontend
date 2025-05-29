@@ -51,6 +51,7 @@ const Header = () => {
             inputClass='order-1'
             placeholderClass='placeholder:text-[#858D9D] sm:placeholder:text-base placeholder:text-xs'
           />
+          
         </div> : null}
       <div className='flex items-center'>
         <span onClick={handleUploadClick}><Icon name='bell' /></span>
@@ -58,7 +59,7 @@ const Header = () => {
           <DropdownTrigger>
             <Button className=' bg-transparent'>
               <div className={clsx('w-10 h-10 border rounded-full', user?.image ? "" : "bg-gray-300")}>
-                {user?.image ? <img src={user?.image} alt="usefer" width={40} height={40} className=' rounded-full object-cover h-full w-full' /> : <Icon name='imagePlaceholder'/>}
+                {user?.image ? <img src={user?.image} alt="usefer" width={40} height={40} className=' rounded-full object-cover h-full w-full' /> : <Icon name='imagePlaceholder' />}
               </div>
               <span><Icon name='caret' fill='#ACACAC' className='!mx-0' /></span>
             </Button>

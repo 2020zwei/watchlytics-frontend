@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Checkbox } from "@heroui/react";
 import Image from "next/image";
 import Link from "next/link";
+import axios from "axios";
 import { setCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -12,11 +13,10 @@ import { useState } from "react";
 import { LoginFormFields, SignInSchema } from "@/utils/mock";
 import FormField from "@/components/common/FormField";
 import { z } from "zod";
-import { useSignin } from "@/hooks/useAuth";
 type FormData = z.infer<typeof SignInSchema>;
 export default function SignIn() {
   const router = useRouter();
-  const { mutateAsync: signin, isPending, error: apiError } = useSignin();
+  const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [togglePassType, setTogglePassType] = useState<{ [key: string]: boolean }>({
     password: false,
@@ -40,13 +40,16 @@ export default function SignIn() {
   };
 
   const onSubmit = async (data: FormData) => {
+    setLoading(true);
     try {
-      const payload = {
-        email: data.email,
-        password: data.password,
-      }
-      const res = await signin(payload);
-      const result = res.data;
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/signin/`,
+        {
+          email: data.email,
+          password: data.password,
+        }
+      );
+      const result = response.data;
 
       setCookie("access_token", result.access_token, {
         maxAge: rememberMe ? 60 * 60 * 24 * 7 : undefined,
@@ -58,10 +61,14 @@ export default function SignIn() {
 
       router.push(result?.is_subscribed ? "/dashboard" : "/subscription");
     } catch (error: any) {
-      console.log(apiError)
       const message =
         error?.response?.data?.non_field_errors?.[0] || "Sign-in failed";
       toast.error(`Signin failed, ${message}`, { position: "top-right" });
+
+      setError("email", { message: message });
+      setError("password", { message: message });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -134,7 +141,7 @@ export default function SignIn() {
 
           <Button
             type="submit"
-            isLoading={isPending}
+            isLoading={loading}
             radius="sm"
             size="lg"
             color="primary"

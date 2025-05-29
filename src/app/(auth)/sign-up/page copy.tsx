@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 import { setCookie } from "cookies-next";
 import FormField from "@/components/common/FormField";
 import { clientId, confirmpassword, email, name, password, RegistrationFormSchema } from "@/utils/mock";
-import { useSignup } from "@/hooks/useAuth";
+const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
 const fields = [
   { ...name, name: "name" },
   email,
@@ -26,7 +26,7 @@ type FormData = z.infer<typeof RegistrationFormSchema>;
 
 export default function Signup() {
   const router = useRouter();
-  const { mutateAsync: signup, isPending, error: apiError } = useSignup();
+  const [loading, setLoading] = useState(false);
 
   const [togglePassType, setTogglePassType] = useState<{ [key: string]: boolean }>({
     password: false,
@@ -59,9 +59,12 @@ export default function Signup() {
       lastname: "",
       client_id: data.client_id || undefined,
     };
+
+    setLoading(true);
     try {
-      const res = await signup(payload);
-      const result = res.data;
+      const url = `${baseURL}/auth/signup/`
+      const response = await axios.post(url, payload);
+      const result = response.data;
 
       setCookie("access_token", result.access_token, {
         maxAge: 60 * 60 * 24 * 7,
@@ -72,11 +75,8 @@ export default function Signup() {
       router.push("/subscription");
     }
     catch (error: any) {
-      console.log(apiError)
       if (axios.isAxiosError(error)) {
-
         const errors = error?.response?.data?.errors;
-        console.log(errors)
         if (errors && typeof errors === "object") {
           Object.entries(errors).forEach(([field, message]) => {
             // @ts-ignore
@@ -84,6 +84,9 @@ export default function Signup() {
           });
         }
       }
+    }
+    finally {
+      setLoading(false);
     }
   };
 
@@ -140,7 +143,7 @@ export default function Signup() {
         {/* Submit Button */}
         <Button
           type="submit"
-          isLoading={isPending}
+          isLoading={loading}
           className="w-full text-white bg-[linear-gradient(180deg,_#092CA2_0%,_#003BFF_100%)] hover:opacity-90 mt-6"
           radius="sm"
           size="lg"
