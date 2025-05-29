@@ -891,7 +891,16 @@ export const RegistrationFormSchema = z.object({
 });
 export const SignInSchema = z.object({
     email: z.string().email("Invalid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
+    password: z.string()
+        .refine(val => !val || val.length >= 8, {
+            message: "Password must be at least 8 characters",
+        })
+        .refine(val => !val || /[A-Z]/.test(val), {
+            message: "Password must contain at least 1 uppercase letter",
+        })
+        .refine(val => !val || /[!@#$%^&*(),.?":{}|<>]/.test(val), {
+            message: "Password must contain at least 1 special character",
+        }),
 })
 export const ResetsswordSchema = z.object({
     password: z.string()
