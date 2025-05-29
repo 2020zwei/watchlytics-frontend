@@ -642,7 +642,7 @@ export const InventoryFormSchema = z.object({
     model_name: z
         .string()
         .nonempty("Model name is required")
-        .min(3, "Model name must be at least 3 characters")
+        .min(2, "Model name must be at least 3 characters")
         .max(200, "Max 200 characters")
         .regex(/^[a-zA-Z0-9 ]+$/, "Only letters, numbers, and spaces are allowed"),
 
