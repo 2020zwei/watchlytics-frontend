@@ -4,7 +4,6 @@ import { isTokenValid } from "./utils/isTokenValid";
 
 const baseURL = process.env.NEXT_PUBLIC_FRONTEND_BASE_URL;
 
-// Publicly accessible routes
 const publicRoutes = [
   "/login",
   "/sign-up",
@@ -12,18 +11,19 @@ const publicRoutes = [
   "/reset-password",
 ];
 
-
 const privateRoutePrefixes = [
   "/dashboard",
   "/profile",
   "/inventory",
   "/subscriptions",
   "/transaction",
+  "/add-transaction",
   "/subscription",
   "/reports",
   "/trading",
   "/add-trading",
   "/customers",
+  "/invoices",
 ];
 
 export async function middleware(request: NextRequest) {
@@ -50,7 +50,6 @@ export async function middleware(request: NextRequest) {
   if (isPrivateRoute && !isAuthenticated) {
     return redirectTo("/login");
   }
-
   
   if (isAuthenticated && isPrivateRoute) {
     try {
@@ -66,16 +65,14 @@ export async function middleware(request: NextRequest) {
         return redirectTo("/subscription");
       }
     } catch (error) {
-      console.error("Error validating subscription:", error);
       return redirectTo("/login");
     }
   }
 
-  
   if (isPublicRoute && isAuthenticated) {
     return redirectTo("/dashboard");
   }
-
+  
   return NextResponse.next();
 }
 
@@ -94,6 +91,7 @@ export const config = {
     "/subscription",
     "/reports/:path*",
     "/trading/:path*",
+    "/invoices/:path*",
     "/add-trading",
     "/customers/:path*",
     {

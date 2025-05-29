@@ -67,7 +67,7 @@ const Inventory = () => {
     const [product, setProduct] = useState<any>();
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [apiLoading, setApiLoading] = useState<boolean>(false);
-    const [selectedAction, setSelectedAction] = useState<string>("");
+    const [selectedAction, setSelectedAction] = useState<string | null>(null);
     const [isAllChecked, setIsAllChecked] = useState(false);
     const [selectedData, setSelectedData] = useState([]);
     const [selectedId, setSelectedId] = useState<any>(null);
@@ -136,6 +136,7 @@ const Inventory = () => {
                         toast.success("Image successfully updated");
                         setFileMeta(null)
                         setSelectedId(null)
+                        setSelectedAction("")
                     },
                     onError: (error: any) => {
                         toast.error(
@@ -199,6 +200,7 @@ const Inventory = () => {
     };
 
     const handleAction = (val: string) => {
+        setSelectedAction(val);
         if (val !== "Export") {
             markAsSold({ product_ids: [...selectedIds] }, {
                 onSuccess: () => {
@@ -206,6 +208,7 @@ const Inventory = () => {
                     setSelectedIds(new Set());
                     setSelectedData([]);
                     setIsAllChecked(false);
+                    setSelectedAction("")
                 },
                 onError: (error: any) => {
                     toast.error(error?.response?.data?.errors?.product_ids || "Something went wrong");
@@ -218,10 +221,11 @@ const Inventory = () => {
                     setSelectedIds(new Set());
                     setSelectedData([]);
                     setIsAllChecked(false);
+                    setSelectedAction("")
                 }, 100);
             }
         }
-        setSelectedAction(val);
+
     };
 
     useEffect(() => {

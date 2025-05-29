@@ -11,7 +11,7 @@ import {
 interface SelectWidgetProps
     extends Omit<SelectProps<object>, "children" | "onSelectionChange" | "selectedKeys"> {
     placeholder?: string;
-    selected?: string;
+    selected?: string | null;
     options?: string[];
     onValueChange?: (key: string) => void;
 }
@@ -23,13 +23,15 @@ export default function SelectWidget({
     options = [],
     ...rest
 }: SelectWidgetProps) {
-    const [internalSelected, setInternalSelected] = useState<string>("");
-    const selectedValue = externalSelected ?? internalSelected;
+    const [internalSelected, setInternalSelected] = useState<string | null>(null);
+    const selectedValue = externalSelected !== undefined ? externalSelected : internalSelected;
+
     const handleSelectionChange = (keys: Selection) => {
-        const selectedKey: any = typeof keys === "string" ? keys : Array.from(keys)[0];
-        setInternalSelected(selectedKey)
+        const selectedKey = typeof keys === "string" ? keys : Array.from(keys)[0] as string;
+        setInternalSelected(selectedKey);
         onValueChange?.(selectedKey);
     };
+
 
     return (
         <Select
