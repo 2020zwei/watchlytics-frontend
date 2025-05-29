@@ -9,7 +9,6 @@ import { toast } from "react-toastify";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Icon from "@/components/common/Icon";
-import { useForgotPassword } from "@/hooks/useAuth";
 
 // Zod Schema
 const ForgotPasswordSchema = z.object({
@@ -19,7 +18,7 @@ const ForgotPasswordSchema = z.object({
 type ForgotPasswordFormData = z.infer<typeof ForgotPasswordSchema>;
 
 export default function ForgotPassword() {
-  const { mutateAsync: forgotPassword, isPending, error: apiError } = useForgotPassword();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const {
     register,
@@ -31,17 +30,21 @@ export default function ForgotPassword() {
   });
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
+    setLoading(true);
     try {
-      const res = await forgotPassword(data)
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/forgot-password/`;
+      await axios.post(url, data);
+
       toast.success("Reset password email sent successfully!", {
         position: "top-right",
       });
     } catch (error: any) {
-      console.log(error)
       toast.error(
         error?.response?.data?.non_field_errors?.[0] ||
         "Failed to send reset link"
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -83,7 +86,7 @@ export default function ForgotPassword() {
 
           <Button
             type="submit"
-            isLoading={isPending}
+            isLoading={loading}
             radius="sm"
             size="lg"
             color="primary"

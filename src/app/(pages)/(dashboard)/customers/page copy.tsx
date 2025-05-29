@@ -6,14 +6,16 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@heroui/react";
 import Pagination from '@/components/common/Pagination'
 import Link from 'next/link'
+import { sendRequest } from '@/utils/apis'
+import { METHODS, URLS } from '@/utils/constants'
 import SelectWidget from '@/components/common/SelectWidget'
 import Icon from '@/components/common/Icon'
 import AddNoteModalWidget from '@/components/common/AddNoteModalWidget'
 import Notfound from '@/components/common/Notfound'
 import AlertModal from '@/components/common/AlertModal'
+import { RequestTypes } from '@/types'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/navigation'
-import { useCustomers, useRemoveCustomer } from '@/hooks/useCustomerHooks' 
 
 const buttons: any = {
     "status": ["active", "inactive"],
@@ -23,89 +25,124 @@ const buttons: any = {
     "Follow Up": ["yes", "no"],
 }
 
+
 const page = () => {
-    const [deleteId, setDeleteId] = useState<number | null>(null)
+    const [deleteId, setDeleteId] = useState()
     const [currentPage, setCurrentPage] = useState(1)
-    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
-    const [filters, setFilters] = useState<{ [key: string]: string }>({})
-    const [deleteAlert, setDeleteAlert] = useState(false)
-    const [note, setNote] = useState<any>()
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+    const [filters, setFilters] = useState<{ [key: string]: string }>({});
+    const [deleteAlert, setDeleteAlert] = useState(false);
+    const [note, setNote] = useState();
     const navigate = useRouter()
     const pageRef = useRef(1)
 
-    const buildQuery = () => {
-        const queryParams = new URLSearchParams(filters)
-        queryParams.set('page', String(pageRef.current))
-        queryParams.set('page_size', '20')
-        return `?${queryParams.toString()}`
-    }
-
-    const { data: customers, isLoading, refetch } = useCustomers(buildQuery())
-
-    const { mutate: deleteCustomer } = useRemoveCustomer()
-
-    const handleDelete = (id: number) => {
-        setDeleteId(id)
-        setDeleteAlert(true)
-    }
-
-    const comfirmDelete = () => {
-        if (!deleteId) return
-        deleteCustomer(deleteId, {
-            onSuccess: () => {
-                toast.success("Customer successfully deleted")
-                refetch()
-            },
-            onError: () => {
-                toast.error("An error occurred while deleting customer.")
-            },
-            onSettled: () => {
-                setDeleteAlert(false)
-                setDeleteId(null)
-            }
-        })
-    }
-
-    const updateFilter = (key: string, value: string) => {
-        navigate.push(`/customers`)
-        setTimeout(() => {
-            const newFilters = { ...filters, [key]: value }
-            delete newFilters.page_number
-            setFilters(newFilters)
-            pageRef.current = 1
-            setCurrentPage(1)
-        }, 2000)
-    }
-
-    const handlePagination = (page: number) => {
-        pageRef.current = page
-        setCurrentPage(page)
-    }
 
     const closeUploadModal = () => {
         setIsUploadModalOpen(false);
         setDeleteAlert(false);
     };
 
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search)
-        const page = parseInt(params.get("page_number") || "1")
-        const initialFilters: { [key: string]: string } = {}
-        for (const [key, value] of params.entries()) {
-            if (key !== "page_number") {
-                initialFilters[key] = value
-            }
-        }
-        pageRef.current = page
-        setCurrentPage(page)
-        setFilters(initialFilters)
-    }, [])
+    const [customers, setCustomers] = useState<any>([])
+    const [loading, setLoading] = useState<boolean>(false)
 
-    if (isLoading) {
-        return <div className='text-center mt-5'><Spinner /></div>
+    const handleDelete = (id: any) => {
+        setDeleteId(id)
+        setDeleteAlert(true)
+
     }
 
-    console.log({ customers })
+
+    const comfirmDelete = () => {
+        const PAYLOAD: RequestTypes = {
+            url: `${URLS.CUSTOMERS}${deleteId}/`,
+            method: METHODS.DELETE,
+        }
+        sendRequest(PAYLOAD).then((res) => {
+            if (res?.status === 204) {
+                getCustomers(currentPage)
+                toast.success("Customer successfully deleted");
+            }
+            else {
+                toast.error(res?.error?.message || "Something went wrong, please try again.");
+            }
+        }).catch((err) => {
+            toast.error("An error occurred while deleting customer.");
+        }).finally(() => setDeleteAlert(false))
+    }
+    const getCustomers = (query: string = "") => {
+        setLoading(true)
+        sendRequest({ url: `${URLS.CUSTOMERS}${query}` }).then((res) => {
+            setCustomers(res?.data)
+        }).finally(() => {
+            setLoading(false)
+        });
+    }
+
+    const updateFilter = (key: string, value: string) => {
+        navigate.push(`/customers`);
+        setTimeout(() => {
+            const newFilters = { ...filters, [key]: value };
+            delete newFilters.page_number;
+
+            const query = new URLSearchParams(newFilters);
+            navigate.push(`/customers/?${query.toString()}`);
+            getCustomers(`?${query.toString()}&page_size=20`);
+            setFilters(newFilters);
+            pageRef.current = 1;
+            setCurrentPage(1);
+        }, 2000)
+    };
+    const handlePagination = (page: number) => {
+        const params = new URLSearchParams(window.location.search);
+        // const page = parseInt(params.get("page_number")!) > currentPage ? parseInt(params.get("page_number")!) : currentPage
+        const queries: any = {}
+        pageRef.current = page
+        for (const [key, value] of params.entries()) {
+            if (key !== "page_number") {
+                queries[key] = value;
+            }
+        }
+        const query = new URLSearchParams(queries).toString()
+        setCurrentPage(page)
+        navigate.push(`/customers/?${query}&page_number=${page}`)
+        getCustomers(`?${query}&page=${page}&page_size=20`)
+    }
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const page = parseInt(params.get("page_number")!) > currentPage ? parseInt(params.get("page_number")!) : currentPage
+        const queries: any = {}
+        pageRef.current = page
+        for (const [key, value] of params.entries()) {
+            if (key !== "page_number") {
+                queries[key] = value;
+            }
+        }
+        const query = new URLSearchParams(queries).toString()
+        getCustomers(`?${query}&page=${page}&page_size=20`)
+        // if (currentPage === 1 && pageRef.current == 1) {
+        //     getCustomers(`?${query}&page=${1}&page_size=20`)
+        //     page > 1 && navigate.push(`/customers/?${query}`)
+        // }
+        // else {
+        //     page > 1 && navigate.push(`/customers/?${query}&page_number=${page}`)
+        //     getCustomers(`?${query}&page=${page}&page_size=20`)
+        // }
+    }, []
+    )
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const initialFilters: { [key: string]: string } = {};
+        for (const [key, value] of params.entries()) {
+            initialFilters[key] = value;
+        }
+        setFilters(initialFilters);
+    }, []);
+
+    if (loading) {
+        return <div className='text-center mt-5'><Spinner /></div>
+    }
 
     return (
         <div>
@@ -134,7 +171,7 @@ const page = () => {
                                 </li>
                             )
                         })}
-                        {Object.keys(filters)?.length ? <li className='rounded-md border !border-gray-70 h-10 px-4 flex items-center justify-center cursor-pointer' onClick={() => { setFilters({}); navigate.push("/customers") }}>Clear</li> : null}
+                        {Object.keys(filters)?.length ? <li className='rounded-md border !border-gray-70 h-10 px-4 flex items-center justify-center cursor-pointer' onClick={() => { setFilters({}); navigate.push("/customers"); getCustomers() }}>Clear</li> : null}
                     </ul>
                     <div className='lg-xl:w-auto w-full text-end'>
                         <Link href="/customers/add" className='bg-blue-gradient ms-auto text-white rounded-lg text-sm h-10 w-[128px] flex items-center justify-center'>Add Customer</Link>
@@ -142,7 +179,7 @@ const page = () => {
                 </div>
 
                 <div className='pt-3'>
-                    {!customers?.data?.results?.length ? <Notfound /> :
+                    {!customers?.results?.length ? <Notfound /> :
                         <>
                             <div className=" overflow-x-auto">
                                 <table className="border-collapse min-w-[1200px] w-full text-start">
@@ -170,7 +207,7 @@ const page = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {customers?.data?.results?.map((item: any) => (
+                                        {customers?.results?.map((item: any) => (
                                             <tr key={item?.id} className="border-b border-gray-200 last:border-b-0 text-sm font-medium text-dark-700"                                    >
                                                 <td>
                                                     <div className='flex items-center gap-2'>
@@ -225,9 +262,9 @@ const page = () => {
                                     </tbody>
                                 </table>
                             </div>
-                            {customers?.data?.count > 20 &&
+                            {customers?.count > 20 &&
                                 <Pagination
-                                    totalPages={Math.ceil(customers?.data?.count / 20)}
+                                    totalPages={Math.ceil(customers?.count / 20)}
                                     currentPage={currentPage > 1 ? currentPage : pageRef.current}
                                     onPageChange={(page) => handlePagination(page)}
                                 />}
@@ -235,7 +272,7 @@ const page = () => {
                     }
                 </div>
             </RoundedBox>
-            <AddNoteModalWidget isOpen={isUploadModalOpen} onOpen={closeUploadModal} note={note} callBack={() => { closeUploadModal() }} />
+            <AddNoteModalWidget isOpen={isUploadModalOpen} onOpen={closeUploadModal} note={note} callBack={() => { closeUploadModal(); getCustomers() }} />
             <AlertModal alertText="Are you sure you want to delete this card?"
                 isOpen={deleteAlert} onOpen={closeUploadModal} callBack={comfirmDelete} />
         </div >

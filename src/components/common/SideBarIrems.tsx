@@ -39,7 +39,7 @@ const SideBarItems = () => {
                         className={clsx(
                             'hover:bg-white/10 duration-300 rounded-lg font-medium relative',
                             isActive ? 'bg-white/10 text-white' : 'text-gray-200',
-                            item.href !== '#'?"px-4 xl:py-4 py-3":""
+
                         )}
                     >
 
@@ -50,7 +50,7 @@ const SideBarItems = () => {
                                 {item.label}
                             </button>
                         ) : (
-                            <Link href={item.href} className='flex-1 flex items-center gap-4'>
+                            <Link href={item.href} className={clsx('flex-1 flex items-center gap-4', item.href !== '#' ? "px-4 xl:py-4 py-3" : "")}>
                                 <Icon name={item.icon} />
                                 {item.label}
                             </Link>

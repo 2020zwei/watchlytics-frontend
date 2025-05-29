@@ -1,13 +1,16 @@
 import { useDropzone } from 'react-dropzone';
 import React, { ReactNode } from 'react';
+import clsx from 'clsx';
 
 interface FileUploader {
   children?: ReactNode;
   multiple?: boolean,
+  presentationClass?: string,
+  inputClass?: string,
   onChange: (value: any) => void
 }
 
-const FileUploader: React.FC<FileUploader> = ({ children, multiple = false, onChange = () => { } }) => {
+const FileUploader: React.FC<FileUploader> = ({ children, presentationClass = "border-dashed p-4", inputClass = "", multiple = false, onChange = () => { } }) => {
 
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -27,8 +30,8 @@ const FileUploader: React.FC<FileUploader> = ({ children, multiple = false, onCh
 
   return (
     <div className="flex flex-col items-center">
-      <div {...getRootProps()} className="border-dashed p-4 cursor-pointer">
-        <input {...getInputProps()} accept=".png,.jpg,.jpeg" />
+      <div {...getRootProps()} className={clsx("cursor-pointer", presentationClass)}>
+        <input {...getInputProps()} accept=".png,.jpg,.jpeg" className={inputClass} />
         {isDragActive ? (
           children
         ) : (

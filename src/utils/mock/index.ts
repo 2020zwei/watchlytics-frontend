@@ -1,6 +1,8 @@
 
 import { z } from "zod";
 
+
+
 export const name = {
     label: "Name",
     name: "first_name",
@@ -13,7 +15,8 @@ export const phone = {
     label: "Phone",
     name: "phone_number",
     placeholder: "Enter Phone",
-    fieldType: "input"
+    fieldType: "input",
+    type: "text"
 }
 export const email = {
     label: "Email",
@@ -811,14 +814,20 @@ export const ProfileFormSchema = z.object({
 
     password: z.string()
         .optional()
-        .refine(val => !val || val.length >= 6, {
-            message: "Password must be at least 6 characters",
+        .refine(val => !val || val.length >= 8, {
+            message: "Password must be at least 8 characters",
+        })
+        .refine(val => !val || /[A-Z]/.test(val), {
+            message: "Password must contain at least 1 uppercase letter",
+        })
+        .refine(val => !val || /[!@#$%^&*(),.?":{}|<>]/.test(val), {
+            message: "Password must contain at least 1 special character",
         }),
 
     confirm_password: z.string()
         .optional()
-        .refine(val => !val || val.length >= 6, {
-            message: "Confirm Password must be at least 6 characters",
+        .refine(val => !val || val.length >= 8, {
+            message: "Confirm Password must be at least 8 characters",
         }),
     client_id: z
         .string()
@@ -831,14 +840,13 @@ export const ProfileFormSchema = z.object({
         }),
 
 
-})
-    .refine((data) => {
-        if (!data.password && !data.confirm_password) return true;
-        return data.password === data.confirm_password;
-    }, {
-        path: ["confirm_password"],
-        message: "Passwords do not match",
-    });
+}).refine((data) => {
+    if (!data.password && !data.confirm_password) return true;
+    return data.password === data.confirm_password;
+}, {
+    path: ["confirm_password"],
+    message: "Passwords do not match",
+});
 
 
 export const RegistrationFormSchema = z.object({

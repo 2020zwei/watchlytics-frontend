@@ -3,26 +3,24 @@
 import RoundedBox from "@/components/common/baseButton/RoundedBox";
 import FormField from "@/components/common/FormField";
 import Heading from "@/components/common/heading";
+import { sendRequest } from "@/utils/apis";
+import { METHODS, URLS } from "@/utils/constants";
 import { Button, Spinner } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
-import {
-    useCustomer,
-    useCreateCustomer,
-    useUpdateCustomer,
-} from "@/hooks/useCustomerHooks";
-
 export const FormFieldsSchema = z.object({
     name: z.string().min(3, "Name is required and at least 3 characters"),
     email: z.string().email("Invalid email address"),
-    phone: z.string().min(8, { message: "Number must be at least 8 characters" }),
+    phone: z
+        .string()
+        .min(1, { message: "Number is required" })
+        .min(8, { message: "Number must be at least 8 characters" }),
     address: z.string().min(1, "Address is required"),
-});
-
+})
 const fields = [
     {
         label: "Name Of Customer:",
@@ -30,7 +28,7 @@ const fields = [
         placeholder: "Enter name",
         fieldType: "input",
         type: "text",
-        required: true,
+        required: true
     },
     {
         label: "Email",
@@ -38,7 +36,7 @@ const fields = [
         placeholder: "Enter email",
         fieldType: "input",
         type: "email",
-        required: true,
+        required: true
     },
     {
         label: "Phone number:",
@@ -46,7 +44,7 @@ const fields = [
         placeholder: "Enter number",
         fieldType: "input",
         type: "text",
-        required: true,
+        required: true
     },
     {
         label: "Address:",
@@ -54,16 +52,16 @@ const fields = [
         placeholder: "Enter address",
         fieldType: "input",
         type: "text",
-        required: true,
+        required: true
     },
-];
-
+]
 type FormSchemaType = z.infer<typeof FormFieldsSchema>;
 
 const AddCustomerWidget = () => {
-    const navigate = useRouter();
-    const id = useSearchParams().get("id");
-    const numericId = useMemo(() => (id ? parseInt(id) : null), [id]);
+    const [submitting, setSubmitting] = useState(false);
+    const [loading, setLoading] = useState(false)
+    const navigate = useRouter()
+    const id = useSearchParams().get('id')
 
     const {
         control,
@@ -72,51 +70,61 @@ const AddCustomerWidget = () => {
         trigger,
         formState: { errors, isValid },
     } = useForm<FormSchemaType>({
+        // @ts-ignore
         resolver: zodResolver(FormFieldsSchema),
         mode: "onChange",
     });
-
-    const { data, isLoading } = useCustomer(numericId!);
-    const { mutate: createCustomer, isPending: creating } = useCreateCustomer();
-    const { mutate: updateCustomer, isPending: updating } = useUpdateCustomer();
-
-    // Populate form fields if editing
-    useEffect(() => {
-        if (data) {
-            const { name, email, phone, address } = data?.data;
-            setValue("name", name);
-            setValue("email", email);
-            setValue("phone", phone);
-            setValue("address", address);
-            trigger();
-        }
-    }, [data, setValue, trigger]);
-
     const onSubmit = (formData: FormSchemaType) => {
-        if (numericId) {
-            updateCustomer(
-                { id: numericId, payload: formData },
-                {
-                    onSuccess: () => {
-                        toast.success("Customer successfully updated");
-                        navigate.push("/customers");
-                    },
-                    onError: () => toast.error("Failed to update customer"),
+        setSubmitting(true);
+        const PAYLOAD = {
+            url: id ? `${URLS.CUSTOMERS}${id}/` : URLS.CUSTOMERS,
+            method: id ? METHODS.PATCH : METHODS.POST,
+            payload: formData
+        };
+        sendRequest(PAYLOAD).then((res) => {
+            if (res?.status === 200 || res?.status === 201) {
+                toast.success(`Customer successfully ${id ? "updated" : "created"}`);
+                navigate.push("/customers")
+            }
+            else {
+                if (res?.status === 400) {
+                    Object.keys(res?.response?.data?.errors).forEach((key: string) => toast.error(res?.response?.data?.errors[key] || "Something went wrong"))
                 }
-            );
-        } else {
-            createCustomer(formData, {
-                onSuccess: () => {
-                    toast.success("Customer successfully created");
-                    navigate.push("/customers");
-                },
-                onError: () => toast.error("Failed to create customer"),
-            });
-        }
-    };
+                if (res?.status === 500) {
+                    toast.error("Something went wrong")
+                }
+            }
+        }).finally(() => {
+            setSubmitting(false);
+        });
+    }
 
-    if (isLoading) {
-        return <div className="text-center mt-5"><Spinner /></div>;
+    const getCustomer = () => {
+        setLoading(true);
+        const PAYLOAD = {
+            url: `${URLS.CUSTOMERS}${id}/`,
+        };
+        sendRequest(PAYLOAD).then((res) => {
+            if (res?.status === 200) {
+                const { name, email, phone, address } = res?.data
+                setValue("name", name)
+                setValue("email", email)
+                setValue("phone", phone)
+                setValue("address", address)
+                trigger()
+            }
+        }).finally(() => {
+            setLoading(false);
+        });
+    }
+
+    useEffect(() => {
+        if (id) {
+            getCustomer()
+        }
+    }, [id])
+    if (loading) {
+        return <div className="text-center mt-5"><Spinner /></div>
     }
     return (
         <RoundedBox className="px-4 min-h-[calc(100vh-160px)] pb-5">
@@ -143,7 +151,7 @@ const AddCustomerWidget = () => {
 
                 </fieldset>
                 <div className=" border-t pt-4">
-                    <Button type="submit" isLoading={creating || updating} className="bg-blue-gradient h-10 w-[84px] rounded-lg text-white text-sm font-medium" isDisabled={!isValid}>{id ? "Update" : "Add"}</Button>
+                    <Button type="submit" isLoading={submitting} className="bg-blue-gradient h-10 w-[84px] rounded-lg text-white text-sm font-medium" isDisabled={!isValid}>{id ? "Update" : "Add"}</Button>
                     <Button variant="bordered" className="h-10 w-[84px] rounded-lg text-[#ACACAC] border-1 ms-3 text-sm font-medium" onPress={() => navigate.push("/customers")}>Cancel</Button>
                 </div>
             </form>
