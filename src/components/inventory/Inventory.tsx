@@ -36,10 +36,13 @@ import SelectWidget from '../common/SelectWidget'
 import FileUploader from '../common/UploadWithDragDrop';
 import { FileMetaTypes } from '@/types';
 
-const holdTimeColors = {
-    "90": "#DA3E33",
-    "30": "#10A760"
-}
+const holdTimeColors: Record<string, string> = {
+    green: "#28a745", 
+    yellow: "#ffc107", 
+    orange: "#fd7e14", 
+    red: "#dc3545", 
+};
+
 
 const STOCKCOLORS: any = {
     "in_stock": "text-green-600",
@@ -487,9 +490,13 @@ const Inventory = () => {
                                                                 col === "hold_time"
                                                                     ? {
                                                                         color:
-                                                                            row.hold_time > 90
-                                                                                ? holdTimeColors["90"]
-                                                                                : row.hold_time <= 90 && row?.hold_time > 30 ? "#565607" : holdTimeColors["30"]
+                                                                            row.hold_time < 30
+                                                                                ? holdTimeColors.green
+                                                                                : row.hold_time <= 60
+                                                                                    ? holdTimeColors.yellow
+                                                                                    : row.hold_time < 90
+                                                                                        ? holdTimeColors.orange
+                                                                                        : holdTimeColors.red,
                                                                     }
                                                                     : {}
                                                             }
