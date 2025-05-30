@@ -86,10 +86,8 @@ export default function ProfilePage() {
     }
 
     try {
-      await updateProfile(formData);
-
+      const res = await updateProfile(formData);
       setIsEditing(false);
-
       // @ts-ignore
       fileMeta?.file && setFileMeta((prev) => ({ ...prev, file: null }));
 

@@ -9,6 +9,7 @@ import {
     stats,
     uploadProducts,
     markAsSold,
+    bulkOperatoions,
 } from '@/services/inventoryService';
 
 // Get Categories
@@ -91,6 +92,15 @@ export const useMarkAsSold = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: markAsSold,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+        },
+    });
+};
+export const useBulkOperation = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: bulkOperatoions,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['products'] });
         },

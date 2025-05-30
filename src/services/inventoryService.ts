@@ -34,6 +34,8 @@ export const uploadProducts = (payload: Record<string, any>) => {
     return apiClient.post(URLS.UPLOAD_PORODUCTS, payload).then(res => res);
 };
 export const markAsSold = (payload: Record<string, any>) => {
-    console.log(payload, "api")
     return apiClient.post(URLS.MARKAS_SOLD, payload).then(res => res);
+};
+export const bulkOperatoions = (payload: Record<string, any>) => {
+    return apiClient.post(URLS.BULK_OPERATION, payload).then(res => res);
 };
