@@ -7,11 +7,12 @@ import clsx from 'clsx'
 import { toast } from 'react-toastify'
 import {
     Dropdown, DropdownItem, DropdownMenu, DropdownTrigger,
+    Select,
+    SelectItem,
     Spinner, useDisclosure
 } from "@heroui/react"
 
 import { Button } from '@/components/common/baseButton/BaseButton'
-import { TransparentButton } from '@/components/common/baseButton/TransparentButton'
 import RoundedBox from '@/components/common/baseButton/RoundedBox'
 import Heading from '@/components/common/heading'
 import Pagination from '@/components/common/Pagination'
@@ -28,19 +29,19 @@ import {
     useProducts,
     useDeleteProduct,
     useUploadProducts,
-    useMarkAsSold,
-    useUpdateProduct
+    useUpdateProduct,
+    useBulkOperation
 } from '@/hooks/useInventory'
 import Checkbox from '../Checkbox'
-import SelectWidget from '../common/SelectWidget'
 import FileUploader from '../common/UploadWithDragDrop';
 import { FileMetaTypes } from '@/types';
+import SearchBar from '../common/SearchBar';
 
 const holdTimeColors: Record<string, string> = {
-    green: "#28a745", 
-    yellow: "#ffc107", 
-    orange: "#fd7e14", 
-    red: "#dc3545", 
+    green: "#28a745",
+    yellow: "#ffc107",
+    orange: "#fd7e14",
+    red: "#dc3545",
 };
 
 
@@ -50,9 +51,20 @@ const STOCKCOLORS: any = {
     "out_of_stock": "#DA3E33"
 }
 
+const actions: any = {
+    export: "Export",
+    sold: "Mark as sold",
+    in_repair: "In repair",
+    reserved: "Reserved",
+    in_stock: "In stock",
+    delete: "Delete"
+};
+
+
 const Inventory = () => {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const { mutateAsync: updateProductMutation, isPending } = useUpdateProduct();
+    const { mutateAsync: bulkOperation } = useBulkOperation();
     const params = useSearchParams();
     const navigate = useRouter();
     const [fileMeta, setFileMeta] = useState<FileMetaTypes | null>();
@@ -89,7 +101,6 @@ const Inventory = () => {
 
     const { mutate: deleteProduct } = useDeleteProduct();
     const { mutate: uploadProductFile } = useUploadProducts();
-    const { mutate: markAsSold } = useMarkAsSold();
 
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
     const checkAllRef = useRef<HTMLInputElement>(null);
@@ -204,10 +215,19 @@ const Inventory = () => {
 
     const handleAction = (val: string) => {
         setSelectedAction(val);
-        if (val !== "Export") {
-            markAsSold({ product_ids: [...selectedIds] }, {
-                onSuccess: () => {
-                    toast.success("Mark as sold successfully");
+        const payload = val === "delete" ? {
+            "action": "bulk_delete",
+            "product_ids": [...selectedIds]
+        } : {
+            "product_ids": [...selectedIds],
+            "action": "update_availability",
+            "availability": val
+        }
+
+        if (val !== "export") {
+            bulkOperation(payload, {
+                onSuccess: (message) => {
+                    toast.success(message?.data?.message);
                     setSelectedIds(new Set());
                     setSelectedData([]);
                     setIsAllChecked(false);
@@ -217,6 +237,7 @@ const Inventory = () => {
                     toast.error(error?.response?.data?.errors?.product_ids || "Something went wrong");
                 }
             });
+
         } else {
             if (selectedData.length > 0 && downloadRef.current) {
                 downloadRef.current.handleClick();
@@ -236,14 +257,11 @@ const Inventory = () => {
             setProduct(null);
         }
     }, [isOpen]);
-
-    // Sync page state with URL when browser back/forward is used
     useEffect(() => {
         const pageParam = Number(params.get("page_number")) || 1;
         setCurrentPage(pageParam);
     }, [params]);
 
-    // Update the URL when currentPage changes
     useEffect(() => {
         const queryParams = new URLSearchParams(params.toString());
         if (currentPage > 1) {
@@ -269,7 +287,7 @@ const Inventory = () => {
 
     return (
         <div>
-            {(apiLoading || isFetching) && (
+            {(apiLoading || isFetching ) && (
                 <div className='fixed z-40 top-0 left-0 right-0 bottom-0 m-auto flex justify-center items-center bg-black/40'>
                     <Spinner className="" size="lg" color="white" />
                 </div>
@@ -323,28 +341,51 @@ const Inventory = () => {
 
             <RoundedBox as='section' className="px-4 py-5 gap-3 mt-5">
                 <div className='flex items-center justify-between md:flex-row flex-col'>
-                    <Heading className='text-start md:w-auto w-full md:-order-1 order-1'>Products {selectedId}</Heading>
-                    {[...selectedIds]?.length ? <div className='w-[140px]'>
-                        <SelectWidget
-                            selected={selectedAction}
-                            onValueChange={(value) => handleAction(value)}
-                            placeholder="Acitons"
-                            options={["Export", "Mark as sold"]}
-                            classNames={{
-                                trigger: "!rounded-lg bg-transparent capitalize border !text-[#1C274C] !border-[#1C274C] font-normal text-sm",
-                                base: "rounded-none",
-                                popoverContent: "rounded-none",
+                    <div className='flex items-center gap-2'>
+                        <Heading className='text-start md:w-auto w-full md:-order-1 order-1'>Products {selectedId}</Heading>
 
-                            }}
-                        />
-                    </div> : null}
+                        <div className='flex items-center ms-2 border rounded-lg flex-1 me-3 max-w-[320px] min-w-[240px] ps-3 border-[#F0F1F3] font-normal'>
+                            <SearchBar placeholder='Search product, supplier, order' icon='search'
+                                inputClass='order-1 !h-[38px] !text-xs'
+                                placeholderClass='placeholder:text-[#858D9D] placeholder:text-xs'
+                            />
+
+                        </div>
+                    </div>
+
                     <ul className='flex items-center gap-3 md:mb-0 mb-5 md:flex-nowrap flex-wrap md:w-auto w-full inventory-btns'>
-                        <li className='xs:w-auto w-[48%]'><Button title='Add Product' className='h-10 ' onPress={onOpen} /></li>
-                        <li className='xs:w-auto w-[48%]'><InventoryFilterModal brands={categories} onApplyFilter={applyFilter} /></li>
+                        <li>
+                            {[...selectedIds]?.length ? <div className='w-[140px]'>
+
+                                <Select
+                                    placeholder="Select Action"
+                                    aria-label="Select Action"
+                                    selectedKeys={selectedAction ? [selectedAction] : []}
+                                    onSelectionChange={(value: any) => handleAction(Array.from(value)[0] as string)}
+                                    classNames={{
+                                        trigger: "!rounded-lg bg-transparent capitalize border !text-[#1C274C] !border-[#003bff] !bg-transparent font-normal text-sm",
+                                        base: "rounded-none",
+                                        popoverContent: "rounded-none",
+
+                                    }}
+                                >
+                                    {Object.keys(actions).map((key: string) => (
+                                        <SelectItem key={key} textValue={key}>
+                                            {actions[key]}
+                                        </SelectItem>
+
+                                    ))}
+                                </Select>
+                            </div> : null}
+                        </li>
                         <li className='xs:w-auto w-[48%]'>
+                            <InventoryFilterModal brands={categories} onApplyFilter={applyFilter} /></li>
+                        <li className='xs:w-auto w-[48%] flex items-center'>
                             <Dropdown className='!rounded-lg'>
                                 <DropdownTrigger>
-                                    <TransparentButton title='Upload' className='h-10 !text-[#1C274C] !border-[#1C274C]' icon='upload' iconFill='#1C274C' />
+                                    <button className='border rounded-lg p-0 bg-transparent h-[38px] px-3 border-[#003bff]'>
+                                        <Icon name='upload' fill='#003bff' />
+                                    </button>
                                 </DropdownTrigger>
                                 <DropdownMenu aria-label="Dropdown menu with description" variant="faded">
                                     <DropdownItem
@@ -365,7 +406,8 @@ const Inventory = () => {
                                 </DropdownMenu>
                             </Dropdown>
                         </li>
-                        <li className='xs:w-auto w-[48%]'><Button title='Generate Invoice' className='h-10 lg:px-5 !px-3' icon='download' /></li>
+                        {/* <li className='xs:w-auto w-[48%]'><Button title='Generate Invoice' className='h-10 lg:px-5 !px-3' icon='download' /></li> */}
+                        <li className='xs:w-auto w-[48%]'><Button title='Add Product' className='h-10 ' onPress={onOpen} /></li>
                     </ul>
                 </div>
                 {

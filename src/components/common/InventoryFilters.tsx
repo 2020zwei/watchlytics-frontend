@@ -142,13 +142,10 @@ const InventoryFilterModal: React.FC<InventoryFilterModalTypes> = ({
                         Clear
                     </Button>
                 )}
-                <TransparentButton
-                    onPress={onOpen}
-                    title="Filters"
-                    className="h-10 !text-[#1C274C] !border-[#1C274C]"
-                    icon="filter"
-                    iconStroke="#1C274C"
-                />
+                <button
+                    onClick={onOpen}
+                    className="border rounded-lg p-0 bg-transparent h-[38px] px-2.5 border-[#003bff]"
+                ><Icon name='keef' fill='#003bff' size="1.5rem"/></button>
             </div>
 
 

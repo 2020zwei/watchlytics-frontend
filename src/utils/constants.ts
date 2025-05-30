@@ -55,6 +55,7 @@ export const URLS = {
   SUBSCRBE: "/subscribe/",
   SUBSCRIPTION_DETAILS: "/subscription/details/",
   MARKAS_SOLD: "/v1/inventory/bulk-mark-sold/",
+  BULK_OPERATION: "/v1/inventory/bulk-operations/",
 };
 
 export const METHODS = {

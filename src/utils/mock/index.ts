@@ -850,7 +850,12 @@ export const ProfileFormSchema = z.object({
 
 
 export const RegistrationFormSchema = z.object({
-    name: z.string().min(3, "Name must be at least 3 characters"),
+    name: z.string()
+        .min(3, "Name must be at least 3 characters")
+        .refine(val => val.trim() === val, {
+            message: "Name cannot start or end with spaces"
+        }),
+
     email: z.string().email("Invalid email address"),
 
     password: z.string()
