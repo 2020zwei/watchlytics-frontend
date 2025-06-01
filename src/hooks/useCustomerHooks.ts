@@ -5,16 +5,24 @@ import {
     create,
     remove,
     update,
-    reportStats
+    reportStats,
+    customerList
 } from '@/services/customerService';
 
 // Fetch all customers with query params
-export const useCustomers = (query: string) => {
+export const useCustomers = (query?: string | undefined) => {
     return useQuery({
         queryKey: ['customers', query],
-        queryFn: () => customers(query),
+        queryFn: () => customers(query!),
         enabled: !!query,
         placeholderData: (prev) => prev,
+    });
+};
+
+export const useCustomerList = () => {
+    return useQuery({
+        queryKey: ['customerslist'],
+        queryFn: () => customerList()
     });
 };
 

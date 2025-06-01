@@ -71,6 +71,7 @@ const Inventory = () => {
     const initialPage = Number(params.get("page_number")) || 1;
     const [currentPage, setCurrentPage] = useState(initialPage);
     const pageRef = useRef(initialPage);
+    const initialLoad = useRef<number>(0);
 
     const queryString = useMemo(() => {
         const sp = new URLSearchParams(params.toString());
@@ -210,6 +211,7 @@ const Inventory = () => {
 
     const applyFilter = () => {
         pageRef.current = 1;
+        initialLoad.current = 1;
         setCurrentPage(1);
     };
 
@@ -287,7 +289,7 @@ const Inventory = () => {
 
     return (
         <div>
-            {(apiLoading || isFetching ) && (
+            {(apiLoading || isFetching) && !initialLoad.current && (
                 <div className='fixed z-40 top-0 left-0 right-0 bottom-0 m-auto flex justify-center items-center bg-black/40'>
                     <Spinner className="" size="lg" color="white" />
                 </div>
@@ -348,6 +350,7 @@ const Inventory = () => {
                             <SearchBar placeholder='Search product, supplier, order' icon='search'
                                 inputClass='order-1 !h-[38px] !text-xs'
                                 placeholderClass='placeholder:text-[#858D9D] placeholder:text-xs'
+                                onChange={() => initialLoad.current = 1}
                             />
 
                         </div>

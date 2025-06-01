@@ -4,6 +4,8 @@ import apiClient from './apiClient';
 
 export const customers = (query: string) =>
     apiClient.get(`${URLS.CUSTOMERS}${query}`).then(res => res);
+export const customerList = () =>
+    apiClient.get(URLS.CUSTOMERS).then(res => res);
 
 export const customer = (id: number) =>
     apiClient.get(`${URLS.CUSTOMERS}${id}`).then(res => res);

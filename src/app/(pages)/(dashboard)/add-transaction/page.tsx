@@ -1,11 +1,12 @@
-import AddTrading from '@/components/AddTrading'
+
+import AddTransaction from '@/components/AddTransaction'
 import LoaderWidget from '@/components/common/LoaderWidget'
 import React, { Suspense } from 'react'
 
 const page = () => {
     return (
-        <Suspense fallback={<LoaderWidget/>}>
-            <AddTrading />
+        <Suspense fallback={<LoaderWidget />}>
+            <AddTransaction />
         </Suspense>
     )
 }
