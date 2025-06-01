@@ -10,3 +10,32 @@ export const bestSellings = (page: number) =>
 export const reportStats = () =>
     apiClient.get(URLS.REPORT_STATE).then(res => res.data);
 
+
+
+export const expenseReports = (page: string | number) =>
+    apiClient.get(`${URLS.REPORTS_EXPENSES}?page=${page}&page_size=20`).then(res => res.data);
+
+export const stockReport = (query: { brand?: string; model?: string }) => {
+    const filteredQuery: Record<string, string> = {};
+    Object.entries(query).forEach(([key, value]) => {
+        if (value) {
+            filteredQuery[key] = value;
+        }
+    });
+
+    const params = new URLSearchParams(filteredQuery).toString();
+    return apiClient.get(`${URLS.STOCK_AGING}?${params}`).then(res => res);
+};
+export const profitLoseReport = (query: any) => {
+    const params = query && new URLSearchParams(query).toString() || "";
+    return apiClient.get(`${URLS.MONTHLY_PROFIT}?${params}`).then(res => res);
+};
+
+export const purchaseReports = (query: any) => {
+    const params = query && new URLSearchParams(query).toString() || "";
+    return apiClient.get(`${URLS.PURCHASE_SALES}?${params}`).then(res => res);
+};
+
+
+
+

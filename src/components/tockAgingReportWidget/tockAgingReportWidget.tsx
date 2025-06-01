@@ -3,12 +3,10 @@ import RoundedBox from '@/components/common/baseButton/RoundedBox';
 import Heading from '@/components/common/heading';
 import ReportFilters from '@/components/common/ReportFilters';
 import SelectWidget from '@/components/common/SelectWidget';
-import { RequestTypes } from '@/types';
-import { sendRequest } from '@/utils/apis';
-import { METHODS, URLS } from '@/utils/constants';
+import { useStockAgingReport } from '@/hooks/useReportHooks';
 import { Spinner } from '@heroui/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
@@ -20,55 +18,35 @@ const COLORS = {
     '90+': '#F857C1',
 };
 
-const TockAgingReportWidget = () => {
-    const [loading, setLoading] = useState(true);
-    const [categories, setCategories] = useState<string[]>([]);
-    const [chartData, setChartData] = useState<any[]>([]);
-    const [modelNames, setModelNames] = useState<string[]>([]);
-    const [filters, setFilters] = useState<{ brand: string; model: string }>({
-        brand: '',
-        model: ''
-    });
-
+const StockAgingReportWidget = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // Load filters from URL on mount
-    useEffect(() => {
-        const brand = searchParams.get('brand') || '';
-        const model = searchParams.get('model') || '';
-        setFilters({ brand, model });
-    }, []);
+    const [categories, setCategories] = useState<string[]>([]);
+    const [chartData, setChartData] = useState<any[]>([]);
+    const [modelNames, setModelNames] = useState<string[]>([]);
 
-    // Fetch chart data
-    const fetchChartData = async () => {
-        setLoading(true);
-        const PAYLOAD: RequestTypes = {
-            url: URLS.STOCK_AGING,
-            method: METHODS.GET,
-        };
-        try {
-            const res = await sendRequest(PAYLOAD);
-            if (res.status === 200) {
-                const transformed = res.data.chart_data.map((item: any) => ({
-                    name: item.id,
-                    '<30': item.less_than_30,
-                    '30-60': item['30_to_60'],
-                    '60-90': item['60_to_90'],
-                    '90+': item['91_plus'],
-                }));
-                setChartData(transformed);
-                setCategories(res.data.available_brands);
-                setModelNames(res.data.available_models);
-            }
-        } finally {
-            setLoading(false);
+    const filters = useMemo(() => ({
+        brand: searchParams.get('brand') || '',
+        model: searchParams.get('model') || ''
+    }), [searchParams]);
+
+    const { data, isLoading } = useStockAgingReport(filters);
+
+    useEffect(() => {
+        if (data?.status === 200) {
+            const transformed = data?.data.chart_data?.map((item: any) => ({
+                name: item.id,
+                '<30': item.less_than_30,
+                '30-60': item['30_to_60'],
+                '60-90': item['60_to_90'],
+                '90+': item['91_plus'],
+            }));
+            setChartData(transformed);
+            setCategories(data?.data.available_brands);
+            setModelNames(data?.data.available_models);
         }
-    };
-
-    useEffect(() => {
-        fetchChartData();
-    }, []);
+    }, [data]);
 
     const updateURLWithFilters = (updatedFilters: { brand: string; model: string }) => {
         const params = new URLSearchParams();
@@ -79,11 +57,10 @@ const TockAgingReportWidget = () => {
 
     const handleFilterChange = (key: 'brand' | 'model', value: string) => {
         const updated = { ...filters, [key]: value };
-        setFilters(updated);
         updateURLWithFilters(updated);
     };
 
-    if (loading) {
+    if (isLoading) {
         return <div className="text-center"><Spinner /></div>;
     }
 
@@ -142,17 +119,16 @@ const TockAgingReportWidget = () => {
                 <div className="min-w-[215px] h-full bg-[#F9F9F9] rounded-lg p-4">
                     <h3 className="font-medium text-dark-800 pb-4">Days in Inventory</h3>
                     <div className="flex flex-col gap-2">
-                        {[
-                            { label: '<30 Days', color: COLORS['<30'] },
-                            { label: '>30 -< 60 Days', color: COLORS['30-60'] },
-                            { label: '>60 -< 90 Days', color: COLORS['60-90'] },
-                            { label: '91+ Days', color: COLORS['90+'] },
-                        ].map(({ label, color }) => (
-                            <div key={label} className="flex items-center gap-3">
-                                <span className="w-5 h-5 rounded" style={{ backgroundColor: color }}></span>
-                                <span className="text-[#808080] text-sm">{label}</span>
-                            </div>
-                        ))}
+                        {[{ label: '<30 Days', color: COLORS['<30'] },
+                        { label: '>30 -< 60 Days', color: COLORS['30-60'] },
+                        { label: '>60 -< 90 Days', color: COLORS['60-90'] },
+                        { label: '91+ Days', color: COLORS['90+'] }]
+                            .map(({ label, color }) => (
+                                <div key={label} className="flex items-center gap-3">
+                                    <span className="w-5 h-5 rounded" style={{ backgroundColor: color }}></span>
+                                    <span className="text-[#808080] text-sm">{label}</span>
+                                </div>
+                            ))}
                     </div>
                 </div>
             </RoundedBox>
@@ -160,4 +136,4 @@ const TockAgingReportWidget = () => {
     );
 };
 
-export default TockAgingReportWidget;
+export default StockAgingReportWidget;

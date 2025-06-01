@@ -1,19 +1,18 @@
 "use client";
 
-import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, useDisclosure } from "@heroui/react";
 
 import React from "react";
 import Icon from "./Icon";
 import Heading from "./heading";
 
-interface TradingModalTypes {
+interface TransactionModalTypes {
     modalTile: string,
     data: any
 }
 
-const TradingModal: React.FC<TradingModalTypes> = ({ modalTile, data }) => {
+const TransactionModal: React.FC<TransactionModalTypes> = ({ modalTile, data }) => {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    console.log(data)
 
     return (
         <>
@@ -61,17 +60,7 @@ const TradingModal: React.FC<TradingModalTypes> = ({ modalTile, data }) => {
                                         </tbody>
                                     </table>
                                 </div>
-                            </ModalBody>
-
-                            {/* <ModalFooter className="flex gap-4">
-                                <Button color="primary" onPress={onClose}>
-                                    Add
-                                </Button>
-                                <Button color="default" variant="flat" onPress={() => { onClose(); }}>
-                                    Cancel
-                                </Button>
-                            </ModalFooter> */}
-                        </>
+                            </ModalBody>                        </>
                     )}
                 </ModalContent>
             </Modal>
@@ -79,4 +68,4 @@ const TradingModal: React.FC<TradingModalTypes> = ({ modalTile, data }) => {
     );
 }
 
-export default TradingModal;
+export default TransactionModal;
