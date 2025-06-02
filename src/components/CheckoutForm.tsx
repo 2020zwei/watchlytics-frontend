@@ -93,6 +93,7 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                             navigate.push("/login")
                         }
                     } else {
+                        console.log(res)
                         if (res?.status === 400 || res?.status == 500) {
                             toast.error(res?.response?.data?.message || "Something went wrong");
                         }

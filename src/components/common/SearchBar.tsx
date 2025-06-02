@@ -15,6 +15,7 @@ interface PropsType {
     placeholderClass?: string;
     size?: string;
     resetKey?: string;
+    paramName?: string;
     debounceTime?: number;
 }
 
@@ -23,6 +24,7 @@ const SearchBar: React.FC<PropsType> = ({
     iconClass,
     inputClass,
     resetKey = "",
+    paramName = "search",
     boxClass,
     placeholder,
     placeholderClass,
@@ -41,7 +43,7 @@ const SearchBar: React.FC<PropsType> = ({
                 const params = new URLSearchParams();
                 setValue(value)
                 if (value) {
-                    params.set("search", value);
+                    params.set(paramName, value);
                 }
                 router.push(`${pathName}?${params.toString()}`);
                 onChange(value);
