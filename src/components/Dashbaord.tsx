@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import _ from "lodash";
 
-import { useMarketData, useStats, useBrands } from "@/hooks/useDashboard";
+import { useMarketData, useStats, useBrands, useExpense, useIncome } from "@/hooks/useDashboard";
 import { Spinner } from "@heroui/react";
 import RoundedBox from "@/components/common/baseButton/RoundedBox";
 import Heading from "@/components/common/heading";
@@ -14,22 +14,30 @@ import clsx from "clsx";
 import Notfound from "@/components/common/Notfound";
 import { formatCurrency } from "@/utils/formatCurrency";
 import Link from "next/link";
+import { CartesianGrid, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { DASHBOARD_EXPENSE } from "@/types";
+import SearchBar from "./common/SearchBar";
 
+const pieData = [
+  { name: "Target", value: 25, color: "#1F79B5" },
+  { name: "Income", value: 40, color: "#E0E0E0" },
+  { name: "Pending", value: 35, color: "#0D3C61" },
+];
 export default function Dashboard() {
+  const initialLoad = useRef<number>(0);
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialBrand = searchParams.get("brand") || "";
   const initialSearch = searchParams.get("search") || "";
   const initialPage = Number(searchParams.get("page") || "1");
 
+  const [expense, setExpense] = useState<DASHBOARD_EXPENSE[]>([]);
+  const [income, setIncome] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [searchQuery, setSearchQuery] = useState(initialBrand || initialSearch);
   const [inputSearch, setInputSearch] = useState(initialSearch || initialBrand);
   const [sortedData, setSortedData] = useState<any[]>([]);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-
-
   const [marketParams, setMarketParams] = useState<Record<string, any>>(() => {
     const params: Record<string, any> = {};
     if (initialBrand) params.brand = initialBrand;
@@ -41,11 +49,14 @@ export default function Dashboard() {
   const { data: stats, isLoading: statsLoading } = useStats();
   const { data: brands, isLoading: brandLoading } = useBrands();
   const { data: marketData, isLoading: marketDataLoading } = useMarketData(marketParams);
+  const { data: expenseData, isLoading: expenseLoading } = useExpense();
+  const { data: incomeData, isLoading: incomeLoading } = useIncome();
 
   const updateFilters = (
     newParams: Record<string, any>,
     options?: { reset?: boolean; includePage?: boolean }
   ) => {
+    // initialLoad.current = 1;
     const pageSize = 20;
     setInputSearch("");
 
@@ -95,7 +106,6 @@ export default function Dashboard() {
 
   const toggleSort = (sourceKey: string) => {
     const newOrder = sortConfig?.key === sourceKey && sortConfig.direction === 'asc' ? 'desc' : 'asc';
-    setSortOrder(newOrder);
     handleSort(sourceKey, newOrder);
   };
 
@@ -114,8 +124,6 @@ export default function Dashboard() {
     []
   );
 
-
-
   useEffect(() => {
     const brand = searchParams.get("brand") || "";
     const search = searchParams.get("search") || "";
@@ -129,8 +137,25 @@ export default function Dashboard() {
     setSortedData([]);
   }, [marketData]);
 
+  useEffect(() => {
+    if (incomeData?.status === 200) {
+      const data = [
+        { name: "Target", value: incomeData?.data?.target, color: "#1F79B5" },
+        { name: "Income", value: incomeData?.data?.income, color: "#E0E0E0" },
+        { name: "Pending", value: incomeData?.data?.pending, color: "#0D3C61" },
+      ];
+      setIncome(data);
+    }
+  }, [incomeData])
+  useEffect(() => {
+    if (expenseData?.status === 200) {
+      const data = expenseData?.data?.map((item: { month: string, sales: number, purchases: number }) => ({ month: item?.month, sales: item?.sales, purchase: item?.purchases }))
+      setExpense(data);
+    }
+  }, [expenseData])
 
-  if (statsLoading || marketDataLoading || brandLoading) {
+
+  if ((statsLoading || marketDataLoading || brandLoading || incomeLoading || expenseLoading) && !initialLoad.current) {
     return (
       <div className="text-center">
         <Spinner />
@@ -175,6 +200,113 @@ export default function Dashboard() {
 
       {/* -------------------------------------- market data -------------------------------------------*/}
 
+      <div className="flex gap-4 mt-6 md:flex-row flex-col">
+
+        <RoundedBox className="flex-1 py-4 h-[430px] pe-5 overflow-y-auto">
+          <div className="px-4 pb-3 flex items-center justify-between">
+            <div>
+              <Heading>Expense Tracking</Heading>
+              <div className="text-sm font-semibold text-dark-800">Payments</div>
+            </div>
+            <div className="flex gap-4 text-sm font-medium">
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-full bg-[#EB2F96]" />
+                <span>Sales</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-full bg-[#52C41A]" />
+                <span>Purchase</span>
+              </div>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <div
+              className="h-[320px]"
+              style={{
+                width: expense.length > 6 ? `${expense.length * 100}px` : '100%',
+              }}
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={expense}
+                  margin={{ top: 10, right: 0, left: 0, bottom: 90 }}
+                >
+                  <CartesianGrid vertical={false} stroke="#f0f0f0" />
+                  <XAxis
+                    dataKey="month"
+                    tick={{ fontSize: 12 }}
+                    padding={{ right: 10, left: 30 }}
+                    tickMargin={40}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 12 }}
+                    axisLine={false}
+                    tickLine={false}
+                    domain={([dataMin, dataMax]) => {
+                      if (dataMin === dataMax) {
+                        return [0, dataMax + 10000];
+                      }
+                      return [Math.max(0, dataMin - 10000), dataMax];
+                    }}
+                  />
+                  <Tooltip
+                    formatter={(value: any) => new Intl.NumberFormat().format(value)}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="sales"
+                    stroke="#EB2F96"
+                    dot={{ r: 3 }}
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="purchase"
+                    stroke="#52C41A"
+                    dot={{ r: 3 }}
+                    strokeWidth={2}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+        </RoundedBox>
+
+        <RoundedBox className="pt-5 px-4 max-h-[430px] lg:min-w-[270px] flex flex-col justify-between pb-4">
+          <Heading>Income</Heading>
+          <ResponsiveContainer width="100%" height={200}>
+            <PieChart margin={{ top: 0 }}>
+              <Pie
+                data={income}
+                innerRadius={40}
+                outerRadius={70}
+                paddingAngle={0}
+                cornerRadius={5}
+                dataKey="value"
+              >
+                {income?.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="flex justify-between w-full text-sm border-t pt-10 border-[#AEAEAE80]">
+            {pieData.map((entry) => (
+              <div key={entry.name} className="flex items-center gap-1">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: entry.color }}
+                ></div>
+                <span>{entry.name}</span>
+              </div>
+            ))}
+          </div>
+        </RoundedBox>
+      </div>
+
       <RoundedBox className="mt-5">
         <div className="flex items-center sm:justify-between justify-start px-5 sm:flex-row flex-col py-5">
           <div className='sm:w-auto w-full'>
@@ -182,10 +314,17 @@ export default function Dashboard() {
           </div>
           <div className="flex items-center sm:mb-0 mb-5 sm:mt-0 mt-3 sm:w-auto w-full xs:flex-row flex-col gap-3">
             <div className='sm:min-w-[320px] w-full flex items-center border rounded-lg placeholder: flex-1 ps-3 border-[#F0F1F3] font-normal'>
-              <>
-                <input value={inputSearch} onChange={(e) => { setInputSearch(e.target.value); debouncedSearch(e.target.value) }} type="text" className={clsx("border-0 placeholder:text-[#858D9D] order-1 !h-10 placeholder:text-xs focus:outline-none px-3 w-full bg-transparent")} placeholder="Search here..." />
-                <span><Icon name="search" size="1.3rem" className={clsx("ms-2")} /></span>
-              </>
+              <SearchBar placeholder='Search product, supplier, order' icon='search'
+                inputClass='order-1 !h-[38px] !text-xs'
+                placeholderClass='placeholder:text-[#858D9D] placeholder:text-xs'
+                onChange={(value) => {
+                  setMarketParams({
+                    ...searchParams,
+                    search: value
+                  });
+                  initialLoad.current = 1
+                }}
+              />
             </div>
             <div className="xs:w-[167px] w-full">
               <SelectWidget
