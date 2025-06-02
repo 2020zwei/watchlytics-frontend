@@ -11,7 +11,7 @@ import { formatCurrency } from '@/utils/formatCurrency';
 import { Spinner } from '@heroui/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useRef, useEffect, useState } from 'react';
-
+import CsvDownloader from 'react-csv-downloader';
 
 const ExpenseReport = () => {
     const searchParams = useSearchParams();
@@ -19,11 +19,19 @@ const ExpenseReport = () => {
     const pageQuery = parseInt(searchParams.get("page_number") || "1", 10);
     const [currentPage, setCurrentPage] = useState(pageQuery);
     const pageRef = useRef(currentPage);
+    const downloadRef = useRef<any>(null);
+
 
     const {
         data: reports,
         isLoading,
     } = useExpenseReport(currentPage);
+
+    const handleExport = () => {
+        if (reports?.results?.length > 0 && downloadRef.current) {
+            downloadRef.current.handleClick();
+        }
+    }
 
     useEffect(() => {
         if (currentPage > 1) {
@@ -36,11 +44,18 @@ const ExpenseReport = () => {
         return <div className='text-center'><Spinner /></div>;
     }
 
+    const columns = reports?.results?.length ? Object.keys(reports?.results[0]) : [];
+
     return (
         <>
             <div className='mb-5 flex sm:flex-row flex-col items-center sm:justify-between'>
                 <Heading as='h3' className='md:text-2xl text-lg w-full'>Expense Report</Heading>
-                <ReportFilters selectedReport='Expense Report' />
+                <div className='flex items-center gap-3'>
+                    <button onClick={handleExport} className='border rounded-lg p-0 bg-transparent h-[38px] px-3 border-gray-180'>
+                        Export
+                    </button>
+                    <ReportFilters selectedReport='Expense Report' />
+                </div>
             </div>
 
             {!reports?.results?.length ? <Notfound /> :
@@ -94,6 +109,18 @@ const ExpenseReport = () => {
                         </div>}
                 </RoundedBox>
             }
+
+            <CsvDownloader
+                ref={downloadRef}
+                className="hidden"
+                datas={reports?.results}
+                filename="expense-report"
+                extension=".csv"
+                columns={columns.map(col => ({
+                    id: col,
+                    displayName: col
+                }))}
+            />
         </>
     );
 };

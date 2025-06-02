@@ -188,7 +188,7 @@ const page = () => {
                                                 <td className="py-5 whitespace-nowrap px-4 text-center">{item?.total_spending || "-"}</td>
                                                 <td className="py-5 whitespace-nowrap px-4 text-center">{item?.follow_up_display || "-"}</td>
                                                 <td className="py-5 whitespace-nowrap px-4 text-center">
-                                                    <button className={clsx("border rounded-lg h-8 w-[72px] hover:opacity-50", item?.status_display === "Active" ? "border-[#10A760] text-[#10A760]" : "border-[#DA3E33] text-[#DA3E33]")}>{item?.status_display}</button>
+                                                    <button className={clsx("border rounded-lg h-8 w-[72px] cursor-default", item?.status_display === "Active" ? "border-[#10A760] text-[#10A760]" : "border-[#DA3E33] text-[#DA3E33]")}>{item?.status_display}</button>
                                                 </td>
                                                 <td className='text-center'>
                                                     <Dropdown className='!rounded-lg'>

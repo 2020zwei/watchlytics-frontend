@@ -37,7 +37,7 @@ const ReportFilters = ({ selectedReport }: ReportFiltersProps) => {
     };
 
     return (
-        <div className='border rounded-lg border-gray-200 ms-auto text-end w-[300px]'>
+        <div className='border rounded-lg border-gray-180 ms-auto text-end w-[300px]'>
             <SelectWidget
                 options={REPORTFILTEROPTIONS}
                 onValueChange={onValueChange}

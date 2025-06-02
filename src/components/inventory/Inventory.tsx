@@ -289,7 +289,7 @@ const Inventory = () => {
 
     return (
         <div>
-            {(apiLoading || isFetching) && !initialLoad.current && (
+            {(apiLoading || isFetching) && (
                 <div className='fixed z-40 top-0 left-0 right-0 bottom-0 m-auto flex justify-center items-center bg-black/40'>
                     <Spinner className="" size="lg" color="white" />
                 </div>
@@ -551,16 +551,16 @@ const Inventory = () => {
                                                                     currencyFields.includes(col)
                                                                         ? row?.[col]
                                                                             ? <span className="flex items-center">{formatCurrency(row?.[col], 'en-US', 'USD')}</span>
-                                                                            : "-"
+                                                                            : "No Data"
                                                                         : col === "profit_margin"
-                                                                            ? row?.[col] ? `${row?.[col]}%` : "-"
+                                                                            ? row?.[col] ? `${row?.[col]}%` : "No Data"
                                                                             : col === "hold_time"
                                                                                 ? `~${row?.[col]}`
                                                                                 : col === "is_sold"
                                                                                     ? <div className={clsx("min-w-5 mx-auto w-5 h-5 rounded border flex items-center justify-between", row?.is_sold ? "bg-blue-850" : "")}>
                                                                                         <Icon name='checkmark' className=' text-white text-lg' />
                                                                                     </div>
-                                                                                    : row?.[col] || "-"
+                                                                                    : row?.[col] || "No Data"
                                                                 }
                                                             </div>
                                                         </td>

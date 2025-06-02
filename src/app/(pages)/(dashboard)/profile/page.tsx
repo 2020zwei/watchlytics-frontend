@@ -13,7 +13,6 @@ import clsx from "clsx";
 import Heading from "@/components/common/heading";
 import { Button } from "@/components/common/baseButton/BaseButton";
 import { TransparentButton } from "@/components/common/baseButton/TransparentButton";
-import { URLS, METHODS } from "@/utils/constants";
 import { Spinner } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
