@@ -95,7 +95,7 @@ const page = () => {
                                     {
                                         expensesData?.data?.results?.map((item: any) => (
                                             <tr key={item?.product} className='border'>
-                                                <td className='text-gray-650 text-sm test-start px-4 py-2'>{item?.product}</td>
+                                                <td className='text-gray-650 text-sm test-start px-4 py-2'>{item?.model}</td>
                                                 <td className='text-sm text text-dark-500 text-center py-2'>${item?.repairs}</td>
                                                 <td className='text-sm text text-dark-500 text-center py-2'>${item?.shipping}</td>
                                                 <td className='text-sm text text-green-500 text-center px-4 py-2'>{item?.impact}%</td>
