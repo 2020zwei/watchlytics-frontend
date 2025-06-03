@@ -46,6 +46,7 @@ export const URLS = {
   INVOICE: "/v1/invoices/",
   CUSTOMERS: "/v1/customers/",
   DASHBOARD_STATS: "/v1/dashboard/stats/",
+  SOLD_ITEMS: "/v1/dashboard/sold-items/",
   DASHBOARD_INCOME_BREAKDONW: "/v1/dashboard/income-breakdown/",
   DASHBOARD_EXPENSE_TRACKING: "/v1/dashboard/expense-tracking/",
   // DASHBOARD_DETAILED_ANALYTICS: "/v1/dashboard/detailed-analytics/",

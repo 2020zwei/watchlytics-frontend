@@ -18,7 +18,7 @@ const Invoices = () => {
     const [currentPage, setCurrentPage] = useState(pageFromURL);
 
     const query = `?page=${currentPage}`;
-    const { data: invoices, isLoading } = useInvoices(query);
+    const { data: invoices, isLoading, error } = useInvoices(query);
 
     useEffect(() => {
         router.push(`/invoices?page=${currentPage}`);
@@ -26,6 +26,9 @@ const Invoices = () => {
 
     if (isLoading) {
         return <div className="text-center mt-5"><Spinner /></div>;
+    }
+    if (error) {
+        console.log(error)
     }
 
     return (

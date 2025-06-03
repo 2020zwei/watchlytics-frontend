@@ -18,11 +18,10 @@ export const useBestSelling = (page: number) => {
     });
 };
 
-export const useExpenseReport = (page: number) => {
+export const useExpenseReport = () => {
     return useQuery({
-        queryKey: ['expensereports', page],
-        queryFn: () => expenseReports(page),
-        enabled: !!page,
+        queryKey: ['expensereports'],
+        queryFn: () => expenseReports(),
         placeholderData: (prevData) => prevData,
     });
 };

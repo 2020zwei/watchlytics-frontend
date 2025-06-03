@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import _ from "lodash";
 
@@ -10,82 +10,48 @@ import Heading from "@/components/common/heading";
 import Pagination from "@/components/common/Pagination";
 import SelectWidget from "@/components/common/SelectWidget";
 import Icon from "@/components/common/Icon";
-import clsx from "clsx";
 import Notfound from "@/components/common/Notfound";
 import { formatCurrency } from "@/utils/formatCurrency";
 import Link from "next/link";
 import { CartesianGrid, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { DASHBOARD_EXPENSE } from "@/types";
 import SearchBar from "./common/SearchBar";
+import FilterLoader from "./common/FilterLoader";
 
-const pieData = [
-  { name: "Target", value: 25, color: "#1F79B5" },
-  { name: "Income", value: 40, color: "#E0E0E0" },
-  { name: "Pending", value: 35, color: "#0D3C61" },
-];
+type ParamsType = Record<string, string | number>;
+
 export default function Dashboard() {
+  const searchParams = useSearchParams();
+
+  const initialParams: Record<string, string> = {};
+  const trackingParams: Record<string, string> = {};
+  searchParams.forEach((value, key) => {
+    if (key === "tracking") {
+      trackingParams[key] = value
+    }
+    else {
+      initialParams[key] = value;
+    }
+  });
+
   const initialLoad = useRef<number>(0);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const initialBrand = searchParams.get("brand") || "";
-  const initialSearch = searchParams.get("search") || "";
   const initialPage = Number(searchParams.get("page") || "1");
 
   const [expense, setExpense] = useState<DASHBOARD_EXPENSE[]>([]);
   const [income, setIncome] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const [searchQuery, setSearchQuery] = useState(initialBrand || initialSearch);
-  const [inputSearch, setInputSearch] = useState(initialSearch || initialBrand);
   const [sortedData, setSortedData] = useState<any[]>([]);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
-  const [marketParams, setMarketParams] = useState<Record<string, any>>(() => {
-    const params: Record<string, any> = {};
-    if (initialBrand) params.brand = initialBrand;
-    if (initialSearch) params.search = initialSearch;
-    if (initialPage) params.page = initialPage;
-    return params;
-  });
+
+  const [marketParams, setMarketParams] = useState<ParamsType>(initialParams)
+  const [expenseTracking, setExpenseTracking] = useState<ParamsType>(trackingParams)
 
   const { data: stats, isLoading: statsLoading } = useStats();
   const { data: brands, isLoading: brandLoading } = useBrands();
   const { data: marketData, isLoading: marketDataLoading } = useMarketData(marketParams);
-  const { data: expenseData, isLoading: expenseLoading } = useExpense();
+  const { data: expenseData, isLoading: expenseLoading } = useExpense(expenseTracking);
   const { data: incomeData, isLoading: incomeLoading } = useIncome();
-
-  const updateFilters = (
-    newParams: Record<string, any>,
-    options?: { reset?: boolean; includePage?: boolean }
-  ) => {
-    const pageSize = 20;
-    const { reset = false, includePage = true } = options || {};
-
-    const apiParams: Record<string, any> = {
-      ...newParams,
-      page_size: pageSize,
-    };
-
-    if (includePage && !newParams.page) {
-      apiParams.page = 1;
-    }
-
-    const uiParams = { ...newParams };
-    if (!includePage) {
-      delete uiParams.page;
-    }
-
-    setMarketParams(apiParams);
-    setSearchQuery(uiParams?.brand || "");
-    setInputSearch(uiParams?.brand || "");
-    setCurrentPage(Number(uiParams?.page || 1));
-
-    const query = new URLSearchParams();
-    Object.entries(uiParams).forEach(([key, value]) => {
-      if (value) query.set(key, value.toString());
-    });
-
-    router.replace(`/dashboard?${query.toString()}`, { scroll: false });
-  };
-
 
   const handleSort = (sourceKey: string, direction: 'asc' | 'desc') => {
     if (!market_data?.results) return;
@@ -106,28 +72,57 @@ export default function Dashboard() {
     handleSort(sourceKey, newOrder);
   };
 
+  const handleFilter = (query: string | number, key: string) => {
+    initialLoad.current = 1;
 
+    let updatedParams: ParamsType = {};
+    if (key === "page") {
+      setMarketParams((prev) => {
+        const { page, ...rest } = prev;
+        const newParams = {
+          ...rest,
+          page: query
+        };
+        updatedParams = newParams;
+        return newParams;
+      });
 
-  const handleBrandFilter = (query: string, key = "brand") => {
-    const formatted = query?.replace(/\s+/g, "No Data");
-    updateFilters({ [key]: formatted, page: 1 }, { reset: true, includePage: false });
+    } else {
+      const formattedQuery = query?.toString()?.replace(/\s+/g, "-");
+      updatedParams = { [key]: formattedQuery };
+      if (key === "tracking") {
+        setExpenseTracking({ [key]: formattedQuery })
+        updatedParams = { [key]: formattedQuery };
+      }
+      else {
+        setMarketParams((prev) => {
+          const merged = { [key]: formattedQuery };
+          updatedParams = merged;
+          return merged;
+        });
+      }
+    }
+    const queryString = new URLSearchParams(updatedParams).toString();
+    router.push(`/dashboard/?${queryString}`);
   };
 
-  const debouncedSearch = useCallback(
-    _.debounce((value: string) => {
-      const formatted = value?.replace(/\s+/g, "No Data");
-      updateFilters({ search: formatted }, { reset: true, includePage: false });
-    }, 500),
-    []
-  );
+  const handleSliceClick = (data: any, index: number) => {
+    const label = data.name?.toLowerCase();
 
-  useEffect(() => {
-    const brand = searchParams.get("brand") || "";
-    const search = searchParams.get("search") || "";
-    const page = Number(searchParams.get("page") || "1");
-    setInputSearch(search || "");
-    setCurrentPage(page);
-  }, [searchParams]);
+    switch (label) {
+      case 'target':
+        router.push('/dashboard/target');
+        break;
+      case 'income':
+        router.push('/dashboard/income');
+        break;
+      case 'pending':
+        router.push('/dashboard/pending');
+        break;
+      default:
+        break;
+    }
+  };
 
   useEffect(() => {
     setSortConfig(null);
@@ -144,9 +139,11 @@ export default function Dashboard() {
       setIncome(data);
     }
   }, [incomeData])
+
   useEffect(() => {
     if (expenseData?.status === 200) {
-      const data = expenseData?.data?.map((item: { month: string, sales: number, purchases: number }) => ({ month: item?.month, sales: item?.sales, purchase: item?.purchases }))
+      const data = expenseData?.data?.map((item: { period: string, sales: number, purchases: number, expenses: number }) => (
+        { month: item?.period, sales: item?.sales, purchase: item?.purchases, expense: item?.expenses }))
       setExpense(data);
     }
   }, [expenseData])
@@ -154,9 +151,7 @@ export default function Dashboard() {
 
   if ((statsLoading || marketDataLoading || brandLoading || incomeLoading || expenseLoading) && !initialLoad.current) {
     return (
-      <div className="text-center">
-        <Spinner />
-      </div>
+      <div className="text-center"><Spinner /></div>
     );
   }
 
@@ -164,32 +159,41 @@ export default function Dashboard() {
 
   return (
     <>
+      <FilterLoader isLoading={(initialLoad.current && marketDataLoading) ? true : false} />
       <RoundedBox className="p-4 pb-5">
         <Heading>Stock Tracking</Heading>
-        <div className=" grid md:grid-cols-4 xs:grid-cols-2 grid-cols-1 mt-6 gap-3">
+        <div className=" grid md:grid-cols-5 xs:grid-cols-2 grid-cols-1 mt-6 gap-3">
           <Link href="/inventory" className=" rounded-lg bg-white shadow-lg p-4 border-blue-700 border-t-2">
             <div className="text-lg font-medium pb-3 text-blue-700">Manage in Stock</div>
             <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none">
               {stats?.data?.manage_in_stock}
             </div>
           </Link>
-          <Link href="/transaction" className=" rounded-lg bg-white shadow-lg p-4 border-t-2 border-red-600">
-            <div className="text-lg font-medium pb-3 text-red-600">Sold</div>
+          <Link href="/sold-items" className=" rounded-lg bg-white shadow-lg p-4 border-t-2 border-red-600">
+            <div className="text-lg font-medium pb-3 text-red-600">Sold Items</div>
             <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none flex items-center gap-1">
-              <span className="text-gray-180">$</span>
+              {/* <span className="text-gray-180">$</span> */}
               <span>{stats?.data?.sold_amount}</span>
             </div>
           </Link>
           <div className=" rounded-lg bg-white shadow-lg p-4 border-t-2 border-orange-600">
             <div className="text-lg font-medium pb-3 text-orange-600">Pending Sale</div>
-            <select name="" id="" className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none">
-              <option value="868" className="">{stats?.data?.pending_sale}</option>
-            </select>
+            <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none">
+              {stats?.data?.pending_sale}
+            </div>
           </div>
           <div className=" rounded-lg bg-white shadow-lg p-4 border-t-2 border-green-600">
             <div className="text-lg font-medium pb-3 text-green-600">Total Orders</div>
             <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none flex items-center gap-1">
               {stats?.data?.total_orders}
+            </div>
+          </div>
+
+          <div className=" rounded-lg bg-white shadow-lg p-4 border-t-2 border-orange-600">
+            <div className="text-lg font-medium pb-3 text-orange-600">Average Profit</div>
+            <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none flex items-center gap-1">
+              {/* <span className="text-gray-180">$</span> */}
+              <span>{formatCurrency(stats?.data?.total_profit, 'en-US', 'USD')}</span>
             </div>
           </div>
         </div>
@@ -205,14 +209,33 @@ export default function Dashboard() {
               <Heading>Expense Tracking</Heading>
               <div className="text-sm font-semibold text-dark-800">Payments</div>
             </div>
-            <div className="flex gap-4 text-sm font-medium">
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-full bg-[#EB2F96]" />
-                <span>Sales</span>
+            <div className="flex gap-3">
+              <div className="xs:w-[167px] w-full">
+                <SelectWidget
+                  options={["Monthly", "Quarterly", "Yearly"]}
+                  onValueChange={(value) => handleFilter(value, "tracking")}
+                  // selected={marketParams.brand?.replaceAll("-", " ") || ""}
+                  classNames={{
+                    trigger: "!rounded-lg bg-transparent border !border-gray-[#F0F1F3] text-[#858D9D] font-normal text-sm",
+                    base: "rounded-none",
+                    popoverContent: "rounded-none",
+                  }}
+                />
+
               </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-full bg-[#52C41A]" />
-                <span>Purchase</span>
+              <div className="flex gap-4 text-sm font-medium">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-red-500" />
+                  <span>Expense</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-[#EB2F96]" />
+                  <span>Sales</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-[#52C41A]" />
+                  <span>Purchase</span>
+                </div>
               </div>
             </div>
           </div>
@@ -265,6 +288,13 @@ export default function Dashboard() {
                     dot={{ r: 3 }}
                     strokeWidth={2}
                   />
+                  <Line
+                    type="monotone"
+                    dataKey="expense"
+                    stroke="red"
+                    dot={{ r: 3 }}
+                    strokeWidth={2}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -273,7 +303,20 @@ export default function Dashboard() {
         </RoundedBox>
 
         <RoundedBox className="pt-5 px-4 max-h-[430px] lg:min-w-[270px] flex flex-col justify-between pb-4">
-          <Heading>Income</Heading>
+          <div>
+            <Heading>Income</Heading>
+            <div className="flex flex-col w-full text-sm pt-3 gap-2">
+              {income.map((entry) => (
+                <div key={entry.name} className="flex items-center gap-1">
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: entry.color }}
+                  ></div>
+                  <span>{entry.name}: ${entry?.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={200}>
             <PieChart margin={{ top: 0 }}>
               <Pie
@@ -283,24 +326,15 @@ export default function Dashboard() {
                 paddingAngle={0}
                 cornerRadius={5}
                 dataKey="value"
+                onClick={handleSliceClick}
+                style={{ cursor: 'pointer', outline: "none" }}
               >
                 {income?.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                  <Cell key={`cell-${index}`} fill={entry.color} style={{ outline: "none" }} />
                 ))}
               </Pie>
             </PieChart>
           </ResponsiveContainer>
-          <div className="flex justify-between w-full text-sm border-t pt-10 border-[#AEAEAE80]">
-            {pieData.map((entry) => (
-              <div key={entry.name} className="flex items-center gap-1">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: entry.color }}
-                ></div>
-                <span>{entry.name}</span>
-              </div>
-            ))}
-          </div>
         </RoundedBox>
       </div>
 
@@ -314,19 +348,13 @@ export default function Dashboard() {
               <SearchBar placeholder='Search product, supplier, order' icon='search'
                 inputClass='order-1 !h-[38px] !text-xs'
                 placeholderClass='placeholder:text-[#858D9D] placeholder:text-xs'
-                onChange={(value) => {
-                  setMarketParams({
-                    ...searchParams,
-                    search: value
-                  });
-                  initialLoad.current = 1
-                }}
+                onChange={(value) => handleFilter(value!, "search")}
               />
             </div>
             <div className="xs:w-[167px] w-full">
               <SelectWidget
                 options={brands?.data?.results?.map((item: any) => item.name)}
-                onValueChange={(value) => handleBrandFilter(value, "brand")}
+                onValueChange={(value) => handleFilter(value, "brand")}
                 selected={marketParams.brand?.replaceAll("-", " ") || ""}
                 classNames={{
                   trigger: "!rounded-lg bg-transparent border !border-gray-[#F0F1F3] text-[#858D9D] font-normal text-sm",
@@ -339,7 +367,7 @@ export default function Dashboard() {
           </div>
         </div>
         <div className='overflow-x-auto'>
-          {marketData === undefined ? <Notfound label={`No records found ${searchQuery}`} /> :
+          {!(sortConfig ? sortedData : market_data?.results)?.length ? <Notfound /> :
             <table className='w-full'>
               <thead className='h-12'>
                 <tr className='text-white text-sm font-medium bg-blue-gradient'>
@@ -359,7 +387,7 @@ export default function Dashboard() {
                     </span>
                   </th>
                   <th className='text-start px-4 whitespace-nowrap'>
-                    <span className="px-4">up/down %</span>
+                    <span className="px-4">Change %</span>
                   </th>
                   <th className='text-start px-4 whitespace-nowrap'>
                     Chrono24
@@ -369,7 +397,7 @@ export default function Dashboard() {
 
                   </th>
                   <th className='text-start px-4 whitespace-nowrap'>
-                    <span className="px-4">up/down %</span>
+                    <span className="px-4">Change %</span>
                   </th>
                   <th className='text-start px-4 whitespace-nowrap'>
                     Bezel
@@ -378,7 +406,7 @@ export default function Dashboard() {
                     </span>
                   </th>
                   <th className='text-start px-4 whitespace-nowrap'>
-                    <span className="px-4">up/down %</span>
+                    <span className="px-4">Change %</span>
                   </th>
                   <th className='text-end px-4 whitespace-nowrap'>
                     Grailzee
@@ -387,7 +415,7 @@ export default function Dashboard() {
                     </span>
                   </th>
                   <th className='text-start px-4 whitespace-nowrap'>
-                    <span className="px-4">up/down %</span>
+                    <span className="px-4">Change %</span>
                   </th>
                   <th className='text-end px-4 last:rounded-e-lg whitespace-nowrap'>
                     Last Updated
@@ -399,18 +427,18 @@ export default function Dashboard() {
                 {
                   (sortConfig ? sortedData : market_data?.results)?.map((item: any, index: number) => (
                     <tr key={index} className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
-                      <td className="px-4">
+                      <td className="px-4 whitespace-nowrap">
                         <RoundedBox className="relative items-center justify-center flex  my-2 !bg-gray-80 p-2 h-14 w-14">
                           {item?.image_url ? <img src={item?.image_url} width={48} alt="image" className='w-full h-full rounded-md' /> : "N/A"}
                         </RoundedBox>
                       </td>
-                      <td className=' text-start py-3 px-4'>
+                      <td className=' text-start py-3 px-4 whitespace-nowrap'>
                         <div className="flex items-center">{item?.reference_number}</div>
                       </td>
                       <td className=' text-start py-3 px-4'>
                         {item?.buying_price ? formatCurrency(item?.buying_price, 'en-US', 'USD') : "No Data"}
                       </td>
-                      <td className=' text-start py-3 px-4'>
+                      <td className=' text-start py-3 px-4 whitespace-nowrap'>
                         <div className="flex items-center">
                           {item?.sources?.ebay?.price && <span className={item?.sources?.ebay?.price > item?.buying_price ? "" : "rotate-180"}>
                             <Icon name="arrow" stroke={item?.sources?.ebay?.price > item?.buying_price ? "" : "red"} /></span>}
@@ -419,7 +447,7 @@ export default function Dashboard() {
                           </div>
                         </div>
                       </td>
-                      <td className=' text-center py-3 px-4'>
+                      <td className=' text-center py-3 px-4 whitespace-nowrap'>
                         <>
                           {item?.sources?.ebay?.price_diff_percent ?
                             <div className="flex items-center px-4 whitespace-nowrap">
@@ -428,7 +456,7 @@ export default function Dashboard() {
                               <span>${item?.sources?.ebay?.price_diff_percent} %</span></div> : "No Data"}
                         </>
                       </td>
-                      <td className=' text-start py-3 px-4'>
+                      <td className=' text-start py-3 px-4 whitespace-nowrap'>
                         <div className="flex items-center">
                           {item?.sources?.chrono24?.price &&
                             <span className={item?.sources?.chrono24?.price > item?.buying_price ? "" : "rotate-180"}>
@@ -437,7 +465,7 @@ export default function Dashboard() {
 
                         </div>
                       </td>
-                      <td className=' text-center py-3 px-4'>
+                      <td className=' text-center py-3 px-4 whitespace-nowrap'>
                         <>
                           {item?.sources?.chrono24?.price_diff_percent ?
                             <div className="flex items-center px-4 whitespace-nowrap">
@@ -446,7 +474,7 @@ export default function Dashboard() {
                               <span>${item?.sources?.chrono24?.price_diff_percent} %</span></div> : "No Data"}
                         </>
                       </td>
-                      <td className=' text-start py-3 px-4'>
+                      <td className=' text-start py-3 px-4 whitespace-nowrap'>
                         <div className="flex items-center">
                           {item?.sources?.bezel?.price && <span className={item?.sources?.bezel?.price > item?.buying_price ? "" : "rotate-180"}>
                             <Icon name="arrow" stroke={item?.sources?.bezel?.price > item?.buying_price ? "" : "red"} /></span>}
@@ -454,7 +482,7 @@ export default function Dashboard() {
 
                         </div>
                       </td>
-                      <td className=' text-center py-3 px-4'>
+                      <td className=' text-center py-3 px-4 whitespace-nowrap'>
                         <>
                           {item?.sources?.bezel?.price_diff_percent ?
                             <div className="flex items-center px-4 whitespace-nowrap">
@@ -463,14 +491,14 @@ export default function Dashboard() {
                               <span>${item?.sources?.bezel?.price_diff_percent} %</span></div> : "No Data"}
                         </>
                       </td>
-                      <td className=' text-start py-3 px-4'>
+                      <td className=' text-start py-3 px-4 whitespace-nowrap'>
                         <div className="flex items-center justify-end">
                           {item?.sources?.grailzee?.price && <span className={item?.sources?.grailzee?.price > item?.buying_price ? "" : "rotate-180"}>
                             <Icon name="arrow" stroke={item?.sources?.grailzee?.price > item?.buying_price ? "" : "red"} /></span>}
                           {item?.sources?.grailzee?.price ? formatCurrency(item?.sources?.grailzee?.price, 'en-US', 'USD') : "No Data"}
                         </div>
                       </td>
-                      <td className=' text-center py-3 px-4'>
+                      <td className=' text-center py-3 px-4 whitespace-nowrap'>
                         <>
                           {item?.sources?.grailzee?.price_diff_percent ?
                             <div className="flex items-center px-4 whitespace-nowrap">
@@ -479,19 +507,20 @@ export default function Dashboard() {
                               <span>${item?.sources?.grailzee?.price_diff_percent} %</span></div> : "No Data"}
                         </>
                       </td>
-                      <td className='py-3 px-4 text-center'>{item?.last_updated || "No Data"}</td>
+                      <td className='py-3 px-4 text-center whitespace-nowrap'>{item?.last_updated || "No Data"}</td>
                     </tr>
                   ))}
               </tbody>
             </table>}
         </div>
-        {market_data?.count > 20 &&
+        {market_data?.count > 2 &&
           <div className="px-4 pb-5">
             <Pagination
-              totalPages={Math.ceil(market_data?.count / 20)}
+              totalPages={Math.ceil(market_data?.count / 1)}
               currentPage={currentPage}
               onPageChange={(page) => {
-                updateFilters({ ...marketParams, page });
+                handleFilter(page, "page")
+                setCurrentPage(page)
               }}
             />
           </div>}

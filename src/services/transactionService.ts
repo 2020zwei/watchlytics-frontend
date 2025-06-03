@@ -2,7 +2,7 @@ import { URLS } from '@/utils/constants';
 import apiClient from './apiClient';
 
 export const transactions = (query: string) =>
-    apiClient.get(`${URLS.TRANSACTIONS}${query}`).then(res => res);;
+    apiClient.get(`${URLS.TRANSACTIONS}${query}`).then(res => res);
 
 export const transactionById = (id: number | string) =>
     apiClient.get(`${URLS.TRANSACTIONS}${id}/`).then(res => res);;

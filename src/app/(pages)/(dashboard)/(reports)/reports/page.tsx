@@ -5,7 +5,7 @@ import Icon from '@/components/common/Icon';
 import Notfound from '@/components/common/Notfound';
 import Pagination from '@/components/common/Pagination';
 import ReportFilters from '@/components/common/ReportFilters';
-import { useReportStat, useBestSelling, useExpense } from '@/hooks/useReportHooks';
+import { useReportStat, useBestSelling, useExpense, useExpenseReport } from '@/hooks/useReportHooks';
 import { Spinner } from '@heroui/react'
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react'
@@ -16,7 +16,7 @@ const page = () => {
     const router = useRouter()
 
     const { data: stats, isLoading: loadingStats } = useReportStat()
-    const { data: expensesData, isLoading: loadingExpenses } = useExpense()
+    const { data: expensesData, isLoading: loadingExpenses } = useExpenseReport()
     const { data: reports, isLoading: loadingReports } = useBestSelling(currentPage)
 
     useEffect(() => {
