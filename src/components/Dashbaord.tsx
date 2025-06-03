@@ -56,10 +56,7 @@ export default function Dashboard() {
     newParams: Record<string, any>,
     options?: { reset?: boolean; includePage?: boolean }
   ) => {
-    // initialLoad.current = 1;
     const pageSize = 20;
-    setInputSearch("");
-
     const { reset = false, includePage = true } = options || {};
 
     const apiParams: Record<string, any> = {

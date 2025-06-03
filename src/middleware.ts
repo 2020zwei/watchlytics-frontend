@@ -24,6 +24,7 @@ const privateRoutePrefixes = [
   "/add-trading",
   "/customers",
   "/invoices",
+  "/checkout"
 ];
 
 export async function middleware(request: NextRequest) {
@@ -46,11 +47,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   };
 
-  
+
   if (isPrivateRoute && !isAuthenticated) {
     return redirectTo("/login");
   }
-  
+
   if (isAuthenticated && isPrivateRoute) {
     try {
       const meResponse = await fetch(`${baseURL}/api/me`, {
@@ -61,7 +62,11 @@ export async function middleware(request: NextRequest) {
 
       const res = await meResponse.json();
 
-      if (!res?.isSubscribed && !pathname.startsWith("/subscription")) {
+      if (
+        !res?.isSubscribed &&
+        !pathname.startsWith("/subscription") &&
+        !pathname.startsWith("/checkout")
+      ) {
         return redirectTo("/subscription");
       }
     } catch (error) {
@@ -72,7 +77,11 @@ export async function middleware(request: NextRequest) {
   if (isPublicRoute && isAuthenticated) {
     return redirectTo("/dashboard");
   }
-  
+
+  if (pathname === "/") {
+    return redirectTo("/dashboard");
+  }
+
   return NextResponse.next();
 }
 
@@ -94,6 +103,7 @@ export const config = {
     "/invoices/:path*",
     "/add-trading",
     "/customers/:path*",
+    "/checkout/:path*",
     {
       source:
         "/((?!api|_next/static|_next/image|favicon.ico|.*.png|.*.svg|.*.jpg).*)",

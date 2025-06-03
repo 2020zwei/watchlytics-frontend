@@ -10,9 +10,9 @@ import type { StripeElementChangeEvent } from "@stripe/stripe-js";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { Button } from "./common/baseButton/BaseButton";
-import { sendRequest } from "@/utils/apis";
 import Icon from "./common/Icon";
 import { useRouter } from "next/navigation";
+import { useCreateSubcription } from "@/hooks/useSubscription";
 
 const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string }) => {
     const stripe = useStripe();
@@ -21,13 +21,11 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
     const [cardNumberError, setCardNumberError] = useState("");
     const [csvError, setCsvError] = useState("");
     const [expiryError, setExpiryError] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    // ✅ Complete flags
     const [isCardComplete, setIsCardComplete] = useState(false);
     const [isExpiryComplete, setIsExpiryComplete] = useState(false);
     const [isCvcComplete, setIsCvcComplete] = useState(false);
     const [name, setName] = useState("")
+    const { mutateAsync: createSubscription, isPending } = useCreateSubcription();
 
     const stripeInputStyle = {
         base: {
@@ -49,18 +47,15 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
             return false
         }
         e.preventDefault();
-        setIsSubmitting(true);
 
         if (!stripe || !elements) {
             toast.error("Payment couldn't be initiated, Try Again!");
-            setIsSubmitting(false);
             return;
         }
 
         const cardElement = elements.getElement(CardNumberElement);
         if (!cardElement) {
             toast.error("Card details not found.");
-            setIsSubmitting(false);
             return;
         }
 
@@ -71,39 +66,33 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
 
         if (error) {
             toast.error(error.message || "Payment failed.");
-            setIsSubmitting(false);
         } else {
             const PAYLOAD = {
-                card_holder_name:name,
+                card_holder_name: name,
                 plan_name: planName,
                 price_id: priceId,
                 payment_method_token: paymentMethod?.id,
             };
 
-            sendRequest({ url: "/subscribe/", method: "POST", payload: PAYLOAD })
-                .then(async (res) => {
-                    if (res?.data?.success) {
-                        toast.success(res?.data?.message);
+            try {
+                createSubscription(PAYLOAD, {
+                    onSuccess(data: any) {
+                        toast.success(data?.data?.message || "Subscribed.");
                         const isLoggedIn = JSON.parse(localStorage.getItem("isLoggedin") || "false");
                         if (isLoggedIn) {
                             navigate.push("/dashboard");
+                        } else {
+                            fetch('/api/logout');
+                            navigate.push("/login");
                         }
-                        else {
-                            await fetch('/api/logout')
-                            navigate.push("/login")
-                        }
-                    } else {
-                        console.log(res)
-                        if (res?.status === 400 || res?.status == 500) {
-                            toast.error(res?.response?.data?.message || "Something went wrong");
-                        }
-                    }
-                }).catch((err) => {
-                    toast.error("Something went wrong")
+                    },
+                    onError(error: any) {
+                        toast.error(error?.response?.data?.message)
+                    },
                 })
-                .finally(() => {
-                    setIsSubmitting(false);
-                });
+            } catch (error: any) {
+                toast.error(error?.response?.data?.message || "Subscription failed.");
+            }
         }
     };
 
@@ -187,13 +176,13 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                         isDisabled={
                             !stripe ||
                             !elements ||
-                            isSubmitting ||
+                            isPending ||
                             !isCardComplete ||
                             !isExpiryComplete ||
                             !isCvcComplete ||
                             !(name.toString().length > 2)
                         }
-                        isLoading={isSubmitting}
+                        isLoading={isPending}
                     />
                 </div>
             </form>
