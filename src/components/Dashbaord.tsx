@@ -513,10 +513,10 @@ export default function Dashboard() {
               </tbody>
             </table>}
         </div>
-        {market_data?.count > 2 &&
+        {market_data?.count > 20 &&
           <div className="px-4 pb-5">
             <Pagination
-              totalPages={Math.ceil(market_data?.count / 1)}
+              totalPages={Math.ceil(market_data?.count / 20)}
               currentPage={currentPage}
               onPageChange={(page) => {
                 handleFilter(page, "page")
