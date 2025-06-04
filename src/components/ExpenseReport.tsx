@@ -51,9 +51,9 @@ const ExpenseReport = () => {
             <div className='mb-5 flex sm:flex-row flex-col items-center sm:justify-between'>
                 <Heading as='h3' className='md:text-2xl text-lg w-full'>Expense Report</Heading>
                 <div className='flex items-center gap-3'>
-                    <button onClick={handleExport} className='border rounded-lg p-0 bg-transparent h-[38px] px-3 border-gray-180'>
+                    {reports?.results?.length ? <button onClick={handleExport} className='border rounded-lg p-0 bg-transparent h-[38px] px-3 border-gray-180'>
                         Export
-                    </button>
+                    </button> : null}
                     <ReportFilters selectedReport='Expense Report' />
                 </div>
             </div>

@@ -108,16 +108,17 @@ export default function Dashboard() {
 
   const handleSliceClick = (data: any, index: number) => {
     const label = data.name?.toLowerCase();
+    console.log(label,"label")
 
     switch (label) {
       case 'target':
-        router.push('/dashboard/target');
+        router.push('/target-report');
         break;
       case 'income':
-        router.push('/dashboard/income');
+        router.push('/income-report');
         break;
       case 'pending':
-        router.push('/dashboard/pending');
+        router.push('/pending-report');
         break;
       default:
         break;
@@ -355,7 +356,7 @@ export default function Dashboard() {
               <SelectWidget
                 options={brands?.data?.results?.map((item: any) => item.name)}
                 onValueChange={(value) => handleFilter(value, "brand")}
-                selected={marketParams.brand?.replaceAll("-", " ") || ""}
+                selected={marketParams.brand?.toString()?.replaceAll("-", " ") || ""}
                 classNames={{
                   trigger: "!rounded-lg bg-transparent border !border-gray-[#F0F1F3] text-[#858D9D] font-normal text-sm",
                   base: "rounded-none",

@@ -22,6 +22,11 @@ export const brands = () => {
 export const soldItems = (query: string | number) => {
     return apiClient.get(`${URLS.SOLD_ITEMS}${query}`).then(res => res);
 }
+export const pieReports = (query: Record<string, any>) => {
+    const params = new URLSearchParams(query).toString();
+    return apiClient.get(`${URLS.DASHBOARD_REPORTS}?${params}`).then(res => res);
+};
+
 
 export const marketData = (params: Record<string, any> = {}) => {
     const finalParams = {

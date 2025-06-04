@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { stats, expense, income, marketData, brands, soldItems } from '@/services/dashboardService';
+import { stats, expense, income, marketData, brands, soldItems, pieReports } from '@/services/dashboardService';
 
 export const useStats = () => {
     return useQuery({
@@ -31,6 +31,13 @@ export const useSoldItems = (query: any) =>
     useQuery({
         queryKey: ['soldItems'],
         queryFn: () => soldItems(query),
+        enabled: !!query,
+    });
+
+export const usePieReports = (query: any) =>
+    useQuery({
+        queryKey: ['piereports'],
+        queryFn: () => pieReports(query),
         enabled: !!query,
     });
 

@@ -429,13 +429,13 @@ const Inventory = () => {
                                                 </div>
                                             </th>
                                             <th className="px-4 text-sm font-medium py-3">Actions</th>
-                                            <th className="w-7">Image</th>
+                                            <th className="w-7 text-sm font-medium">Image</th>
                                             {columns?.map((col, index) => (
                                                 col !== 'id' && col !== "image" && col !== "category" && col !== "availability" && col !== "owner" ?
                                                     <th
                                                         key={index}
                                                         className={clsx(
-                                                            "text-sm font-medium py-3 px-4"
+                                                            "text-sm font-medium py-3 px-4 capitalize"
                                                         )}
 
                                                     >
