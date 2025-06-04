@@ -108,7 +108,7 @@ export default function Dashboard() {
 
   const handleSliceClick = (data: any, index: number) => {
     const label = data.name?.toLowerCase();
-    console.log(label,"label")
+    console.log(label, "label")
 
     switch (label) {
       case 'target':
@@ -132,14 +132,23 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (incomeData?.status === 200) {
-      const data = [
-        { name: "Target", value: incomeData?.data?.target, color: "#1F79B5" },
-        { name: "Income", value: incomeData?.data?.income, color: "#E0E0E0" },
-        { name: "Pending", value: incomeData?.data?.pending, color: "#0D3C61" },
+      const MIN_SLICE = 3000;
+
+      const rawData = [
+        { name: "Target", value: incomeData.data.target, color: "#1F79B5" },
+        { name: "Income", value: incomeData.data.income, color: "#E0E0E0" },
+        { name: "Pending", value: incomeData.data.pending, color: "#0D3C61" },
       ];
-      setIncome(data);
+
+      const dataWithDisplayValue = rawData.map(item => ({
+        ...item,
+        displayValue: item.value < MIN_SLICE ? MIN_SLICE : item.value,
+      }));
+
+      setIncome(dataWithDisplayValue);
     }
-  }, [incomeData])
+  }, [incomeData]);
+
 
   useEffect(() => {
     if (expenseData?.status === 200) {
@@ -322,18 +331,24 @@ export default function Dashboard() {
             <PieChart margin={{ top: 0 }}>
               <Pie
                 data={income}
+                dataKey="displayValue"
                 innerRadius={40}
                 outerRadius={70}
                 paddingAngle={0}
                 cornerRadius={5}
-                dataKey="value"
                 onClick={handleSliceClick}
-                style={{ cursor: 'pointer', outline: "none" }}
               >
                 {income?.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} style={{ outline: "none" }} />
+                  <Cell key={`cell-${index}`} fill={entry.color}  style={{ cursor: "pointer", outline: 'none'}}/>
                 ))}
               </Pie>
+              {/* <Tooltip formatter={(value, name, props) => {
+                // show actual value in tooltip
+                const realValue = income?.[props.index]?.value;
+                return `$${realValue}`;
+              }} /> */}
+
+
             </PieChart>
           </ResponsiveContainer>
         </RoundedBox>

@@ -5,10 +5,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Checkbox } from "@heroui/react";
 import Image from "next/image";
 import Link from "next/link";
-import { setCookie } from "cookies-next";
+import { getCookie, setCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LoginFormFields, SignInSchema } from "@/utils/mock";
 import FormField from "@/components/common/FormField";
 import { z } from "zod";
@@ -40,7 +40,7 @@ export default function SignIn() {
   };
 
   const onSubmit = async (data: FormData) => {
-    
+
     try {
       const payload = {
         email: data.email,
@@ -57,7 +57,7 @@ export default function SignIn() {
       toast.success("Login Successfully!", { position: "top-right" });
       localStorage.setItem("isLoggedin", "true");
 
-      router.push(result?.is_subscribed ? "/dashboard" : "/subscription");
+      router.replace(result?.is_subscribed ? "/dashboard" : "/subscription");
     } catch (error: any) {
       console.log(apiError)
       const message =
@@ -65,6 +65,13 @@ export default function SignIn() {
       toast.error(`Signin failed, ${message}`, { position: "top-right" });
     }
   };
+
+  useEffect(() => {
+    const token = getCookie("access_token");
+    if (token) {
+      router.replace("/dashboard");
+    }
+  }, [router]);
 
   return (
     <div className="flex justify-center items-center">
