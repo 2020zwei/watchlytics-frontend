@@ -346,7 +346,7 @@ const Inventory = () => {
                     <div className='flex items-center gap-2'>
                         <Heading className='text-start md:w-auto w-full md:-order-1 order-1'>Products {selectedId}</Heading>
 
-                        <div className='flex items-center ms-2 border rounded-lg flex-1 me-3 max-w-[320px] min-w-[240px] ps-3 border-[#F0F1F3] font-normal'>
+                        <div className='flex items-center ms-2 border rounded-lg flex-1 me-3 max-w-[320px] min-w-[240px] ps-3 !border-gray-[#F0F1F3] font-normal'>
                             <SearchBar placeholder='Search product, supplier, order' icon='search'
                                 inputClass='order-1 !h-[38px] !text-xs'
                                 placeholderClass='placeholder:text-[#858D9D] placeholder:text-xs'
@@ -550,7 +550,7 @@ const Inventory = () => {
                                                                 {
                                                                     currencyFields.includes(col)
                                                                         ? row?.[col]
-                                                                            ? <span className="flex items-center">{formatCurrency(row?.[col], 'en-US', 'USD')}</span>
+                                                                            ? <span className="flex items-center first-letter:text-lg">{formatCurrency(row?.[col], 'en-US', 'USD')}</span>
                                                                             : "No Data"
                                                                         : col === "profit_margin"
                                                                             ? row?.[col] ? `${row?.[col]}%` : "No Data"

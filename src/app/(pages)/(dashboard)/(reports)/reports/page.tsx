@@ -6,6 +6,7 @@ import Notfound from '@/components/common/Notfound';
 import Pagination from '@/components/common/Pagination';
 import ReportFilters from '@/components/common/ReportFilters';
 import { useReportStat, useBestSelling, useExpense, useExpenseReport } from '@/hooks/useReportHooks';
+import { formatCurrency } from '@/utils/formatCurrency';
 import { Spinner } from '@heroui/react'
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react'
@@ -137,7 +138,7 @@ const page = () => {
                                                     <td>{report?.reference_number}</td>
                                                     <td className='first-letter:uppercase'>{report?.brand}</td>
                                                     <td>{report?.remaining_quantity} Watches</td>
-                                                    <td>{report?.turn_over}</td>
+                                                    <td>{formatCurrency(report?.turn_over, 'en-US', 'USD')}</td>
                                                     <td className={report?.increase_by < 0 ? "text-red-500" : "text-green-500"}>
                                                         <div className='flex items-center'>
                                                             <span className={report?.increase_by < 0 ? " rotate-180" : ""}><Icon name='arrow' stroke={report?.increase_by < 0 ? "#da3e33" : "#10a760"} /></span>

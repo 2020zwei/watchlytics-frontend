@@ -322,7 +322,8 @@ export default function Dashboard() {
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: entry.color }}
                   ></div>
-                  <span>{entry.name}: ${entry?.value}</span>
+                  <span>{entry.name}:</span>
+                  <span>{formatCurrency(entry?.value, 'en-US', 'USD')}</span>
                 </div>
               ))}
             </div>
@@ -339,7 +340,7 @@ export default function Dashboard() {
                 onClick={handleSliceClick}
               >
                 {income?.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color}  style={{ cursor: "pointer", outline: 'none'}}/>
+                  <Cell key={`cell-${index}`} fill={entry.color} style={{ cursor: "pointer", outline: 'none' }} />
                 ))}
               </Pie>
               {/* <Tooltip formatter={(value, name, props) => {
@@ -362,8 +363,8 @@ export default function Dashboard() {
           <div className="flex items-center sm:mb-0 mb-5 sm:mt-0 mt-3 sm:w-auto w-full xs:flex-row flex-col gap-3">
             <div className='sm:min-w-[320px] w-full flex items-center border rounded-lg placeholder: flex-1 ps-3 border-[#F0F1F3] font-normal'>
               <SearchBar placeholder='Search product, supplier, order' icon='search'
-                inputClass='order-1 !h-[38px] !text-xs'
-                placeholderClass='placeholder:text-[#858D9D] placeholder:text-xs'
+                inputClass='order-1 !h-[38px] !text-xs border !border-gray-[#F0F1F3]'
+                placeholderClass='placeholder:text-[#71717a] placeholder:text-sm'
                 onChange={(value) => handleFilter(value!, "search")}
               />
             </div>
@@ -469,7 +470,7 @@ export default function Dashboard() {
                             <div className="flex items-center px-4 whitespace-nowrap">
                               <span className={item?.sources?.ebay?.price > item?.buying_price ? "" : "rotate-180"}>
                                 <Icon name="arrow" stroke={item?.sources?.ebay?.price > item?.buying_price ? "" : "red"} /></span>
-                              <span>${item?.sources?.ebay?.price_diff_percent} %</span></div> : "No Data"}
+                              <span>${Math.abs(item?.sources?.ebay?.price_diff_percent)} %</span></div> : "No Data"}
                         </>
                       </td>
                       <td className=' text-start py-3 px-4 whitespace-nowrap'>
@@ -487,7 +488,7 @@ export default function Dashboard() {
                             <div className="flex items-center px-4 whitespace-nowrap">
                               <span className={item?.sources?.chrono24?.price > item?.buying_price ? "" : "rotate-180"}>
                                 <Icon name="arrow" stroke={item?.sources?.chrono24?.price > item?.buying_price ? "" : "red"} /></span>
-                              <span>${item?.sources?.chrono24?.price_diff_percent} %</span></div> : "No Data"}
+                              <span>${Math.abs(item?.sources?.chrono24?.price_diff_percent)} %</span></div> : "No Data"}
                         </>
                       </td>
                       <td className=' text-start py-3 px-4 whitespace-nowrap'>
@@ -504,7 +505,7 @@ export default function Dashboard() {
                             <div className="flex items-center px-4 whitespace-nowrap">
                               <span className={item?.sources?.bezel?.price > item?.buying_price ? "" : "rotate-180"}>
                                 <Icon name="arrow" stroke={item?.sources?.bezel?.price > item?.buying_price ? "" : "red"} /></span>
-                              <span>${item?.sources?.bezel?.price_diff_percent} %</span></div> : "No Data"}
+                              <span>${Math.abs(item?.sources?.bezel?.price_diff_percent)} %</span></div> : "No Data"}
                         </>
                       </td>
                       <td className=' text-start py-3 px-4 whitespace-nowrap'>
@@ -520,7 +521,7 @@ export default function Dashboard() {
                             <div className="flex items-center px-4 whitespace-nowrap">
                               <span className={item?.sources?.grailzee?.price > item?.buying_price ? "" : "rotate-180"}>
                                 <Icon name="arrow" stroke={item?.sources?.grailzee?.price > item?.buying_price ? "" : "red"} /></span>
-                              <span>${item?.sources?.grailzee?.price_diff_percent} %</span></div> : "No Data"}
+                              <span>${Math.abs(item?.sources?.grailzee?.price_diff_percent)} %</span></div> : "No Data"}
                         </>
                       </td>
                       <td className='py-3 px-4 text-center whitespace-nowrap'>{item?.last_updated || "No Data"}</td>
