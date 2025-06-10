@@ -42,6 +42,7 @@ export default function Signup() {
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(RegistrationFormSchema),
+    shouldUnregister: true,
     mode: "onChange"
   });
 
@@ -60,7 +61,6 @@ export default function Signup() {
   }, [password, confirmPassword, trigger]);
 
   const onSubmit = async (data: FormData) => {
-    console.log(data)
     const payload = {
       email: data.email,
       password: data.password,
@@ -81,11 +81,9 @@ export default function Signup() {
       router.push("/subscription");
     }
     catch (error: any) {
-      console.log(apiError)
       if (axios.isAxiosError(error)) {
 
         const errors = error?.response?.data?.errors;
-        console.log(errors)
         if (errors && typeof errors === "object") {
           Object.entries(errors).forEach(([field, message]) => {
             // @ts-ignore
@@ -106,7 +104,7 @@ export default function Signup() {
       </div>
 
       <h1 className="text-[32px] font-bold text-dark-800 ">Create Account</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="pb-10">
+      <form onSubmit={handleSubmit(onSubmit)} className="pb-10" autoComplete="off">
 
 
         <fieldset className="grid grid-cols-1">
@@ -133,6 +131,7 @@ export default function Signup() {
                 iconSize="1.5rem"
                 inputClass="bg-transparent"
                 fill="#48505e"
+                formName="register"
                 icon={
                   field.type === "password"
                     ? togglePassType[field.name]

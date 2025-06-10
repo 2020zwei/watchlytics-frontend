@@ -12,6 +12,7 @@ interface StyleProps {
     icon?: string,
     iconPosition?: "left" | "right",
     stroke?: string,
+    formName?: string,
     fill?: string,
     iconClass?: ""
     iconSize?: string,
@@ -54,6 +55,7 @@ const FormField: React.FC<FormFieldProps> = ({
     iconPosition = "right",
     icon = "",
     stroke = "",
+    formName = "",
     iconClass = "",
     fill = "#48505e",
     iconSize = "1.2rem",
@@ -74,6 +76,7 @@ const FormField: React.FC<FormFieldProps> = ({
                 {label} {name === "client_id" && <Icon name="exclamation" size="1.2rem" />}
                 {field?.required && <sup><Icon name="star" fill="red" size="0.5rem" /></sup>}
             </label>
+            
             <div className={inputContainer}>
                 <div className={clsx("relative flex items-center", type === "checkbox" ? "gap-2" : "justify-between")}
                 >

@@ -860,7 +860,7 @@ export const RegistrationFormSchema = z.object({
 
     password: z.string()
         .refine(val => !val || val.length >= 8, {
-            message: "Password must be at least 8 characters",
+            message: "Password must be at least 8 characters and 1 uppercase and 1 special character",
         })
         .refine(val => !val || /[A-Z]/.test(val), {
             message: "Password must contain at least 1 uppercase letter",

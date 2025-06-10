@@ -13,7 +13,8 @@ import Notfound from '@/components/common/Notfound'
 import AlertModal from '@/components/common/AlertModal'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/navigation'
-import { useCustomers, useRemoveCustomer } from '@/hooks/useCustomerHooks' 
+import { useCustomers, useRemoveCustomer } from '@/hooks/useCustomerHooks'
+import { formatCurrency } from '@/utils/formatCurrency'
 
 const buttons: any = {
     "status": ["active", "inactive"],
@@ -23,11 +24,22 @@ const buttons: any = {
     "Follow Up": ["yes", "no"],
 }
 
+type SortDirection = 'asc' | 'desc';
+
+type SortConfig<T> = {
+    key: keyof T;
+    direction: SortDirection;
+} | null;
+
 const page = () => {
     const [deleteId, setDeleteId] = useState<number | null>(null)
     const [currentPage, setCurrentPage] = useState(1)
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
     const [filters, setFilters] = useState<{ [key: string]: string }>({})
+    const [followUps, setFollowUps] = useState<Record<string, string>>({});
+    const [sortConfig, setSortConfig] = useState<SortConfig<T>>(null);
+    const [sortedData, setSortedData] = useState<T[]>([]);
+
     const [deleteAlert, setDeleteAlert] = useState(false)
     const [note, setNote] = useState<any>()
     const navigate = useRouter()
@@ -87,6 +99,43 @@ const page = () => {
         setDeleteAlert(false);
     };
 
+    const handleSort = (key: keyof T) => {
+        setSortConfig(prev => {
+            if (prev && prev.key === key) {
+                // Toggle direction
+                return {
+                    key,
+                    direction: prev.direction === 'asc' ? 'desc' : 'asc',
+                };
+            }
+            return { key, direction: 'asc' };
+        });
+    };
+
+    useEffect(() => {
+        if (!sortConfig || !customers?.data?.results) {
+            setSortedData(customers?.data?.results ?? []);
+            return;
+        }
+
+        const sorted = [...customers?.data?.results].sort((a, b) => {
+            let aVal = a[sortConfig.key];
+            let bVal = b[sortConfig.key];
+            if (sortConfig.key === 'last_purchase_date') {
+                aVal = new Date(aVal).getTime();
+                bVal = new Date(bVal).getTime();
+            }
+            if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+            if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+
+            if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+        setSortedData(sorted);
+    }, [sortConfig, customers?.data?.results]);
+
+
     useEffect(() => {
         const params = new URLSearchParams(window.location.search)
         const page = parseInt(params.get("page_number") || "1")
@@ -105,10 +154,41 @@ const page = () => {
         return <div className='text-center mt-5'><Spinner /></div>
     }
 
-    console.log({ customers })
 
     return (
         <div>
+            <div className=" grid md:grid-cols-4 xs:grid-cols-2 grid-cols-1 mt-6 gap-3">
+                <Link href="/inventory" className=" rounded-lg bg-white shadow-lg p-4 border-blue-700 border-t-2">
+                    <div className="text-lg font-medium pb-3 text-blue-700">Total Customers</div>
+                    <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none">
+                        23
+                    </div>
+                </Link>
+
+                <Link href="/inventory" className=" rounded-lg bg-white shadow-lg p-4 border-blue-700 border-t-2">
+                    <div className="text-lg font-medium pb-3 text-blue-700">Avg Spending
+                    </div>
+                    <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none">
+                        23%
+                    </div>
+                </Link>
+
+                <Link href="/inventory" className=" rounded-lg bg-white shadow-lg p-4 border-blue-700 border-t-2">
+                    <div className="text-lg font-medium pb-3 text-blue-700">Follow-ups Due
+                    </div>
+                    <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none">
+                        23
+                    </div>
+                </Link>
+
+                <Link href="/inventory" className=" rounded-lg bg-white shadow-lg p-4 border-blue-700 border-t-2">
+                    <div className="text-lg font-medium pb-3 text-blue-700">New Leads This Month
+                    </div>
+                    <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none">
+                        23
+                    </div>
+                </Link>
+            </div>
             <RoundedBox as='section' className="px-4 py-5 gap-3 mt-5">
 
                 <div className='lg-xl:flex items-center lg-xl:justify-between lg-xl:flex-row flex-col'>
@@ -148,47 +228,93 @@ const page = () => {
                                 <table className="border-collapse min-w-[1200px] w-full text-start">
                                     <thead className="bg-blue-gradient text-white">
                                         <tr>
-                                            <th className={clsx("text-sm font-medium py-3 rounded-tl-lg rounded-bl-lg  first-letter:uppercase whitespace-nowrap px-4")}
+                                            <th className={clsx("text-sm font-bold py-3 rounded-tl-lg rounded-bl-lg  first-letter:uppercase whitespace-nowrap px-4")}
                                             >Name </th>
-                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            <th className={clsx("text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >email</th>
-                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            <th className={clsx("text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >address</th>
-                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            <th className={clsx("text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >phone</th>
-                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
-                                            >No. of Orders </th>
-                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
-                                            >last purchase date </th>
-                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
-                                            >Spending </th>
-                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            <th onClick={() => handleSort('orders_count')} className={clsx("text-sm font-bold py-3 cursor-default first-letter:uppercase whitespace-nowrap px-4")}
+                                            ><span className='pe-1'>No. of Orders</span>
+                                                {sortConfig?.key === 'orders_count' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}
+                                            </th>
+                                            <th onClick={() => handleSort('last_purchase_date')} className={clsx("text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4 cursor-default")}
+                                            ><span className='pe-1'>last purchase date</span>
+                                                {sortConfig?.key === 'last_purchase_date' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}
+                                            </th>
+                                            <th onClick={() => handleSort('total_spending')} className={clsx(" cursor-default text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            ><span className='pe-1'>Spending</span>
+
+                                                {sortConfig?.key === 'total_spending' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}
+                                            </th>
+                                            <th className={clsx("text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >Follow Up </th>
-                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            <th className={clsx("text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >Status</th>
-                                            <th className="px-4 rounded-tr-lg rounded-br-lg text-sm font-medium py-3">Actions</th>
+                                            <th className="px-4 rounded-tr-lg rounded-br-lg text-sm font-bold py-3">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {customers?.data?.results?.map((item: any) => (
-                                            <tr key={item?.id} className="border-b border-gray-200 last:border-b-0 text-sm font-medium text-dark-700"                                    >
+                                        {sortedData?.map((item: any, index: number) => (
+                                            <tr key={item?.id} className={clsx("border-b border-gray-200 last:border-b-0 text-sm font-medium text-dark-700", (index + 1) / 2 !== 0 ? " hover:bg-gray-10" : "")}                                    >
                                                 <td>
-                                                    <div className='flex items-center gap-2'>
+                                                    <div className='flex items-center gap-2 ms-3'>
                                                         <RoundedBox className="relative items-center justify-center flex  my-2 !bg-gray-80 p-2 h-7 w-7 !rounded-full">
                                                             {item?.profile_picture ? <img src={item?.profile_picture} width={48} alt="image" className='w-full h-full rounded-md' /> : null}
                                                         </RoundedBox>
                                                         <span className='whitespace-nowrap'>{item?.name}</span>
                                                     </div>
                                                 </td>
-                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.email || "-"}</td>
-                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.address || "-"}</td>
-                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.phone || "-"}</td>
-                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.orders_count || "-"}</td>
-                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.last_purchase_date || "-"}</td>
-                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.total_spending || "-"}</td>
-                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.follow_up_display || "-"}</td>
-                                                <td className="py-5 whitespace-nowrap px-4 text-center">
-                                                    <button className={clsx("border rounded-lg h-8 w-[72px] cursor-default", item?.status_display === "Active" ? "border-[#10A760] text-[#10A760]" : "border-[#DA3E33] text-[#DA3E33]")}>{item?.status_display}</button>
+                                                <td className="py-3 whitespace-nowrap px-4 text-center">
+                                                    <Link href={`mailto:${item?.email}`}>{item?.email || "No Data"}</Link>
+                                                </td>
+                                                <td className="py-3 whitespace-nowrap px-4 text-center">{item?.address || "No Data"}</td>
+                                                <td className="py-3 whitespace-nowrap px-4 text-center">
+                                                    <Link href={`tel:${item?.phone}`}>{item?.phone || "-"}</Link>
+                                                </td>
+                                                <td className="py-3 whitespace-nowrap px-4 text-center">
+                                                    {
+                                                        item?.orders_count ? <Link className='block' href={`order-detail/${item.id}`}>{item?.orders_count}</Link> : "No Data"
+                                                    }</td>
+                                                <td className="py-3 whitespace-nowrap px-4 text-center">{item?.last_purchase_date || "No Data"}</td>
+                                                <td className="py-3 whitespace-nowrap px-4 text-center">{formatCurrency(item?.total_spending, 'en-US', 'USD') || "No Data"}</td>
+
+                                                <td className="py-3 whitespace-nowrap px-4 text-center">
+                                                    <SelectWidget
+                                                        selected={followUps[item.id] || ""}
+                                                        onValueChange={(value) =>
+                                                            setFollowUps((prev) => ({ ...prev, [item.id]: value }))
+                                                        }
+                                                        placeholder={item?.follow_up_display}
+                                                        options={["Yes", "No", "Upcoming"]}
+                                                        classNames={{
+                                                            trigger:
+                                                                "!rounded-lg bg-transparent capitalize border !border-gray-70 !text-read-500 font-normal text-sm w-[120px] follow-up",
+                                                            base: "rounded-none",
+                                                            popoverContent: "rounded-none",
+                                                        }}
+                                                    />
+                                                </td>
+
+                                                <td className="py-3 whitespace-nowrap px-4 text-center">
+                                                    <div className="relative w-10">
+                                                        <input
+                                                            type="radio"
+                                                            id={`id_${item?.id}`}
+                                                            name="card"
+                                                            checked={item?.status_display === "Active" ? true : false}
+                                                            className="sr-only peer"
+                                                        />
+                                                        <label
+                                                            htmlFor={`id_${item?.id}`}
+                                                            className={clsx("block w-full h-5 rounded-full cursor-pointer transition-colors", item?.status ? "peer-checked:bg-[#10A760]" : "bg-[#DA3E33]")}
+                                                        ></label>
+                                                        <span
+                                                            className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200 transform peer-checked:translate-x-5"
+                                                        />
+                                                    </div>
                                                 </td>
                                                 <td className='text-center'>
                                                     <Dropdown className='!rounded-lg'>
