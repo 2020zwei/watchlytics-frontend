@@ -11,4 +11,4 @@ export const forgotpassword = (payload: any) =>
     apiClient.post(URLS.FORGOT_PASSWORD, payload);
 
 export const passwordReset = (payload: any, id:string) =>
-    apiClient.post(`${URLS.RESET_PASSWORD}${id}/`, payload);
+    apiClient.post(`${URLS.RESET_PASSWORD}${id}`, payload);
