@@ -29,6 +29,7 @@ export default function SignIn() {
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(SignInSchema),
+    shouldUnregister: true,
     mode: "onChange"
   });
 
@@ -59,7 +60,6 @@ export default function SignIn() {
 
       router.replace(result?.is_subscribed ? "/dashboard" : "/subscription");
     } catch (error: any) {
-      console.log(apiError)
       const message =
         error?.response?.data?.non_field_errors?.[0] || "Sign-in failed";
       toast.error(`Signin failed, ${message}`, { position: "top-right" });
@@ -85,7 +85,7 @@ export default function SignIn() {
 
         <h1 className="text-[2.5rem] font-bold mb-8 text-[#1E293B]">Sign In</h1>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 md:w-[28rem] w-full">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 md:w-[28rem] w-full" autoComplete="off">
           {/* Email Field */}
 
           <fieldset className="grid grid-cols-1">

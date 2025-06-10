@@ -90,6 +90,9 @@ body .searchbale-select__control--is-focused{
 .searchbale-select__value-container--is-multi{
   @apply !flex-nowrap
 }
+.follow-up span{
+  @apply !text-[#808080]
+}
 @media(max-width:500px){
 
   .inventory-btns li button{
