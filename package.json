@@ -20,6 +20,8 @@
     "cookies-next": "^5.1.0",
     "framer-motion": "^12.6.3",
     "js-cookie": "^3.0.5",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "next": "15.2.3",
@@ -48,8 +50,8 @@
     "@types/react-dropzone": "^4.2.2",
     "eslint": "^9",
     "eslint-config-next": "15.2.3",
-    "typescript": "^5",
-    "react-csv-downloader": "^3.1.0"
+    "react-csv-downloader": "^3.1.0",
+    "typescript": "^5"
   },
   "engines": {
     "node": ">=22.11.0",
