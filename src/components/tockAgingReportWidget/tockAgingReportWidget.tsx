@@ -102,21 +102,45 @@ const StockAgingReportWidget = () => {
 
             <RoundedBox className="!p-4 !ps-0 flex gap-2">
                 <div className="flex-1">
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }} barGap={0}>
-                            <CartesianGrid vertical={false} stroke="#3333331A" />
-                            <XAxis dataKey="name" axisLine={{ stroke: '#3333331A' }} fontSize={14} tickLine={false} />
-                            <YAxis domain={[0, 100]} axisLine={false} tickLine={false} />
-                            <Tooltip cursor={false} />
-                            <Bar dataKey="<30" stackId="a" fill={COLORS['<30']} barSize={44} />
-                            <Bar dataKey="30-60" stackId="a" fill={COLORS['30-60']} barSize={44} />
-                            <Bar dataKey="60-90" stackId="a" fill={COLORS['60-90']} barSize={44} />
-                            <Bar dataKey="90+" stackId="a" fill={COLORS['90+']} barSize={44} />
-                        </BarChart>
-                    </ResponsiveContainer>
+                    <div className="overflow-x-auto">
+                        {/* Optional: Display length */}
+                        {/* {chartData.length} */}
+
+                        <div
+                            className={
+                                chartData.length > 6
+                                    ? 'min-w-[1000px]' // 👈 Force horizontal scroll
+                                    : 'w-full'         // 👈 Fit container if <= 9
+                            }
+                        >
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart
+                                    data={chartData}
+                                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                                    barGap={0}
+                                >
+                                    <CartesianGrid vertical={false} stroke="#3333331A" />
+                                    <XAxis
+                                        dataKey="name"
+                                        axisLine={{ stroke: '#3333331A' }}
+                                        fontSize={14}
+                                        tickLine={false}
+                                    />
+                                    <YAxis domain={[0, 100]} axisLine={false} tickLine={false} />
+                                    <Tooltip cursor={false} />
+                                    <Bar dataKey="<30" stackId="a" fill={COLORS['<30']} barSize={44} />
+                                    <Bar dataKey="30-60" stackId="a" fill={COLORS['30-60']} barSize={44} />
+                                    <Bar dataKey="60-90" stackId="a" fill={COLORS['60-90']} barSize={44} />
+                                    <Bar dataKey="90+" stackId="a" fill={COLORS['90+']} barSize={44} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="min-w-[215px] h-full bg-[#F9F9F9] rounded-lg p-4">
+
+
+                <div className="min-w-[215px] h-full bg-[#F9F9F9] rounded-lg p-4 overflow-x-auto">
                     <h3 className="font-medium text-dark-800 pb-4">Days in Inventory</h3>
                     <div className="flex flex-col gap-2">
                         {[{ label: '<30 Days', color: COLORS['<30'] },

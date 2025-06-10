@@ -307,7 +307,7 @@ const Inventory = () => {
                         <Heading className=' text-orange-800'>Total Products</Heading>
                         <div className='grid grid-cols-2 font-semibold text-base text-gray-600'>
                             <span>{stats?.data?.total_products?.count}</span>
-                            <span className="text-center">{stats?.data?.total_products?.revenue}</span>
+                            <span className="text-center">{formatCurrency(stats?.data?.total_products?.revenue, 'en-US', 'USD')}</span>
                         </div>
                         <div className='grid grid-cols-2 gap-10 font-semibold text-base text-gray-500'>
                             <span>{stats?.data?.total_products?.label}</span>
@@ -318,7 +318,7 @@ const Inventory = () => {
                         <Heading className=' text-pink-500'>Top Selling</Heading>
                         <div className='grid grid-cols-2 gap-10 font-semibold text-base text-gray-600'>
                             <span>{stats?.data?.top_selling?.count}</span>
-                            <span className="text-center">{stats?.data?.top_selling?.cost}</span>
+                            <span className="text-center">{formatCurrency(stats?.data?.top_selling?.cost, 'en-US', 'USD')}</span>
                         </div>
                         <div className='grid grid-cols-2 gap-10 font-semibold text-base text-gray-500'>
                             <span>{stats?.data?.top_selling?.label}</span>

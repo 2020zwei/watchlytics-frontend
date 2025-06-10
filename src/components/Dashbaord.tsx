@@ -203,7 +203,7 @@ export default function Dashboard() {
             <div className="text-lg font-medium pb-3 text-orange-600">Average Profit</div>
             <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none flex items-center gap-1">
               {/* <span className="text-gray-180">$</span> */}
-              <span>{formatCurrency(stats?.data?.total_profit, 'en-US', 'USD')}</span>
+              <span>{formatCurrency(stats?.data?.average_profit_per_unit, 'en-US', 'USD')}</span>
             </div>
           </div>
         </div>
@@ -509,7 +509,7 @@ export default function Dashboard() {
                         </>
                       </td>
                       <td className=' text-start py-3 px-4 whitespace-nowrap'>
-                        <div className="flex items-center justify-end">
+                        <div className="flex items-center justify-end first-letter:text-red-600">
                           {item?.sources?.grailzee?.price && <span className={item?.sources?.grailzee?.price > item?.buying_price ? "" : "rotate-180"}>
                             <Icon name="arrow" stroke={item?.sources?.grailzee?.price > item?.buying_price ? "" : "red"} /></span>}
                           {item?.sources?.grailzee?.price ? formatCurrency(item?.sources?.grailzee?.price, 'en-US', 'USD') : "No Data"}
