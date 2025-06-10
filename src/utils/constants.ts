@@ -3,7 +3,7 @@ export const URLS = {
   REGISTER: "/auth/signup/",
   LOGIN: "/auth/signin/",
   FORGOT_PASSWORD: "/auth/forgot-password/",
-  RESET_PASSWORD: "/auth/password-reset-confirm/MQ/",
+  RESET_PASSWORD: "/auth/password-reset-confirm",
   TRAINERS: "auth/users/?account_type=TRAINER&is_verified=True",
   PROGRAMS: "/program",
   TRAINER_BIOGRAPHY_BIDEO: "/auth/users/?account_type=TRAINER&is_verified=True",
