@@ -83,8 +83,6 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                             navigate.push("/dashboard");
                         } else {
                             fetch('/api/logout').then(res => {
-                                console.log(res)
-                                //  window.location.reload()
                                 navigate.push("/login");
                             });
 
