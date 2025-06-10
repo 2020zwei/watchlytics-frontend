@@ -54,8 +54,8 @@ export default function SignIn() {
         toast.success("Password reset successfully!");
         router.push("/login");
       } catch (error: any) {
-        console.error("API error:", error?.response?.data?.password[0]);
-        toast.error(error?.response?.data?.password[0]);
+        console.error("API error:", error?.response?.data?.non_field_errors?.[0]);
+        toast.error(error?.response?.data?.non_field_errors?.[0]);
       }
     }
   };
