@@ -15,6 +15,7 @@ import { toast } from 'react-toastify'
 import { useRouter } from 'next/navigation'
 import { useCustomers, useRemoveCustomer } from '@/hooks/useCustomerHooks'
 import { formatCurrency } from '@/utils/formatCurrency'
+import { exportToPDF } from '@/utils/exportToPDF'
 
 const buttons: any = {
     "status": ["active", "inactive"],
@@ -217,6 +218,8 @@ const page = () => {
                         {Object.keys(filters)?.length ? <li className='rounded-md border !border-gray-70 h-10 px-4 flex items-center justify-center cursor-pointer' onClick={() => { setFilters({}); navigate.push("/customers") }}>Clear</li> : null}
                     </ul>
                     <div className='lg-xl:w-auto w-full text-end'>
+                        <button onClick={() => exportToPDF(sortedData, 'Customer Report')}>Export PDF</button>
+
                         <Link href="/customers/add" className='bg-blue-gradient ms-auto text-white rounded-lg text-sm h-10 w-[128px] flex items-center justify-center'>Add Customer</Link>
                     </div>
                 </div>
