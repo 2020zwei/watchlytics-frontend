@@ -85,7 +85,12 @@ const AddCardWidget = () => {
                 onSuccess(data, variables, context) {
                     toast.success("Card successfyll added");
                     const id = JSON.parse(localStorage.getItem("cardId") || "null");
-                    if (id) navigate.push(`/payments/?id=${id}`);
+                    if (id) {
+                        navigate.push(`/payments/?id=${id}`);
+                    }
+                    else{
+                     navigate.push(`/payments/`);   
+                    }
                 },
                 onError(error, variables, context) {
                     toast.error(error?.response.data?.message || "Something went wrong");
