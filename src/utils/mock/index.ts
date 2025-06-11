@@ -908,7 +908,7 @@ export const SignInSchema = z.object({
         }),
 })
 export const ResetsswordSchema = z.object({
-    password: z.string()
+    password: z.string().min(8)
         .refine(val => !val || val.length >= 8, {
             message: "Password must be at least 8 characters",
         })
@@ -919,7 +919,7 @@ export const ResetsswordSchema = z.object({
             message: "Password must contain at least 1 special character",
         }),
 
-    confirm_password: z.string()
+    confirm_password: z.string().min(8)
         .refine(val => !val || val.length >= 8, {
             message: "Confirm Password must be at least 8 characters",
         }),
