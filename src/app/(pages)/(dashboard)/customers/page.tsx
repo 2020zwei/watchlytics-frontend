@@ -3,7 +3,7 @@ import RoundedBox from '@/components/common/baseButton/RoundedBox'
 import Heading from '@/components/common/heading'
 import clsx from 'clsx'
 import React, { useEffect, useRef, useState } from 'react'
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@heroui/react";
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Select, SelectItem, Spinner } from "@heroui/react";
 import Pagination from '@/components/common/Pagination'
 import Link from 'next/link'
 import SelectWidget from '@/components/common/SelectWidget'
@@ -18,6 +18,7 @@ import { formatCurrency } from '@/utils/formatCurrency'
 import { exportToPDF } from '@/utils/exportToPDF'
 import SearchBar from '@/components/common/SearchBar'
 import Checkbox from '@/components/Checkbox'
+import CsvDownloader from 'react-csv-downloader';
 
 const buttons: any = {
     "status": ["active", "inactive"],
@@ -26,6 +27,14 @@ const buttons: any = {
     "Newsletter": ["subscribed", "unsubscribed"],
     "Follow Up": ["yes", "no"],
 }
+
+const actions: any = {
+    pdf: "PDF",
+    csv: "CSV",
+    follow_up: "Mark follow-up",
+    newsletter: "Send newsletter",
+    deactivate: "Deactivate",
+};
 
 type SortDirection = 'asc' | 'desc';
 
@@ -44,9 +53,11 @@ const page = () => {
     const [sortedData, setSortedData] = useState<T[]>([]);
     const [isAllChecked, setIsAllChecked] = useState(false);
     const [selectedData, setSelectedData] = useState([]);
+    const [selectedAction, setSelectedAction] = useState<string | null>(null);
     const [deleteAlert, setDeleteAlert] = useState(false)
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
     const [note, setNote] = useState<any>()
+    const downloadRef = useRef<any>(null);
     const navigate = useRouter()
     const pageRef = useRef(1)
 
@@ -136,6 +147,31 @@ const page = () => {
             setIsAllChecked(false);
         }
     };
+    const handleAction = (val: string) => {
+        setSelectedAction(val);
+        // const payload = val === "delete" ? {
+        //     "action": "bulk_delete",
+        //     "product_ids": [...selectedIds]
+        // } : {
+        //     "product_ids": [...selectedIds],
+        //     "action": "update_availability",
+        //     "availability": val
+        // }
+
+        if (selectedData.length > 0 && downloadRef.current && val === "csv") {
+            downloadRef.current.handleClick();
+            setTimeout(() => {
+                setSelectedIds(new Set());
+                setSelectedData([]);
+                setIsAllChecked(false);
+                setSelectedAction("")
+            }, 100);
+        }
+        if (customers?.data?.results?.length && val === "pdf") {
+            exportToPDF({ data: customers?.data?.results, label: "customer" })
+        }
+
+    };
 
     useEffect(() => {
         if (!sortConfig || !customers?.data?.results) {
@@ -186,7 +222,7 @@ const page = () => {
     if (isLoading) {
         return <div className='text-center mt-5'><Spinner /></div>
     }
-
+    const columns = customers?.data?.results.length ? Object.keys(customers?.data?.results[0]) : [];
 
     return (
         <div>
@@ -255,22 +291,31 @@ const page = () => {
                             <SearchBar placeholder='Search...' icon='search'
                                 inputClass='order-1 !h-[38px] !text-xs  w-full'
                                 placeholderClass='placeholder:text-[#71717a] placeholder:text-sm'
-                                onChange={handleFilter}
+                                onChange={(value) => handleFilter(value!)}
                             />
                         </div>
-                        <div>
-                            <SelectWidget
-                                onValueChange={(value) => { }}
-                                placeholder="Select option"
-                                options={["PDF", "CSV","Mark follow-up","Send newsletter","Deactivate"]}
+                        {selectedIds.size ? <div className='w-[140px]'>
+
+                            <Select
+                                placeholder="Select Action"
+                                aria-label="Select Action"
+                                selectedKeys={selectedAction ? [selectedAction] : []}
+                                onSelectionChange={(value: any) => handleAction(Array.from(value)[0] as string)}
                                 classNames={{
-                                    trigger:
-                                        "!rounded-lg bg-transparent capitalize border !border-gray-70 !text-read-500 font-normal text-sm w-[150px] follow-up",
+                                    trigger: "!rounded-lg bg-transparent capitalize border !text-[#1C274C] !border-gray-70 !bg-transparent font-normal text-sm",
                                     base: "rounded-none",
                                     popoverContent: "rounded-none",
+
                                 }}
-                            />
-                        </div>
+                            >
+                                {Object.keys(actions).map((key: string) => (
+                                    <SelectItem key={key} textValue={key}>
+                                        {actions[key]}
+                                    </SelectItem>
+
+                                ))}
+                            </Select>
+                        </div> : null}
                         <Link href="/customers/add" className='bg-blue-gradient text-white rounded-lg text-sm h-10 w-[128px] flex items-center justify-center'>Add Customer</Link>
                     </div>
                 </div>
@@ -437,6 +482,18 @@ const page = () => {
             <AddNoteModalWidget isOpen={isUploadModalOpen} onOpen={closeUploadModal} note={note} callBack={() => { closeUploadModal() }} />
             <AlertModal alertText="Are you sure you want to delete this card?"
                 isOpen={deleteAlert} onOpen={closeUploadModal} callBack={comfirmDelete} />
+
+            <CsvDownloader
+                ref={downloadRef}
+                className="hidden"
+                datas={selectedData}
+                filename="inventory-data"
+                extension=".csv"
+                columns={columns.map(col => ({
+                    id: col,
+                    displayName: col
+                }))}
+            />
         </div >
     )
 }

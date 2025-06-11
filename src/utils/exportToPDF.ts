@@ -1,21 +1,42 @@
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
-export const exportToPDF = (data: any[], title = 'Report') => {
-    const doc = new jsPDF();
+interface ExportPDFProps {
+    data: any,
+    label: string
+}
 
-    doc.text(title, 14, 10);
+export const exportToPDF = ({ data, label = "" }: ExportPDFProps) => {
+    const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "A4" });
+    const keys = Object.keys(data[0] || {});
+    const headers = keys.map((key) => ({
+        header: key.replace(/_/g, " ").toUpperCase(),
+        dataKey: key,
+    }));
 
-    if (!data.length) return;
-
-    const columns = Object.keys(data[0]);
-    const rows = data.map(row => columns.map(col => row[col]));
-
-    autoTable(doc, {
-        head: [columns],
-        body: rows,
-        startY: 20,
+    const rows = data.map((row: any) => {
+        const newRow: any = {};
+        keys.forEach((key) => {
+            newRow[key] = row[key] ?? "";
+        });
+        return newRow;
     });
 
-    doc.save(`${title}.pdf`);
-};
+    autoTable(doc, {
+        columns: headers,
+        body: rows,
+        styles: {
+            fontSize: 8,
+            cellPadding: 4,
+        },
+        margin: { top: 20 },
+        headStyles: {
+            fillColor: [41, 128, 185],
+            fontSize: 10,
+        },
+    });
+
+
+    doc.save(`${label}.pdf`);
+}
+

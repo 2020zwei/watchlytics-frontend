@@ -135,8 +135,8 @@ export default function Signup() {
                 icon={
                   field.type === "password"
                     ? togglePassType[field.name]
-                      ? "eyeOff"
-                      : "filledEye"
+                      ? "filledEye"
+                      : "eyeOff"
                     : undefined
                 }
                 onPasswordToggle={() => handleTogglePasswordType(field.name)}
