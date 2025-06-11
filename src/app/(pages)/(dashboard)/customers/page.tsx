@@ -289,39 +289,39 @@ const page = () => {
                         })}
                         {Object.keys(filters)?.length ? <li className='rounded-md border !border-gray-70 h-10 px-4 flex items-center justify-center cursor-pointer' onClick={() => { setFilters({}); navigate.push("/customers") }}>Clear</li> : null}
                     </ul>
-                    <div className='lg-xl:w-auto flex items-center justify-end gap-3 w-full mt-4'>
-                        {/* <button onClick={() => exportToPDF(sortedData, 'Customer Report')}>Export PDF</button> */}
-                        <div className='sm:min-w-[250px] max-w-[250px] flex items-center border !border-gray-70 rounded-lg placeholder: flex-1 ps-3 font-normal'>
-                            <SearchBar placeholder='Search...' icon='search'
-                                inputClass='order-1 !h-[38px] !text-xs  w-full'
-                                placeholderClass='placeholder:text-[#71717a] placeholder:text-sm'
-                                onChange={(value) => handleFilter(value!)}
-                            />
-                        </div>
-                        {selectedIds.size ? <div className='w-[140px]'>
-
-                            <Select
-                                placeholder="Select Action"
-                                aria-label="Select Action"
-                                selectedKeys={selectedAction ? [selectedAction] : []}
-                                onSelectionChange={(value: any) => handleAction(Array.from(value)[0] as string)}
-                                classNames={{
-                                    trigger: "!rounded-lg bg-transparent capitalize border !text-[#1C274C] !border-gray-70 !bg-transparent font-normal text-sm",
-                                    base: "rounded-none",
-                                    popoverContent: "rounded-none",
-
-                                }}
-                            >
-                                {Object.keys(actions).map((key: string) => (
-                                    <SelectItem key={key} textValue={key}>
-                                        {actions[key]}
-                                    </SelectItem>
-
-                                ))}
-                            </Select>
-                        </div> : null}
-                        <Link href="/customers/add" className='bg-blue-gradient text-white rounded-lg text-sm h-10 w-[128px] flex items-center justify-center'>Add Customer</Link>
+                </div>
+                <div className='lg-xl:w-auto flex items-center justify-end gap-3 w-full mt-4'>
+                    {/* <button onClick={() => exportToPDF(sortedData, 'Customer Report')}>Export PDF</button> */}
+                    <div className='sm:min-w-[250px] max-w-[250px] flex items-center border !border-gray-70 rounded-lg placeholder: flex-1 ps-3 font-normal'>
+                        <SearchBar placeholder='Search...' icon='search'
+                            inputClass='order-1 !h-[38px] !text-xs  w-full'
+                            placeholderClass='placeholder:text-[#71717a] placeholder:text-sm'
+                            onChange={(value) => handleFilter(value!)}
+                        />
                     </div>
+                    {selectedIds.size ? <div className='w-[140px]'>
+
+                        <Select
+                            placeholder="Select Action"
+                            aria-label="Select Action"
+                            selectedKeys={selectedAction ? [selectedAction] : []}
+                            onSelectionChange={(value: any) => handleAction(Array.from(value)[0] as string)}
+                            classNames={{
+                                trigger: "!rounded-lg bg-transparent capitalize border !text-[#1C274C] !border-gray-70 !bg-transparent font-normal text-sm",
+                                base: "rounded-none",
+                                popoverContent: "rounded-none",
+
+                            }}
+                        >
+                            {Object.keys(actions).map((key: string) => (
+                                <SelectItem key={key} textValue={key}>
+                                    {actions[key]}
+                                </SelectItem>
+
+                            ))}
+                        </Select>
+                    </div> : null}
+                    <Link href="/customers/add" className='bg-blue-gradient text-white rounded-lg text-sm h-10 w-[128px] flex items-center justify-center'>Add Customer</Link>
                 </div>
 
                 <div className='pt-3'>

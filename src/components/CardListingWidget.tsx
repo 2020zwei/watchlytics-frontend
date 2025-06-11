@@ -10,7 +10,7 @@ import { sendRequest } from '@/utils/apis';
 import Notfound from '@/components/common/Notfound';
 import { toast } from 'react-toastify';
 import { Button, Spinner } from '@heroui/react';
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import AlertModal from './common/AlertModal';
 
 const CardListingWidget = () => {
@@ -22,6 +22,7 @@ const CardListingWidget = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const planId = searchParams.get("id");
     const [deleteId, setDeleteId] = useState()
+    const navigate = useRouter()
     const getCards = async () => {
         setLoading(true)
         const PAYLOAD: RequestTypes = {
@@ -82,6 +83,11 @@ const CardListingWidget = () => {
         }
     };
 
+    const addCard = () => {
+        navigate.push("/payments/add-card")
+        localStorage.setItem("cardId", JSON.stringify(planId))
+    }
+
     const handleCheckout = () => {
         setIsSubmitting(true)
         const selectedCard: any = cards?.find((card: any) => card?.is_default)
@@ -121,6 +127,7 @@ const CardListingWidget = () => {
 
 
     useEffect(() => {
+        
         planId && getSubscriptions()
         getCards()
     },
@@ -134,9 +141,9 @@ const CardListingWidget = () => {
                 <RoundedBox>
                     <div className='flex items-center justify-between px-5 pt-7 pb-3'>
                         <Heading>Saved Cards</Heading>
-                        <Link href="/payments/add-card"
+                        <button onClick={addCard}
                             className="h-10 px-3 text-sm font-medium flex items-center justify-between text-white rounded-lg bg-blue-gradient"
-                        >Add Card</Link>
+                        >Add Card</button>
                     </div>
                     <div className=" overflow-x-auto">
                         {!cards.length ? <Notfound label='Cards not found' /> :
