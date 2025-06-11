@@ -127,11 +127,17 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                         className="bg-transparent w-full text-[#808080] placeholder:text-[#808080] outline-none"
                         required
                         placeholder="Card holder name"
-                        onChange={(e: any) => { setName(e.target.value); e.target.value.length < 3 ? setError(true) : setError(false) }}
-                    />                  
+                        value={name}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            const onlyLetters = value.replace(/[^a-zA-Z\s]/g, '');
+                            setName(onlyLetters);
+                            setError(onlyLetters.length < 3);
+                        }}
+                    />
 
                 </div>
-                  {error ? <p className="text-red-500 !mt-0">Holer name must be at least 3 characters</p> : null}
+                {error ? <p className="text-red-500 !mt-0">Holer name must be at least 3 characters and only alphabet allowed</p> : null}
                 {/* Card Number */}
                 <div className="space-y-1">
                     <div className="rounded-lg border border-gray-180 px-3 flex items-center gap-3 h-14">

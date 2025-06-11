@@ -60,19 +60,19 @@ const page = () => {
                         </div>
                     </div>
                     <div className='flex justify-between px-3 pb-5 gap-3'>
-                        <div className="">
+                        <div className="flex flex-col justify-between">
                             <div className='text-gray-600 text-sm doller-sign'>{stats?.total_profit ? formatCurrency(stats?.total_profit, 'en-US', 'USD') : "No Data"}</div>
-                            <div className=' text-sm font-medium text-dark-500 mt-3'>Total Profit</div>
+                            <div className=' text-sm font-medium text-dark-500 mt-3'>Net purchase value</div>
                         </div>
-                        <div className="">
+                        <div className="flex flex-col justify-between">
                             <div className='text-gray-600 text-sm '>{stats?.net_sales_value ? formatCurrency(stats?.net_sales_value, 'en-US', 'USD') : "No Data"}</div>
                             <div className=' text-sm font-medium text-dark-500 mt-3'>Net sales value</div>
                         </div>
-                        <div className="md:pe-6">
+                        <div className="md:pe-6 flex flex-col justify-between">
                             <div className='text-gray-600 text-sm doller-sign'>{stats?.mom_profit ? formatCurrency(stats?.mom_profit, 'en-US', 'USD') : "No Data"}</div>
                             <div className=' text-sm font-medium text-dark-500 mt-3'>MoM Profit</div>
                         </div>
-                        <div className="md:pe-6">
+                        <div className="md:pe-6 flex flex-col justify-between">
                             <div className='text-gray-600 text-sm doller-sign'>{stats?.yoy_profit ? formatCurrency(stats?.yoy_profit, 'en-US', 'USD') : "No Data"}</div>
                             <div className=' text-sm font-medium text-dark-500 mt-3'>YoY Profit</div>
                         </div>

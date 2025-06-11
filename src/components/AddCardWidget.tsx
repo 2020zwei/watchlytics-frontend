@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import Icon from "@/components/common/Icon";
 import { Button } from "@heroui/react";
 import { METHODS, URLS } from "@/utils/constants";
+import { useAddCard } from "@/hooks/useSubscription";
 
 const AddCardWidget = () => {
     const stripe = useStripe();
@@ -30,6 +31,7 @@ const AddCardWidget = () => {
     const [isCvcComplete, setIsCvcComplete] = useState(false);
     const [name, setName] = useState("")
     const [error, setError] = useState(false)
+    const { mutateAsync: addCardMutation, isPending } = useAddCard();
 
     const stripeInputStyle = {
         base: {
@@ -79,24 +81,16 @@ const AddCardWidget = () => {
                 payment_method_token: paymentMethod?.id,
                 card_holder_name: name
             };
-
-            sendRequest({ url: URLS.CARDS, method: METHODS.POST, payload: PAYLOAD })
-                .then(async (res) => {
-                    if (res.status === 201) {
-                        toast.success(res?.data?.message);
-                        const id = JSON.parse(localStorage.getItem("cardId") || "")
-                        navigate.push(`/payments/?id=${id}`);
-                    } else {
-                        if (res?.status === 400 || res?.status == 500) {
-                            toast.error(res?.response?.data?.message || "Something went wrong");
-                        }
-                    }
-                }).catch((err) => {
-                    toast.error("Something went wrong")
-                })
-                .finally(() => {
-                    setIsSubmitting(false);
-                });
+            addCardMutation(PAYLOAD, {
+                onSuccess(data, variables, context) {
+                    toast.success("Card successfyll added");
+                    const id = JSON.parse(localStorage.getItem("cardId") || "null");
+                    if (id) navigate.push(`/payments/?id=${id}`);
+                },
+                onError(error, variables, context) {
+                    toast.error(error?.response.data?.message || "Something went wrong");
+                },
+            });
         }
     };
 
@@ -124,10 +118,17 @@ const AddCardWidget = () => {
                         className="bg-transparent w-full text-[#808080] placeholder:text-[#808080] outline-none"
                         required
                         placeholder="Card holder name"
-                        onChange={(e: any) => { setName(e.target.value); e.target.value.length < 3 ? setError(true) : setError(false) }}
+                        value={name}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            const onlyLetters = value.replace(/[^a-zA-Z\s]/g, '');
+                            setName(onlyLetters);
+                            setError(onlyLetters.length < 3);
+                        }}
                     />
+
                 </div>
-                {error ? <p className="text-red-500 !mt-0">Card holder name must be at least 3 characters</p> : null}
+                {error ? <p className="text-red-500 !mt-0">Card holder name must be at least 3 characters only alphabets allowed</p> : null}
                 {/* Card Number */}
                 <div className="space-y-1">
                     <div className="rounded-lg border border-gray-180 px-3 flex items-center gap-3 h-14">
@@ -180,13 +181,13 @@ const AddCardWidget = () => {
                         isDisabled={
                             !stripe ||
                             !elements ||
-                            isSubmitting ||
+                            isPending ||
                             !isCardComplete ||
                             !isExpiryComplete ||
                             !isCvcComplete ||
                             !(name.toString().length > 2)
                         }
-                        isLoading={isSubmitting}
+                        isLoading={isPending}
                     >Add Card</Button>
                 </div>
             </form>
