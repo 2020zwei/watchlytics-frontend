@@ -29,6 +29,7 @@ const AddCardWidget = () => {
     const [isExpiryComplete, setIsExpiryComplete] = useState(false);
     const [isCvcComplete, setIsCvcComplete] = useState(false);
     const [name, setName] = useState("")
+    const [error, setError] = useState(false)
 
     const stripeInputStyle = {
         base: {
@@ -45,7 +46,7 @@ const AddCardWidget = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if (!name) {
+        if (name.length < 3) {
             toast.error("Please fill card holder field")
             return false
         }
@@ -83,9 +84,10 @@ const AddCardWidget = () => {
                 .then(async (res) => {
                     if (res.status === 201) {
                         toast.success(res?.data?.message);
-                        navigate.push("/payments");
+                        const id = JSON.parse(localStorage.getItem("cardId") || "")
+                        navigate.push(`/payments/?id=${id}`);
                     } else {
-                        if (res?.status === 400 || res?.status== 500) {
+                        if (res?.status === 400 || res?.status == 500) {
                             toast.error(res?.response?.data?.message || "Something went wrong");
                         }
                     }
@@ -122,9 +124,10 @@ const AddCardWidget = () => {
                         className="bg-transparent w-full text-[#808080] placeholder:text-[#808080] outline-none"
                         required
                         placeholder="Card holder name"
-                        onChange={(e: any) => setName(e.target.value)}
+                        onChange={(e: any) => { setName(e.target.value); e.target.value.length < 3 ? setError(true) : setError(false) }}
                     />
                 </div>
+                {error ? <p className="text-red-500 !mt-0">Card holder name must be at least 3 characters</p> : null}
                 {/* Card Number */}
                 <div className="space-y-1">
                     <div className="rounded-lg border border-gray-180 px-3 flex items-center gap-3 h-14">
