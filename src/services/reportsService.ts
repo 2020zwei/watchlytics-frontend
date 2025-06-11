@@ -12,7 +12,7 @@ export const reportStats = () =>
 
 
 
-export const expenseReports = (page:number) =>
+export const expenseReports = (page:number=1) =>
     apiClient.get(`${URLS.REPORTS_EXPENSES}?/page=${page}`).then(res => res);
 
 export const stockReport = (query: { brand?: string; model?: string }) => {

@@ -5,6 +5,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, useDisclosure } from "@her
 import React from "react";
 import Icon from "./Icon";
 import Heading from "./heading";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 interface TransactionModalTypes {
     modalTile: string,
@@ -45,16 +46,16 @@ const TransactionModal: React.FC<TransactionModalTypes> = ({ modalTile, data }) 
                                                         <td className="text-start py-4">
                                                             <div className="flex items-center gap-1 ">
                                                                 <div className="w-8 h-8 p-[3px] !bg-gray-80 flex justify-center items-center">
-                                                                    {item?.product_details?.image ? <img src={item?.product_details?.image} alt="image" className="rounded w-full h-full" /> : "N/A"}
+                                                                    {item?.product_details?.image ? <img src={item?.product_details?.image} alt="image" className="rounded w-full h-full" /> :<Icon name="watch"/>}
                                                                 </div>
                                                                 <span>{item?.product_details?.model_name}</span>
                                                             </div>
                                                         </td>
                                                         <td className="py-4 text-center">{item?.buyer_name}</td>
                                                         <td className="py-4 text-center">{item?.quantity}</td>
-                                                        <td className="py-4 text-center">{item?.purchase_price}</td>
-                                                        <td className="py-4 text-center">{item?.sale_price}</td>
-                                                        <td className="text-end py-4">{item?.sale_price}</td>
+                                                        <td className="py-4 text-center">{item?.purchase_price ? formatCurrency(item?.purchase_price, 'en-US', 'USD') : "No Data"}</td>
+                                                        <td className="py-4 text-center">{item?.sale_price ? formatCurrency(item?.sale_price, 'en-US', 'USD') : "No Data"}</td>
+                                                        <td className="text-end py-4">{item?.sale_price ? formatCurrency(item?.sale_price, 'en-US', 'USD') : "No Data"}</td>
                                                     </tr>
                                                 ))}
                                         </tbody>

@@ -16,7 +16,7 @@ export function formatCurrency(
 
     return (
         <span className="flex items-center">
-            <span className="text-[17px] leading-[20px]">{symbol} </span>
+            <span className="text-[17px] leading-[20px] symbol">{symbol} </span>
             < span > {value} </span>
         </span>
     );

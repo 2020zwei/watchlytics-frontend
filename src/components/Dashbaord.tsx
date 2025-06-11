@@ -133,14 +133,13 @@ export default function Dashboard() {
   useEffect(() => {
     if (incomeData?.status === 200) {
       const MIN_SLICE = 3000;
-
       const rawData = [
         { name: "Target", value: incomeData.data.target, color: "#1F79B5" },
         { name: "Income", value: incomeData.data.income, color: "#E0E0E0" },
         { name: "Pending", value: incomeData.data.pending, color: "#0D3C61" },
       ];
-
-      const dataWithDisplayValue = rawData.map(item => ({
+      const notZeroValue = rawData.filter((item) => item?.value)
+      const dataWithDisplayValue = notZeroValue.map(item => ({
         ...item,
         displayValue: item.value < MIN_SLICE ? MIN_SLICE : item.value,
       }));
@@ -203,7 +202,7 @@ export default function Dashboard() {
             <div className="text-lg font-medium pb-3 text-orange-600">Average Profit</div>
             <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none flex items-center gap-1">
               {/* <span className="text-gray-180">$</span> */}
-              <span>{formatCurrency(stats?.data?.average_profit_per_unit, 'en-US', 'USD')}</span>
+              <span className="average_profit_per_unit">{formatCurrency(stats?.data?.average_profit_per_unit, 'en-US', 'USD')}</span>
             </div>
           </div>
         </div>
