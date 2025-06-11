@@ -175,6 +175,14 @@ const page = () => {
         setFilters(initialFilters)
     }, [])
 
+    useEffect(() => {
+        if ([...selectedIds].length) {
+            const selectedPro = customers?.data?.results?.filter((item: any) => [...selectedIds].includes(item.id));
+            setSelectedData(selectedPro);
+            setIsAllChecked([...selectedIds].length === customers?.data?.results?.length);
+        }
+    }, [selectedIds, customers?.data?.results]);
+
     if (isLoading) {
         return <div className='text-center mt-5'><Spinner /></div>
     }
@@ -254,7 +262,7 @@ const page = () => {
                             <SelectWidget
                                 onValueChange={(value) => { }}
                                 placeholder="Select option"
-                                options={["PDF", "CSV"]}
+                                options={["PDF", "CSV","Mark follow-up","Send newsletter","Deactivate"]}
                                 classNames={{
                                     trigger:
                                         "!rounded-lg bg-transparent capitalize border !border-gray-70 !text-read-500 font-normal text-sm w-[150px] follow-up",
@@ -274,7 +282,7 @@ const page = () => {
                                 <table className="border-collapse min-w-[1200px] w-full text-start">
                                     <thead className="bg-blue-gradient text-white">
                                         <tr>
-                                            <th className="w-3 rounded-tl-lg rounded-bl-lg">
+                                            <th className="w-3 rounded-tl-lg rounded-bl-lg ">
                                                 <div className='w-4 ps-3'>
                                                     <Checkbox
                                                         checked={isAllChecked}
@@ -282,7 +290,7 @@ const page = () => {
                                                     />
                                                 </div>
                                             </th>
-                                            <th className={clsx("text-sm font-bold py-3 rounded-tl-lg rounded-bl-lg  first-letter:uppercase whitespace-nowrap px-4")}
+                                            <th className={clsx("text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >Name </th>
                                             <th className={clsx("text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >email</th>
