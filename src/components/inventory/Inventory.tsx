@@ -297,7 +297,7 @@ const Inventory = () => {
 
             <RoundedBox as='section' className="lg:px-4 lg:py-5 gap-3 mb-0.5 lg:!bg-white !bg-transparent">
                 <Heading as="h1" className="col-span-12 pb-4">Overall Inventory</Heading>
-                <div className='flex justify-between lg:flex-nowrap flex-wrap lg:gap-0 gap-y-3'>
+                <div className='flex justify-between inventory lg:flex-nowrap flex-wrap lg:gap-0 gap-y-3'>
                     <div className="lg:w-auto sm:w-[49%] w-full lg:p-0 p-4 rounded-lg grid grid-cols-1 gap-3 border-r border-gray-200 bg-white lg:pe-14 md:pe-8 pe-3">
                         <Heading>Categories</Heading>
                         <div className=' font-semibold text-base text-gray-600'>{stats?.data?.categories?.count}</div>

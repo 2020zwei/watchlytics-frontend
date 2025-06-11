@@ -109,8 +109,11 @@ body .searchbale-select__control--is-focused {
   @apply text-[30px]
 }
 
-.reports-cards .doller-sign .symbol {
+.reports-cards .doller-sign .symbol{
   @apply text-lg
+}
+.inventory .doller-sign .symbol{
+  @apply text-xl
 }
 
 @media(max-width:500px) {
