@@ -50,7 +50,6 @@ const Chart: React.FC<ChartProps> = ({ lineA, lineB, label, data, lineACol, line
     const handleChartTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         callBack?.(e.target.value as string);
     };
-
     return (
         <div>
             <div className="flex items-center justify-between mb-4">

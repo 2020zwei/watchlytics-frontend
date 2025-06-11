@@ -28,9 +28,9 @@ const ProfitLossReport = () => {
     }, [searchParams]);
 
     const chartData = data?.data?.chart_data?.map((item: any) => ({
-        month: item?.month || item?.date,
-        purchase: Math.max(item.purchase || 0, 0),
-        sale: Math.max(item.sale || 0, 0),
+        month: item?.period || item?.period,
+        profit: Math.max(item.profit || 0, 0),
+        loss: Math.max(item.loss || 0, 0),
     })) || [];
 
     const updateFilter = (value: string) => {

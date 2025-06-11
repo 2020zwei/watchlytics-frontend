@@ -3,7 +3,7 @@ export const URLS = {
   REGISTER: "/auth/signup/",
   LOGIN: "/auth/signin/",
   FORGOT_PASSWORD: "/auth/forgot-password/",
-  RESET_PASSWORD: "/auth/password-reset-confirm/MQ/",
+  RESET_PASSWORD: "/auth/password-reset-confirm/",
   TRAINERS: "auth/users/?account_type=TRAINER&is_verified=True",
   PROGRAMS: "/program",
   TRAINER_BIOGRAPHY_BIDEO: "/auth/users/?account_type=TRAINER&is_verified=True",
@@ -46,6 +46,7 @@ export const URLS = {
   INVOICE: "/v1/invoices/",
   CUSTOMERS: "/v1/customers/",
   DASHBOARD_STATS: "/v1/dashboard/stats/",
+  SOLD_ITEMS: "/v1/dashboard/sold-items/",
   DASHBOARD_INCOME_BREAKDONW: "/v1/dashboard/income-breakdown/",
   DASHBOARD_EXPENSE_TRACKING: "/v1/dashboard/expense-tracking/",
   // DASHBOARD_DETAILED_ANALYTICS: "/v1/dashboard/detailed-analytics/",
@@ -56,6 +57,7 @@ export const URLS = {
   SUBSCRIPTION_DETAILS: "/subscription/details/",
   MARKAS_SOLD: "/v1/inventory/bulk-mark-sold/",
   BULK_OPERATION: "/v1/inventory/bulk-operations/",
+  DASHBOARD_REPORTS: "/v1/dashboard/income-reports/",
 };
 
 export const METHODS = {

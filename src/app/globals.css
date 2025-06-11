@@ -60,39 +60,65 @@ body .searchbale-select__control {
 .searchbale-select__indicator-separator {
   @apply hidden
 }
-.searchbale-select__value-container{
+
+.searchbale-select__value-container {
   @apply pt-0
 }
-.searchbale-select__placeholder,.searchbale-select__value-container{
+
+.searchbale-select__placeholder, .searchbale-select__value-container {
   @apply text-sm font-normal !mt-0
 }
-.searchbale-select__placeholder{
+
+.searchbale-select__placeholder {
   @apply !text-gray-180
 }
+
 .searchbale-select__input-container {
   @apply !m-0 !p-0 text-dark-800
 }
-body .searchbale-select__control--is-focused{
+
+body .searchbale-select__control--is-focused {
   @apply !border-gray-70 !shadow-none
 }
-.filter-option1{
+
+.filter-option1 {
   @apply min-w-[122px]
 }
-.filter-option2{
+
+.filter-option2 {
   @apply min-w-[145px]
 }
-.filter-option3{
+
+.filter-option3 {
   @apply min-w-[130px]
 }
-.filter-option4{
+
+.filter-option4 {
   @apply min-w-[124px]
 }
-.searchbale-select__value-container--is-multi{
+
+.searchbale-select__value-container--is-multi {
   @apply !flex-nowrap
 }
-@media(max-width:500px){
 
-  .inventory-btns li button{
+.follow-up span {
+  @apply !text-[#808080]
+}
+
+.average_profit_per_unit .symbol {
+  @apply text-[30px]
+}
+
+.reports-cards .doller-sign .symbol{
+  @apply text-lg
+}
+.inventory .doller-sign .symbol{
+  @apply text-xl
+}
+
+@media(max-width:500px) {
+
+  .inventory-btns li button {
     @apply !w-full
   }
 }

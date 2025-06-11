@@ -5,10 +5,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Checkbox } from "@heroui/react";
 import Image from "next/image";
 import Link from "next/link";
-import { setCookie } from "cookies-next";
+import { getCookie, setCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LoginFormFields, SignInSchema } from "@/utils/mock";
 import FormField from "@/components/common/FormField";
 import { z } from "zod";
@@ -29,6 +29,7 @@ export default function SignIn() {
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(SignInSchema),
+    shouldUnregister: true,
     mode: "onChange"
   });
 
@@ -40,7 +41,7 @@ export default function SignIn() {
   };
 
   const onSubmit = async (data: FormData) => {
-    
+
     try {
       const payload = {
         email: data.email,
@@ -57,18 +58,24 @@ export default function SignIn() {
       toast.success("Login Successfully!", { position: "top-right" });
       localStorage.setItem("isLoggedin", "true");
 
-      router.push(result?.is_subscribed ? "/dashboard" : "/subscription");
+      router.replace(result?.is_subscribed ? "/dashboard" : "/subscription");
     } catch (error: any) {
-      console.log(apiError)
       const message =
         error?.response?.data?.non_field_errors?.[0] || "Sign-in failed";
       toast.error(`Signin failed, ${message}`, { position: "top-right" });
     }
   };
 
+  useEffect(() => {
+    const token = getCookie("access_token");
+    if (token) {
+      router.replace("/dashboard");
+    }
+  }, [router]);
+
   return (
     <div className="flex justify-center items-center">
-      <div className="w-full max-w-xl mx-auto">
+      <div className="w-fit max-w-xl mx-auto">
         <div className="flex items-center mb-8">
           <Image src="/clock.svg" alt="clock" width={48} height={48} />
           <span className="text-[#003BFF] font-medium text-lg ml-2">
@@ -78,7 +85,7 @@ export default function SignIn() {
 
         <h1 className="text-[2.5rem] font-bold mb-8 text-[#1E293B]">Sign In</h1>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 md:w-[28rem] w-full">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 md:w-[28rem] w-full" autoComplete="off">
           {/* Email Field */}
 
           <fieldset className="grid grid-cols-1">
@@ -108,8 +115,8 @@ export default function SignIn() {
                   icon={
                     field.type === "password"
                       ? togglePassType[field.name]
-                        ? "eyeOff"
-                        : "filledEye"
+                        ? "filledEye"
+                        : "eyeOff"
                       : undefined
                   }
                   onPasswordToggle={() => handleTogglePasswordType(field.name)}

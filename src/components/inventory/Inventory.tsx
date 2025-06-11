@@ -297,7 +297,7 @@ const Inventory = () => {
 
             <RoundedBox as='section' className="lg:px-4 lg:py-5 gap-3 mb-0.5 lg:!bg-white !bg-transparent">
                 <Heading as="h1" className="col-span-12 pb-4">Overall Inventory</Heading>
-                <div className='flex justify-between lg:flex-nowrap flex-wrap lg:gap-0 gap-y-3'>
+                <div className='flex justify-between inventory lg:flex-nowrap flex-wrap lg:gap-0 gap-y-3'>
                     <div className="lg:w-auto sm:w-[49%] w-full lg:p-0 p-4 rounded-lg grid grid-cols-1 gap-3 border-r border-gray-200 bg-white lg:pe-14 md:pe-8 pe-3">
                         <Heading>Categories</Heading>
                         <div className=' font-semibold text-base text-gray-600'>{stats?.data?.categories?.count}</div>
@@ -307,7 +307,7 @@ const Inventory = () => {
                         <Heading className=' text-orange-800'>Total Products</Heading>
                         <div className='grid grid-cols-2 font-semibold text-base text-gray-600'>
                             <span>{stats?.data?.total_products?.count}</span>
-                            <span className="text-center">{stats?.data?.total_products?.revenue}</span>
+                            <span className="text-center doller-sign">{formatCurrency(stats?.data?.total_products?.revenue, 'en-US', 'USD')}</span>
                         </div>
                         <div className='grid grid-cols-2 gap-10 font-semibold text-base text-gray-500'>
                             <span>{stats?.data?.total_products?.label}</span>
@@ -318,7 +318,7 @@ const Inventory = () => {
                         <Heading className=' text-pink-500'>Top Selling</Heading>
                         <div className='grid grid-cols-2 gap-10 font-semibold text-base text-gray-600'>
                             <span>{stats?.data?.top_selling?.count}</span>
-                            <span className="text-center">{stats?.data?.top_selling?.cost}</span>
+                            <span className="text-center doller-sign">{formatCurrency(stats?.data?.top_selling?.cost, 'en-US', 'USD')}</span>
                         </div>
                         <div className='grid grid-cols-2 gap-10 font-semibold text-base text-gray-500'>
                             <span>{stats?.data?.top_selling?.label}</span>
@@ -346,7 +346,7 @@ const Inventory = () => {
                     <div className='flex items-center gap-2'>
                         <Heading className='text-start md:w-auto w-full md:-order-1 order-1'>Products {selectedId}</Heading>
 
-                        <div className='flex items-center ms-2 border rounded-lg flex-1 me-3 max-w-[320px] min-w-[240px] ps-3 border-[#F0F1F3] font-normal'>
+                        <div className='flex items-center ms-2 border rounded-lg flex-1 me-3 max-w-[320px] min-w-[240px] ps-3 !border-gray-[#F0F1F3] font-normal'>
                             <SearchBar placeholder='Search product, supplier, order' icon='search'
                                 inputClass='order-1 !h-[38px] !text-xs'
                                 placeholderClass='placeholder:text-[#858D9D] placeholder:text-xs'
@@ -429,13 +429,13 @@ const Inventory = () => {
                                                 </div>
                                             </th>
                                             <th className="px-4 text-sm font-medium py-3">Actions</th>
-                                            <th className="w-7">Image</th>
+                                            <th className="w-7 text-sm font-medium">Image</th>
                                             {columns?.map((col, index) => (
                                                 col !== 'id' && col !== "image" && col !== "category" && col !== "availability" && col !== "owner" ?
                                                     <th
                                                         key={index}
                                                         className={clsx(
-                                                            "text-sm font-medium py-3 px-4"
+                                                            "text-sm font-medium py-3 px-4 capitalize"
                                                         )}
 
                                                     >
@@ -550,7 +550,7 @@ const Inventory = () => {
                                                                 {
                                                                     currencyFields.includes(col)
                                                                         ? row?.[col]
-                                                                            ? <span className="flex items-center">{formatCurrency(row?.[col], 'en-US', 'USD')}</span>
+                                                                            ? <span className="flex items-center first-letter:text-lg">{formatCurrency(row?.[col], 'en-US', 'USD')}</span>
                                                                             : "No Data"
                                                                         : col === "profit_margin"
                                                                             ? row?.[col] ? `${row?.[col]}%` : "No Data"

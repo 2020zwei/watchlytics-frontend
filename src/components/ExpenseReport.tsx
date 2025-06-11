@@ -28,7 +28,7 @@ const ExpenseReport = () => {
     } = useExpenseReport(currentPage);
 
     const handleExport = () => {
-        if (reports?.results?.length > 0 && downloadRef.current) {
+        if (reports?.data?.results?.length > 0 && downloadRef.current) {
             downloadRef.current.handleClick();
         }
     }
@@ -44,21 +44,21 @@ const ExpenseReport = () => {
         return <div className='text-center'><Spinner /></div>;
     }
 
-    const columns = reports?.results?.length ? Object.keys(reports?.results[0]) : [];
+    const columns = reports?.data?.results?.length ? Object.keys(reports?.data?.results[0]) : [];
 
     return (
         <>
             <div className='mb-5 flex sm:flex-row flex-col items-center sm:justify-between'>
                 <Heading as='h3' className='md:text-2xl text-lg w-full'>Expense Report</Heading>
                 <div className='flex items-center gap-3'>
-                    <button onClick={handleExport} className='border rounded-lg p-0 bg-transparent h-[38px] px-3 border-gray-180'>
+                    {reports?.data?.results?.length ? <button onClick={handleExport} className='border rounded-lg p-0 bg-transparent h-[38px] px-3 border-gray-180'>
                         Export
-                    </button>
+                    </button> : null}
                     <ReportFilters selectedReport='Expense Report' />
                 </div>
             </div>
 
-            {!reports?.results?.length ? <Notfound /> :
+            {!reports?.data?.results?.length ? <Notfound /> :
                 <RoundedBox>
                     <div className=''>
                         <table className='w-full'>
@@ -75,7 +75,7 @@ const ExpenseReport = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {reports?.results?.map((report: any, index: number) => (
+                                {reports?.data?.results?.map((report: any, index: number) => (
                                     <tr key={index} className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
                                         <td className='text-start py-3 px-4 first-letter:uppercase'>{report?.model}</td>
                                         <td>{report?.brand}</td>
@@ -99,10 +99,10 @@ const ExpenseReport = () => {
                             </tbody>
                         </table>
                     </div>
-                    {reports?.count! > 20 &&
+                    {reports?.data?.count! > 20 &&
                         <div className="px-4 pb-5">
                             <Pagination
-                                totalPages={Math.ceil(reports?.count! / 20)}
+                                totalPages={Math.ceil(reports?.data?.count! / 20)}
                                 currentPage={currentPage}
                                 onPageChange={setCurrentPage}
                             />
@@ -113,7 +113,7 @@ const ExpenseReport = () => {
             <CsvDownloader
                 ref={downloadRef}
                 className="hidden"
-                datas={reports?.results}
+                datas={reports?.data?.results}
                 filename="expense-report"
                 extension=".csv"
                 columns={columns.map(col => ({

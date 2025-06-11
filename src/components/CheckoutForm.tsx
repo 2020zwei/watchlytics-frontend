@@ -25,6 +25,7 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
     const [isExpiryComplete, setIsExpiryComplete] = useState(false);
     const [isCvcComplete, setIsCvcComplete] = useState(false);
     const [name, setName] = useState("")
+    const [error, setError] = useState(false)
     const { mutateAsync: createSubscription, isPending } = useCreateSubcription();
 
     const stripeInputStyle = {
@@ -44,6 +45,10 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
         e.preventDefault()
         if (!name) {
             toast.error("Please fill card holder field")
+            return false
+        }
+        if (name.length > 2) {
+            toast.error("Holder name at least 3 characters")
             return false
         }
         e.preventDefault();
@@ -82,8 +87,10 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                         if (isLoggedIn) {
                             navigate.push("/dashboard");
                         } else {
-                            fetch('/api/logout');
-                            navigate.push("/login");
+                            fetch('/api/logout').then(res => {
+                                navigate.push("/login");
+                            });
+
                         }
                     },
                     onError(error: any) {
@@ -120,9 +127,11 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
                         className="bg-transparent w-full text-[#808080] placeholder:text-[#808080] outline-none"
                         required
                         placeholder="Card holder name"
-                        onChange={(e: any) => setName(e.target.value)}
-                    />
+                        onChange={(e: any) => { setName(e.target.value); e.target.value.length < 3 ? setError(true) : setError(false) }}
+                    />                  
+
                 </div>
+                  {error ? <p className="text-red-500 !mt-0">Holer name must be at least 3 characters</p> : null}
                 {/* Card Number */}
                 <div className="space-y-1">
                     <div className="rounded-lg border border-gray-180 px-3 flex items-center gap-3 h-14">

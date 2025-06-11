@@ -54,15 +54,15 @@ export default function SignIn() {
         toast.success("Password reset successfully!");
         router.push("/login");
       } catch (error: any) {
-        console.error("API error:", error?.response?.data?.password[0]);
-        toast.error(error?.response?.data?.password[0]);
+        console.error("API error 323:", error?.response?.data);
+        toast.error(error?.response?.data?.non_field_errors?.[0] || error?.response?.data?.password?.[0]);
       }
     }
   };
 
   return (
     <div className="flex justify-center items-center">
-      <div className="w-full max-w-xl mx-auto px-4">
+      <div className="w-fit max-w-xl mx-auto px-4">
         <div className="flex items-center mb-8">
           <Image src="/clock.svg" alt="clock" width={48} height={48} />
           <span className="text-[#003BFF] font-medium text-lg ml-2">
@@ -104,8 +104,8 @@ export default function SignIn() {
                   icon={
                     field.type === "password"
                       ? togglePassType[field.name]
-                        ? "eyeOff"
-                        : "filledEye"
+                        ? "filledEye"
+                        : "eyeOff"
                       : undefined
                   }
                   onPasswordToggle={() => handleTogglePasswordType(field.name)}

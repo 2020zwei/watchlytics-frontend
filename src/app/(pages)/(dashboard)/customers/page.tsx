@@ -3,7 +3,7 @@ import RoundedBox from '@/components/common/baseButton/RoundedBox'
 import Heading from '@/components/common/heading'
 import clsx from 'clsx'
 import React, { useEffect, useRef, useState } from 'react'
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@heroui/react";
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Select, SelectItem, Spinner } from "@heroui/react";
 import Pagination from '@/components/common/Pagination'
 import Link from 'next/link'
 import SelectWidget from '@/components/common/SelectWidget'
@@ -13,7 +13,12 @@ import Notfound from '@/components/common/Notfound'
 import AlertModal from '@/components/common/AlertModal'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/navigation'
-import { useCustomers, useRemoveCustomer } from '@/hooks/useCustomerHooks' 
+import { useCustomers, useRemoveCustomer } from '@/hooks/useCustomerHooks'
+import { formatCurrency } from '@/utils/formatCurrency'
+import { exportToPDF } from '@/utils/exportToPDF'
+import SearchBar from '@/components/common/SearchBar'
+import Checkbox from '@/components/Checkbox'
+import CsvDownloader from 'react-csv-downloader';
 
 const buttons: any = {
     "status": ["active", "inactive"],
@@ -23,13 +28,36 @@ const buttons: any = {
     "Follow Up": ["yes", "no"],
 }
 
+const actions: any = {
+    pdf: "PDF",
+    csv: "CSV",
+    follow_up: "Mark follow-up",
+    newsletter: "Send newsletter",
+    deactivate: "Deactivate",
+};
+
+type SortDirection = 'asc' | 'desc';
+
+type SortConfig<T> = {
+    key: keyof T;
+    direction: SortDirection;
+} | null;
+
 const page = () => {
     const [deleteId, setDeleteId] = useState<number | null>(null)
     const [currentPage, setCurrentPage] = useState(1)
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
     const [filters, setFilters] = useState<{ [key: string]: string }>({})
+    const [followUps, setFollowUps] = useState<Record<string, string>>({});
+    const [sortConfig, setSortConfig] = useState<SortConfig<T>>(null);
+    const [sortedData, setSortedData] = useState<T[]>([]);
+    const [isAllChecked, setIsAllChecked] = useState(false);
+    const [selectedData, setSelectedData] = useState([]);
+    const [selectedAction, setSelectedAction] = useState<string | null>(null);
     const [deleteAlert, setDeleteAlert] = useState(false)
+    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
     const [note, setNote] = useState<any>()
+    const downloadRef = useRef<any>(null);
     const navigate = useRouter()
     const pageRef = useRef(1)
 
@@ -87,6 +115,92 @@ const page = () => {
         setDeleteAlert(false);
     };
 
+    const handleSort = (key: keyof T) => {
+        setSortConfig(prev => {
+            if (prev && prev.key === key) {
+                // Toggle direction
+                return {
+                    key,
+                    direction: prev.direction === 'asc' ? 'desc' : 'asc',
+                };
+            }
+            return { key, direction: 'asc' };
+        });
+    };
+    const handleFilter = (query: string) => {
+        console.log(query)
+    }
+    const allIds = customers?.data?.results?.map((row: any) => row.id) || [];
+    const handleCheck = (id: number, checked: boolean) => {
+        setSelectedIds((prev) => {
+            const next = new Set(prev);
+            checked ? next.add(id) : next.delete(id);
+            return next;
+        });
+    };
+    const handleCheckAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.checked) {
+            setSelectedIds(new Set(allIds));
+            setIsAllChecked(true);
+        } else {
+            setSelectedIds(new Set());
+            setIsAllChecked(false);
+        }
+    };
+    const resetAction = () => {
+        setTimeout(() => {
+            setSelectedIds(new Set());
+            setSelectedData([]);
+            setIsAllChecked(false);
+            setSelectedAction("")
+        }, 100);
+    }
+    const handleAction = (val: string) => {
+        setSelectedAction(val);
+        // const payload = val === "delete" ? {
+        //     "action": "bulk_delete",
+        //     "product_ids": [...selectedIds]
+        // } : {
+        //     "product_ids": [...selectedIds],
+        //     "action": "update_availability",
+        //     "availability": val
+        // }
+
+        if (selectedData.length > 0 && downloadRef.current && val === "csv") {
+            downloadRef.current.handleClick();
+            resetAction()
+        }
+        if (customers?.data?.results?.length && val === "pdf") {
+            exportToPDF({ data: customers?.data?.results, label: "customer" })
+            resetAction()
+        }
+
+    };
+
+    useEffect(() => {
+        if (!sortConfig || !customers?.data?.results) {
+            setSortedData(customers?.data?.results ?? []);
+            return;
+        }
+
+        const sorted = [...customers?.data?.results].sort((a, b) => {
+            let aVal = a[sortConfig.key];
+            let bVal = b[sortConfig.key];
+            if (sortConfig.key === 'last_purchase_date') {
+                aVal = new Date(aVal).getTime();
+                bVal = new Date(bVal).getTime();
+            }
+            if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+            if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+
+            if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+        setSortedData(sorted);
+    }, [sortConfig, customers?.data?.results]);
+
+
     useEffect(() => {
         const params = new URLSearchParams(window.location.search)
         const page = parseInt(params.get("page_number") || "1")
@@ -101,14 +215,53 @@ const page = () => {
         setFilters(initialFilters)
     }, [])
 
+    useEffect(() => {
+        if ([...selectedIds].length) {
+            const selectedPro = customers?.data?.results?.filter((item: any) => [...selectedIds].includes(item.id));
+            setSelectedData(selectedPro);
+            setIsAllChecked([...selectedIds].length === customers?.data?.results?.length);
+        }
+    }, [selectedIds, customers?.data?.results]);
+
     if (isLoading) {
         return <div className='text-center mt-5'><Spinner /></div>
     }
-
-    console.log({ customers })
+    const columns = customers?.data?.results.length ? Object.keys(customers?.data?.results[0]) : [];
 
     return (
         <div>
+            <div className=" grid md:grid-cols-4 xs:grid-cols-2 grid-cols-1 mt-6 gap-3">
+                <Link href="/inventory" className=" rounded-lg bg-white shadow-lg p-4 border-blue-700 border-t-2">
+                    <div className="text-lg font-medium pb-3 text-blue-700">Total Customers</div>
+                    <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none">
+                        23
+                    </div>
+                </Link>
+
+                <Link href="/inventory" className=" rounded-lg bg-white shadow-lg p-4 border-blue-700 border-t-2">
+                    <div className="text-lg font-medium pb-3 text-blue-700">Avg Spending
+                    </div>
+                    <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none">
+                        23%
+                    </div>
+                </Link>
+
+                <Link href="/inventory" className=" rounded-lg bg-white shadow-lg p-4 border-blue-700 border-t-2">
+                    <div className="text-lg font-medium pb-3 text-blue-700">Follow-ups Due
+                    </div>
+                    <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none">
+                        23
+                    </div>
+                </Link>
+
+                <Link href="/inventory" className=" rounded-lg bg-white shadow-lg p-4 border-blue-700 border-t-2">
+                    <div className="text-lg font-medium pb-3 text-blue-700">New Leads This Month
+                    </div>
+                    <div className="font-bold text-2xl text-dark-800 min-w-[70px] outline-none">
+                        23
+                    </div>
+                </Link>
+            </div>
             <RoundedBox as='section' className="px-4 py-5 gap-3 mt-5">
 
                 <div className='lg-xl:flex items-center lg-xl:justify-between lg-xl:flex-row flex-col'>
@@ -136,9 +289,39 @@ const page = () => {
                         })}
                         {Object.keys(filters)?.length ? <li className='rounded-md border !border-gray-70 h-10 px-4 flex items-center justify-center cursor-pointer' onClick={() => { setFilters({}); navigate.push("/customers") }}>Clear</li> : null}
                     </ul>
-                    <div className='lg-xl:w-auto w-full text-end'>
-                        <Link href="/customers/add" className='bg-blue-gradient ms-auto text-white rounded-lg text-sm h-10 w-[128px] flex items-center justify-center'>Add Customer</Link>
+                </div>
+                <div className='lg-xl:w-auto flex items-center justify-end gap-3 w-full mt-4'>
+                    {/* <button onClick={() => exportToPDF(sortedData, 'Customer Report')}>Export PDF</button> */}
+                    <div className='sm:min-w-[250px] max-w-[250px] flex items-center border !border-gray-70 rounded-lg placeholder: flex-1 ps-3 font-normal'>
+                        <SearchBar placeholder='Search...' icon='search'
+                            inputClass='order-1 !h-[38px] !text-xs  w-full'
+                            placeholderClass='placeholder:text-[#71717a] placeholder:text-sm'
+                            onChange={(value) => handleFilter(value!)}
+                        />
                     </div>
+                    {selectedIds.size ? <div className='w-[140px]'>
+
+                        <Select
+                            placeholder="Select Action"
+                            aria-label="Select Action"
+                            selectedKeys={selectedAction ? [selectedAction] : []}
+                            onSelectionChange={(value: any) => handleAction(Array.from(value)[0] as string)}
+                            classNames={{
+                                trigger: "!rounded-lg bg-transparent capitalize border !text-[#1C274C] !border-gray-70 !bg-transparent font-normal text-sm",
+                                base: "rounded-none",
+                                popoverContent: "rounded-none",
+
+                            }}
+                        >
+                            {Object.keys(actions).map((key: string) => (
+                                <SelectItem key={key} textValue={key}>
+                                    {actions[key]}
+                                </SelectItem>
+
+                            ))}
+                        </Select>
+                    </div> : null}
+                    <Link href="/customers/add" className='bg-blue-gradient text-white rounded-lg text-sm h-10 w-[128px] flex items-center justify-center'>Add Customer</Link>
                 </div>
 
                 <div className='pt-3'>
@@ -148,47 +331,112 @@ const page = () => {
                                 <table className="border-collapse min-w-[1200px] w-full text-start">
                                     <thead className="bg-blue-gradient text-white">
                                         <tr>
-                                            <th className={clsx("text-sm font-medium py-3 rounded-tl-lg rounded-bl-lg  first-letter:uppercase whitespace-nowrap px-4")}
+                                            <th className="w-3 rounded-tl-lg rounded-bl-lg ">
+                                                <div className='w-4 ps-3'>
+                                                    <Checkbox
+                                                        checked={isAllChecked}
+                                                        onChange={handleCheckAll}
+                                                    />
+                                                </div>
+                                            </th>
+                                            <th className={clsx("text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >Name </th>
-                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            <th className={clsx("text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >email</th>
-                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            <th className={clsx("text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >address</th>
-                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            <th className={clsx("text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >phone</th>
-                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
-                                            >No. of Orders </th>
-                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
-                                            >last purchase date </th>
-                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
-                                            >Spending </th>
-                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            <th onClick={() => handleSort('orders_count')} className={clsx("text-sm font-bold py-3 cursor-default first-letter:uppercase whitespace-nowrap px-4")}
+                                            ><span className='pe-1'>No. of Orders</span>
+                                                {sortConfig?.key === 'orders_count' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}
+                                            </th>
+                                            <th onClick={() => handleSort('last_purchase_date')} className={clsx("text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4 cursor-default")}
+                                            ><span className='pe-1'>last purchase date</span>
+                                                {sortConfig?.key === 'last_purchase_date' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}
+                                            </th>
+                                            <th onClick={() => handleSort('total_spending')} className={clsx(" cursor-default text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            ><span className='pe-1'>Spending</span>
+
+                                                {sortConfig?.key === 'total_spending' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}
+                                            </th>
+                                            <th className={clsx("text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >Follow Up </th>
-                                            <th className={clsx("text-sm font-medium py-3 first-letter:uppercase whitespace-nowrap px-4")}
+                                            <th className={clsx("text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4")}
                                             >Status</th>
-                                            <th className="px-4 rounded-tr-lg rounded-br-lg text-sm font-medium py-3">Actions</th>
+                                            <th className="px-4 rounded-tr-lg rounded-br-lg text-sm font-bold py-3">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {customers?.data?.results?.map((item: any) => (
-                                            <tr key={item?.id} className="border-b border-gray-200 last:border-b-0 text-sm font-medium text-dark-700"                                    >
+                                        {sortedData?.map((item: any, index: number) => (
+                                            <tr key={item?.id} className={clsx("border-b border-gray-200 last:border-b-0 text-sm font-medium text-dark-700", (index + 1) % 2 !== 0 ? " hover:bg-gray-10 bg-gray-10" : "")}                                    >
+
                                                 <td>
-                                                    <div className='flex items-center gap-2'>
+                                                    <div className='ps-2.5'>
+                                                        <Checkbox
+                                                            value={item.id}
+                                                            checked={selectedIds.has(item.id)}
+                                                            onChange={(e) => handleCheck(item.id, e.target.checked)}
+                                                        />
+
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className='flex items-center gap-2 ms-3'>
                                                         <RoundedBox className="relative items-center justify-center flex  my-2 !bg-gray-80 p-2 h-7 w-7 !rounded-full">
                                                             {item?.profile_picture ? <img src={item?.profile_picture} width={48} alt="image" className='w-full h-full rounded-md' /> : null}
                                                         </RoundedBox>
                                                         <span className='whitespace-nowrap'>{item?.name}</span>
                                                     </div>
                                                 </td>
-                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.email || "-"}</td>
-                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.address || "-"}</td>
-                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.phone || "-"}</td>
-                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.orders_count || "-"}</td>
-                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.last_purchase_date || "-"}</td>
-                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.total_spending || "-"}</td>
-                                                <td className="py-5 whitespace-nowrap px-4 text-center">{item?.follow_up_display || "-"}</td>
-                                                <td className="py-5 whitespace-nowrap px-4 text-center">
-                                                    <button className={clsx("border rounded-lg h-8 w-[72px] cursor-default", item?.status_display === "Active" ? "border-[#10A760] text-[#10A760]" : "border-[#DA3E33] text-[#DA3E33]")}>{item?.status_display}</button>
+                                                <td className="py-3 whitespace-nowrap px-4 text-center">
+                                                    <Link href={`mailto:${item?.email}`}>{item?.email || "No Data"}</Link>
+                                                </td>
+                                                <td className="py-3 whitespace-nowrap px-4 text-center">{item?.address || "No Data"}</td>
+                                                <td className="py-3 whitespace-nowrap px-4 text-center">
+                                                    <Link href={`tel:${item?.phone}`}>{item?.phone || "-"}</Link>
+                                                </td>
+                                                <td className="py-3 whitespace-nowrap px-4 text-center">
+                                                    {
+                                                        item?.orders_count ? <Link className='block' href={`order-detail/${item.id}`}>{item?.orders_count}</Link> : "No Data"
+                                                    }</td>
+                                                <td className="py-3 whitespace-nowrap px-4 text-center">{item?.last_purchase_date || "No Data"}</td>
+                                                <td className="py-3 whitespace-nowrap px-4 text-center">{formatCurrency(item?.total_spending, 'en-US', 'USD') || "No Data"}</td>
+
+                                                <td className="py-3 whitespace-nowrap px-4 text-center">
+                                                    <SelectWidget
+                                                        selected={followUps[item.id] || ""}
+                                                        onValueChange={(value) =>
+                                                            setFollowUps((prev) => ({ ...prev, [item.id]: value }))
+                                                        }
+                                                        placeholder={item?.follow_up_display}
+                                                        options={["Yes", "No", "Upcoming"]}
+                                                        classNames={{
+                                                            trigger:
+                                                                "!rounded-lg bg-transparent capitalize border !border-gray-70 !text-read-500 font-normal text-sm w-[120px] follow-up",
+                                                            base: "rounded-none",
+                                                            popoverContent: "rounded-none",
+                                                        }}
+                                                    />
+                                                </td>
+
+                                                <td className="py-3 whitespace-nowrap px-4 text-center">
+                                                    <div className="relative w-10">
+                                                        <input
+                                                            type="radio"
+                                                            id={`id_${item?.id}`}
+                                                            name="card"
+                                                            checked={item?.status_display === "Active" ? true : false}
+                                                            className="sr-only peer"
+                                                        />
+                                                        <label
+                                                            htmlFor={`id_${item?.id}`}
+                                                            className={clsx("block w-full h-5 rounded-full cursor-default transition-colors", item?.status ? "peer-checked:bg-[#10A760]" : "bg-[#DA3E33]")}
+                                                        ></label>
+                                                        <span
+                                                            className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200 transform peer-checked:translate-x-5"
+                                                        />
+                                                    </div>
                                                 </td>
                                                 <td className='text-center'>
                                                     <Dropdown className='!rounded-lg'>
@@ -238,6 +486,18 @@ const page = () => {
             <AddNoteModalWidget isOpen={isUploadModalOpen} onOpen={closeUploadModal} note={note} callBack={() => { closeUploadModal() }} />
             <AlertModal alertText="Are you sure you want to delete this card?"
                 isOpen={deleteAlert} onOpen={closeUploadModal} callBack={comfirmDelete} />
+
+            <CsvDownloader
+                ref={downloadRef}
+                className="hidden"
+                datas={selectedData}
+                filename="inventory-data"
+                extension=".csv"
+                columns={columns.map(col => ({
+                    id: col,
+                    displayName: col
+                }))}
+            />
         </div >
     )
 }

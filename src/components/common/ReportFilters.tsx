@@ -37,13 +37,13 @@ const ReportFilters = ({ selectedReport }: ReportFiltersProps) => {
     };
 
     return (
-        <div className='border rounded-lg border-gray-180 ms-auto text-end w-[300px]'>
+        <div className='rounded-lg ms-auto text-end w-[300px] !border !border-gray-[#F0F1F3]'>
             <SelectWidget
                 options={REPORTFILTEROPTIONS}
                 onValueChange={onValueChange}
                 selected={selected}
                 classNames={{
-                    trigger: "!shadow-none !border-0 !bg-transparent text-[#858D9D] font-normal text-sm",
+                    trigger: "!shadow-none !border-none !bg-transparent text-[#858D9D] font-normal text-sm",
                     base: "rounded-none",
                     popoverContent: "rounded-none",
 
