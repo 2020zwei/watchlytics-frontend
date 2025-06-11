@@ -1,19 +1,5 @@
-// export function formatCurrency(
-//     amount: number,
-//     locale: string = 'en-US',
-//     currency?: string
-// ): string {
-//     const options: Intl.NumberFormatOptions = currency
-//         ? { style: 'currency', currency }
-//         : { minimumFractionDigits: 0 };
 
 import { JSX } from "react";
-
-//     return new Intl.NumberFormat(locale, options).format(amount);
-// }
-
-
-// utils/formatCurrency.tsx
 export function formatCurrency(
     amount: number,
     locale: string = 'en-US',
@@ -29,8 +15,8 @@ export function formatCurrency(
     const value = match?.[2] ?? '';
 
     return (
-        <span>
-            <span>{symbol} </span>
+        <span className="flex items-center">
+            <span className="text-[17px] leading-[20px]">{symbol} </span>
             < span > {value} </span>
         </span>
     );

@@ -468,13 +468,16 @@ export default function Dashboard() {
                             <div className="flex items-center px-4 whitespace-nowrap">
                               <span className={item?.sources?.ebay?.price > item?.buying_price ? "" : "rotate-180"}>
                                 <Icon name="arrow" stroke={item?.sources?.ebay?.price > item?.buying_price ? "" : "red"} /></span>
-                              <span>${Math.abs(item?.sources?.ebay?.price_diff_percent)} %</span></div> : "No Data"}
+                              <span className="flex items-center leading-[20px]">
+                                {formatCurrency(Math.abs(item?.sources?.ebay?.price_diff_percent), 'en-US', 'USD')}
+                                %</span></div> : "No Data"
+                          }
                         </>
                       </td>
                       <td className=' text-start py-3 px-4 whitespace-nowrap'>
                         <div className="flex items-center">
                           {item?.sources?.chrono24?.price &&
-                            <span className={item?.sources?.chrono24?.price > item?.buying_price ? "" : "rotate-180"}>
+                            <span className={item?.sources?.chrono24?.price > item?.buying_price ? " flex items-center leading-[20px]" : "rotate-180 flex items-center leading-[20px]"}>
                               <Icon name="arrow" stroke={item?.sources?.chrono24?.price > item?.buying_price ? "" : "red"} /></span>}
                           {item?.sources?.chrono24?.price ? formatCurrency(item?.sources?.chrono24?.price, 'en-US', 'USD') : "No Data"}
 
@@ -486,7 +489,8 @@ export default function Dashboard() {
                             <div className="flex items-center px-4 whitespace-nowrap">
                               <span className={item?.sources?.chrono24?.price > item?.buying_price ? "" : "rotate-180"}>
                                 <Icon name="arrow" stroke={item?.sources?.chrono24?.price > item?.buying_price ? "" : "red"} /></span>
-                              <span>${Math.abs(item?.sources?.chrono24?.price_diff_percent)} %</span></div> : "No Data"}
+                              <span className="flex items-center leading-[20px]">  {formatCurrency(Math.abs(item?.sources?.chrono24?.price), 'en-US', 'USD')} %</span></div> : "No Data"}
+
                         </>
                       </td>
                       <td className=' text-start py-3 px-4 whitespace-nowrap'>
@@ -503,7 +507,7 @@ export default function Dashboard() {
                             <div className="flex items-center px-4 whitespace-nowrap">
                               <span className={item?.sources?.bezel?.price > item?.buying_price ? "" : "rotate-180"}>
                                 <Icon name="arrow" stroke={item?.sources?.bezel?.price > item?.buying_price ? "" : "red"} /></span>
-                              <span>${Math.abs(item?.sources?.bezel?.price_diff_percent)} %</span></div> : "No Data"}
+                              <span className="flex items-center leading-[20px]">{formatCurrency(Math.abs(item?.sources?.bezel?.price), 'en-US', 'USD')} %</span></div> : "No Data"}
                         </>
                       </td>
                       <td className=' text-start py-3 px-4 whitespace-nowrap'>
@@ -519,7 +523,7 @@ export default function Dashboard() {
                             <div className="flex items-center px-4 whitespace-nowrap">
                               <span className={item?.sources?.grailzee?.price > item?.buying_price ? "" : "rotate-180"}>
                                 <Icon name="arrow" stroke={item?.sources?.grailzee?.price > item?.buying_price ? "" : "red"} /></span>
-                              <span>${Math.abs(item?.sources?.grailzee?.price_diff_percent)} %</span></div> : "No Data"}
+                              <span className="flex items-center leading-[20px]">{formatCurrency(Math.abs(item?.sources?.grailzee?.price), 'en-US', 'USD')} %</span></div> : "No Data"}
                         </>
                       </td>
                       <td className='py-3 px-4 text-center whitespace-nowrap'>{item?.last_updated || "No Data"}</td>
