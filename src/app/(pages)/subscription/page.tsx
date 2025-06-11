@@ -36,8 +36,10 @@ const page = () => {
                         if (isLoggedIn) {
                             navigate.push("/dashboard");
                         } else {
-                            fetch('/api/logout');
-                            navigate.push("/login");
+                            fetch('/api/logout').then(() => {
+                                navigate.push("/login");
+                            });
+
                         }
                     },
                     onError(error: any) {
