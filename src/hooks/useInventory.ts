@@ -28,11 +28,13 @@ export const useProducts = (query: string) =>
     });
 
 // Get Product Detail
-export const useProductDetail = () =>
+export const useProductDetail = (id: number | string) =>
     useQuery({
-        queryKey: ['productDetail'],
-        queryFn: productDetail,
+        queryKey: ['productDetail', id],
+        queryFn: () => productDetail(id),
+        enabled: !!id,
     });
+
 
 // Create Product
 export const useCreateProduct = () => {

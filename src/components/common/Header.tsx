@@ -4,12 +4,10 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@
 import Icon from './Icon';
 import Link from 'next/link';
 import { useAppContext } from '@/providers/AppContextProvider';
-import { sendRequest } from '@/utils/apis';
-import { METHODS, URLS } from '@/utils/constants';
 import clsx from 'clsx';
-import SearchBar from './SearchBar';
 import NotificationsModal from '../Notification';
 import { usePathname } from 'next/navigation';
+import { useMe } from '@/hooks/useprofile';
 
 const Header = () => {
   const pathname = usePathname()
@@ -18,6 +16,7 @@ const Header = () => {
   const shouldSearch = ["/dashboard", "/inventory", "/reports", "/report-chart"];
 
   const showSearchBar = shouldSearch.includes(pathname);
+  const { data, isLoading } = useMe()
 
   const handleUploadClick = () => {
     setIsUploadModalOpen(true);
@@ -27,21 +26,10 @@ const Header = () => {
   };
 
   useEffect(() => {
-    const getProfileInfo = async () => {
-      const PAYLOAD: any = {
-        url: URLS.ME,
-        method: METHODS.GET,
-      }
-      sendRequest(PAYLOAD).then((res) => {
-        if (res?.data) {
-          setCurrentUser({ image: res?.data?.data?.profile_picture })
-        }
-      })
+    if (data) {
+      setCurrentUser({ image: data?.data?.profile_picture })
     }
-    getProfileInfo()
-  }, [])
-
-
+  }, [data])
   return (
 
     <div className={clsx("flex items-center w-full pe-4 justify-end", showSearchBar ? "" : "")}>

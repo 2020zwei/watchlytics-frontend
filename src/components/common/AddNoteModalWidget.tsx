@@ -1,7 +1,6 @@
 "use client";
 
-import { sendRequest } from "@/utils/apis";
-import { METHODS, URLS } from "@/utils/constants";
+import { useUpdateCustomer } from "@/hooks/useCustomerHooks";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
@@ -22,40 +21,28 @@ const AddNoteModalWidget: React.FC<AddNoteModalWidgetTypes> = ({
     onOpen,
     callBack = () => { },
 }) => {
-    const [value, setValue] = useState();
-    const [submitting, setSubmitting] = useState(false);
+    const [value, setValue] = useState<any>();
+    const { mutateAsync: updateCustomer, isPending } = useUpdateCustomer()
     const navigate = useRouter()
     const onSubmit = () => {
-        setSubmitting(true);
         const DATA = {
             notes: value
         }
-        const PAYLOAD = {
-            url: `${URLS.CUSTOMERS}${note?.id}/`,
-            method: METHODS.PATCH,
-            payload: DATA
-        };
-        sendRequest(PAYLOAD).then((res) => {
-            if (res?.status === 200 || res?.status === 201) {
+        updateCustomer({ payload: DATA, id: note.id }, {
+            onSuccess() {
                 toast.success(`Customer successfully updated`);
                 navigate.push("/customers")
                 setValue("")
                 callBack()
-            }
-            else {
-                if (res?.status === 400) {
-                    Object.keys(res?.response?.data?.errors).forEach((key: string) => toast.error(res?.response?.data?.errors[key] || "Something went wrong"))
-                }
-                if (res?.status === 500) {
-                    toast.error("Something went wrong")
-                }
-            }
-        }).finally(() => {
-            setSubmitting(false);
-        });
+            },
+            onError(error) {
+                // @ts-ignore
+                Object.keys(error?.response?.data?.errors).forEach((key: string) => toast.error(error?.response?.data?.errors[key] || "Something went wrong"))
+            },
+        })
     }
 
-    useEffect(()=>{setValue(note?.notes)},[note])
+    useEffect(() => { setValue(note?.notes) }, [note])
     return (
         <Modal isOpen={isOpen} onOpenChange={onOpen} placement="center" className=" overflow-y-visible">
             <ModalContent className="max-w-[450px] px-4 relative">
@@ -63,7 +50,7 @@ const AddNoteModalWidget: React.FC<AddNoteModalWidgetTypes> = ({
                     <>
                         <ModalHeader className=" left-0 w-full flex justify-center absolute -top-14">
                             <div className="h-[68px] w-[68px] rounded-full bg-white">
-                                {note?.profile_picture ? <img src={note?.profile_picture} alt="N/A" className="h-[68px] w-[68px] rounded-full bg-white p-1" /> :null}
+                                {note?.profile_picture ? <img src={note?.profile_picture} alt="N/A" className="h-[68px] w-[68px] rounded-full bg-white p-1" /> : null}
                             </div>
                         </ModalHeader>
                         <ModalBody className="max-h-[calc(100vh-200px)] gap-6 overflow-y-auto px-0 pt-9">
@@ -78,7 +65,7 @@ const AddNoteModalWidget: React.FC<AddNoteModalWidgetTypes> = ({
                             <Button className=" w-[86px] !rounded-lg border-1" color="default" variant="bordered" onPress={() => { onClose(); }}>
                                 Cancel
                             </Button>
-                            <Button isLoading={submitting} type="button" className="bg-blue-gradient text-white w-[86px] !rounded-lg" onPress={onSubmit}>
+                            <Button isLoading={isPending} type="button" className="bg-blue-gradient text-white w-[86px] !rounded-lg" onPress={onSubmit}>
                                 Add
                             </Button>
                         </ModalFooter>

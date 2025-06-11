@@ -9,11 +9,9 @@ import {
 import type { StripeElementChangeEvent } from "@stripe/stripe-js";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { sendRequest } from "@/utils/apis";
 import { useRouter } from "next/navigation";
 import Icon from "@/components/common/Icon";
 import { Button } from "@heroui/react";
-import { METHODS, URLS } from "@/utils/constants";
 import { useAddCard } from "@/hooks/useSubscription";
 
 const AddCardWidget = () => {

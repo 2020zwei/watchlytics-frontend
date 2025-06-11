@@ -1,86 +1,54 @@
 "use client"
-import React, { useEffect, useState } from 'react'
-import Link from 'next/link';
+import React, { useState } from 'react'
 import RoundedBox from '@/components/common/baseButton/RoundedBox';
 import Heading from '@/components/common/heading';
 import Icon from '@/components/common/Icon';
-import { RequestTypes } from '@/types';
-import { METHODS, URLS } from '@/utils/constants';
-import { sendRequest } from '@/utils/apis';
 import Notfound from '@/components/common/Notfound';
 import { toast } from 'react-toastify';
 import { Button, Spinner } from '@heroui/react';
 import { useRouter, useSearchParams } from "next/navigation";
 import AlertModal from './common/AlertModal';
+import { useCreateSubcription, useDefaultCardCard, useDeleteCard, useGetCards, usePlanById } from '@/hooks/useSubscription';
 
 const CardListingWidget = () => {
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-    const [cards, setCards] = useState([])
-    const [loading, setLoading] = useState(false)
     const searchParams = useSearchParams();
-    const [plan, setPlan] = useState<any>()
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const planId = searchParams.get("id");
     const [deleteId, setDeleteId] = useState()
     const navigate = useRouter()
-    const getCards = async () => {
-        setLoading(true)
-        const PAYLOAD: RequestTypes = {
-            url: URLS.CARDS,
-            method: METHODS.GET,
-        }
-        sendRequest(PAYLOAD).then((res) => {
-            if (res?.status === 200) {
-                setCards(res.data.cards)
-            }
-            else {
-            }
-        }).finally(() => setLoading(false))
-    }
+    const { data: cardData, isLoading } = useGetCards()
+    const { mutateAsync: setDefauldCard } = useDefaultCardCard()
+    const { mutateAsync: deleteCard } = useDeleteCard()
+    const { mutateAsync: createSubscription, isPending } = useCreateSubcription();
+    const { data, isLoading: planLoading } = usePlanById(planId as string);
+
     const handleDelete = (id: any) => {
         setDeleteId(id)
         setIsUploadModalOpen(true)
 
     }
+
     const comfirmDelete = () => {
-        const PAYLOAD: RequestTypes = {
-            url: `${URLS.CARDS}${deleteId}/`,
-            method: METHODS.DELETE,
-        }
-        sendRequest(PAYLOAD).then((res) => {
-            if (res?.status === 200) {
-                setCards(() => cards.filter((card: any) => card.id !== deleteId))
-                toast.success(res.data.message);
+        deleteCard(deleteId!, {
+            onSuccess(data) {
+                toast.success(data.data.message);
                 closeUploadModal()
-            }
-            else {
-                toast.error(res?.error?.message || "Something went wrong, please try again.");
-            }
-        }).catch((err) => {
-            toast.error("An error occurred while deleting card.");
+            },
+            onError(error) {
+                toast.error(error?.response?.data?.message || "Something went wrong, please try again.");
+            },
         })
     }
+
     const handleSetDefauldCard = async (id: any) => {
-        const PAYLOAD: RequestTypes = {
-            url: `${URLS.CARDS}${id}/set_default/`,
-            method: METHODS.POST,
-        };
-        try {
-            const res = await sendRequest(PAYLOAD);
-            if (res?.status === 200) {
-                toast.success(res.data.message);
-                setCards((prevCards: any) =>
-                    prevCards.map((card: any) => ({
-                        ...card,
-                        is_default: card.id === id,
-                    }))
-                );
-            } else {
-                toast.error(res?.error?.message || "Something went wrong, please try again.");
-            }
-        } catch (err) {
-            toast.error("An error occurred while setting the default card.");
-        }
+        setDefauldCard(id, {
+            onSuccess(data) {
+                toast.success(data.data.message);
+            },
+            onError(error) {
+                toast.error(error?.response?.data?.message || "Something went wrong, please try again.");
+            },
+        })
     };
 
     const addCard = () => {
@@ -89,52 +57,36 @@ const CardListingWidget = () => {
     }
 
     const handleCheckout = () => {
-        setIsSubmitting(true)
-        const selectedCard: any = cards?.find((card: any) => card?.is_default)
+        const selectedCard: any = cardData?.data?.cards?.find((card: any) => card?.is_default)
         const PAYLOAD = {
             plan_name: plan.name,
             price_id: plan.stripe_price_id,
             payment_method_token: selectedCard?.stripe_payment_method_id,
         };
-        sendRequest({ url: "/subscribe/", method: "POST", payload: PAYLOAD })
-            .then(async (res) => {
-                if (res?.data?.success) {
-                    toast.success(res?.data?.message);
-                } else {
-                    if (!res?.response?.data?.card_declined) {
-                        toast.error(res?.response?.data?.message);
-                    }
-                    if (res?.data?.response) {
-                        toast.error(res?.data?.response?.errors?.error || "Something went wrong");
-                    }
-                }
-            }).catch((err) => {
-                toast.error("Something went wrong")
+        try {
+            createSubscription(PAYLOAD, {
+                onSuccess(data: any) {
+                    toast.success(data?.data?.message || "Subscribed.");
+                    navigate.push("/dashboard");
+                },
+                onError(error: any) {
+                    toast.error(error?.response?.data?.message || "Something went wrong, please try again.")
+                },
             })
-            .finally(() => {
-                setIsSubmitting(false);
-            });
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || "Subscription failed.");
+        }
     }
-    const getSubscriptions = () => {
-        setLoading(true)
-        sendRequest({ url: `/plans/${planId}/`, method: "GET" }).then(res => {
-            setPlan(res?.data)
-        })
-    }
+
     const closeUploadModal = () => {
         setIsUploadModalOpen(false);
     };
-
-
-    useEffect(() => {
-        
-        planId && getSubscriptions()
-        getCards()
-    },
-        [])
-    if (loading) {
+    const plan = data?.data;
+    if (isLoading || planLoading) {
         return <div className='text-center mt-5'><Spinner /></div>
     }
+
+
     else {
         return (
             <>
@@ -146,7 +98,7 @@ const CardListingWidget = () => {
                         >Add Card</button>
                     </div>
                     <div className=" overflow-x-auto">
-                        {!cards.length ? <Notfound label='Cards not found' /> :
+                        {!cardData?.data?.cards?.length ? <Notfound label='Cards not found' /> :
                             <table className='w-full'>
                                 <thead className='h-12'>
                                     <tr className='text-white text-sm font-medium bg-blue-gradient'>
@@ -170,7 +122,7 @@ const CardListingWidget = () => {
                                 </thead>
 
                                 <tbody>
-                                    {cards.map((card: any) => (
+                                    {cardData?.data?.cards?.map((card: any) => (
                                         <tr key={card?.id} className='border-b border-[#F0F1F3] text-sm font-medium text-[#808080]'>
                                             <td className='text-start py-3 px-4 whitespace-nowrap capitalize'>
                                                 {card?.card_brand}
@@ -209,8 +161,8 @@ const CardListingWidget = () => {
                             </table>}
                     </div>
                 </RoundedBox>
-                {cards?.length && plan?.id ? <div className='text-end mt-5'>
-                    <Button isLoading={isSubmitting} onPress={handleCheckout} className='text-white rounded-lg !bg-blue-gradient'>Checkout</Button>
+                {cardData?.data?.cards?.length && plan?.id ? <div className='text-end mt-5'>
+                    <Button isLoading={isPending} onPress={handleCheckout} className='text-white rounded-lg !bg-blue-gradient'>Checkout</Button>
                 </div> : null}
                 <AlertModal
                     alertText="Are you sure you want to delete this card?"

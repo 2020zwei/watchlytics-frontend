@@ -3,16 +3,12 @@
 import RoundedBox from '@/components/common/baseButton/RoundedBox';
 import FormField from '@/components/common/FormField';
 import Heading from '@/components/common/heading';
-import { RequestTypes } from '@/types';
-import { sendRequest } from '@/utils/apis';
-import { METHODS, URLS } from '@/utils/constants';
 import { InvoiceFormFields, InvoiceFormFieldsSchema } from '@/utils/mock';
 import { Button } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
 import { z } from "zod";
 type FormSchemaType = z.infer<typeof InvoiceFormFieldsSchema>;
 const page = () => {
@@ -30,36 +26,11 @@ const page = () => {
     });
 
     const fetchProducts = async () => {
-        const PAYLOAD: RequestTypes = {
-            url: `${URLS.PRODUCTS}/`,
-            method: METHODS.GET,
-        };
-        sendRequest(PAYLOAD).then((res) => {
-            if (res.status === 200) {
-                const options = res?.data?.results?.map((item: any) => ({
-                    value: item.id,
-                    label: item.model_name,
-                }));
-                setProducts(options);
-            }
-        });
+    
     };
     useEffect(() => { fetchProducts() }, [])
     const onSubmit = (data: FormSchemaType) => {
         setLoading(true)
-        const PAYLOAD: RequestTypes = {
-            url: `${URLS.INVOICE}`,
-            method: METHODS.POST,
-            payload: data
-        };
-        sendRequest(PAYLOAD).then((res) => {
-            if (res.status === 200) {
-                toast.success("fd")
-            }
-            else {
-                toast.error(res?.response?.data||"Something went wrong")
-            }
-        }).finally(() => setLoading(false));
     }
 
     return (
