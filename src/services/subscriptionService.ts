@@ -16,6 +16,9 @@ export const subcriptionDetail = () => {
 export const createSubcription = (payload?: Record<string, any>) => {
     return apiClient.post(URLS.SUBSCRBE, payload).then(res => res);
 };
+export const addCard = (payload?: Record<string, any>) => {
+    return apiClient.post(URLS.CARDS, payload).then(res => res);
+};
 
 export const cancelSubscription = (payload?: Record<string, any>) => {
     return apiClient.post(URLS.SUBSCRBE, payload).then(res => res);
