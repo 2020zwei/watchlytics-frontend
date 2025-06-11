@@ -5,6 +5,7 @@ import {
     createSubcription,
     planById,
     subcriptionDetail,
+    addCard,
 } from '@/services/subscriptionService';
 
 export const usePlans = () => {
@@ -43,6 +44,15 @@ export const useCreateSubcription = () => {
         mutationFn: createSubcription,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['subscriptionDetail'] });
+        },
+    });
+};
+export const useAddCard = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: addCard,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['cards'] });
         },
     });
 };
