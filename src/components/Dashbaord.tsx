@@ -454,8 +454,8 @@ export default function Dashboard() {
                       </td>
                       <td className=' text-start py-3 px-4 whitespace-nowrap'>
                         <div className="flex items-center">
-                          {item?.sources?.ebay?.price && <span className={item?.sources?.ebay?.price > item?.buying_price ? "" : "rotate-180"}>
-                            <Icon name="arrow" stroke={item?.sources?.ebay?.price > item?.buying_price ? "" : "red"} /></span>}
+                          {item?.sources?.ebay?.price ? <span className={item?.sources?.ebay?.price > item?.buying_price ? "" : "rotate-180"}>
+                            <Icon name="arrow" stroke={item?.sources?.ebay?.price > item?.buying_price ? "" : "red"} /></span>:null}
                           <div className="flex items-center">
                             {item?.sources?.ebay?.price ? formatCurrency(item?.sources?.ebay?.price, 'en-US', 'USD') : "No Data"}
                           </div>
@@ -475,9 +475,9 @@ export default function Dashboard() {
                       </td>
                       <td className=' text-start py-3 px-4 whitespace-nowrap'>
                         <div className="flex items-center">
-                          {item?.sources?.chrono24?.price &&
+                          {item?.sources?.chrono24?.price ?
                             <span className={item?.sources?.chrono24?.price > item?.buying_price ? " flex items-center leading-[20px]" : "rotate-180 flex items-center leading-[20px]"}>
-                              <Icon name="arrow" stroke={item?.sources?.chrono24?.price > item?.buying_price ? "" : "red"} /></span>}
+                              <Icon name="arrow" stroke={item?.sources?.chrono24?.price > item?.buying_price ? "" : "red"} /></span>:null}
                           {item?.sources?.chrono24?.price ? formatCurrency(item?.sources?.chrono24?.price, 'en-US', 'USD') : "No Data"}
 
                         </div>
@@ -488,14 +488,15 @@ export default function Dashboard() {
                             <div className="flex items-center px-4 whitespace-nowrap">
                               <span className={item?.sources?.chrono24?.price > item?.buying_price ? "" : "rotate-180"}>
                                 <Icon name="arrow" stroke={item?.sources?.chrono24?.price > item?.buying_price ? "" : "red"} /></span>
-                              <span className="flex items-center leading-[20px]">  {formatCurrency(Math.abs(item?.sources?.chrono24?.price), 'en-US', 'USD')} %</span></div> : "No Data"}
+                              <span className="flex items-center leading-[20px]">
+                                {formatCurrency(Math.abs(item?.sources?.chrono24?.price), 'en-US', 'USD')} %</span></div> : "No Data"}
 
                         </>
                       </td>
                       <td className=' text-start py-3 px-4 whitespace-nowrap'>
                         <div className="flex items-center">
-                          {item?.sources?.bezel?.price && <span className={item?.sources?.bezel?.price > item?.buying_price ? "" : "rotate-180"}>
-                            <Icon name="arrow" stroke={item?.sources?.bezel?.price > item?.buying_price ? "" : "red"} /></span>}
+                          {item?.sources?.bezel?.price ? <span className={item?.sources?.bezel?.price > item?.buying_price ? "" : "rotate-180"}>
+                            <Icon name="arrow" stroke={item?.sources?.bezel?.price > item?.buying_price ? "" : "red"} /></span>:null}
                           {item?.sources?.bezel?.price ? formatCurrency(item?.sources?.bezel?.price, 'en-US', 'USD') : "No Data"}
 
                         </div>
@@ -511,8 +512,8 @@ export default function Dashboard() {
                       </td>
                       <td className=' text-start py-3 px-4 whitespace-nowrap'>
                         <div className="flex items-center justify-end first-letter:text-red-600">
-                          {item?.sources?.grailzee?.price && <span className={item?.sources?.grailzee?.price > item?.buying_price ? "" : "rotate-180"}>
-                            <Icon name="arrow" stroke={item?.sources?.grailzee?.price > item?.buying_price ? "" : "red"} /></span>}
+                          {item?.sources?.grailzee?.price? <span className={item?.sources?.grailzee?.price > item?.buying_price ? "" : "rotate-180"}>
+                            <Icon name="arrow" stroke={item?.sources?.grailzee?.price > item?.buying_price ? "" : "red"} /></span>:null}
                           {item?.sources?.grailzee?.price ? formatCurrency(item?.sources?.grailzee?.price, 'en-US', 'USD') : "No Data"}
                         </div>
                       </td>
