@@ -219,8 +219,8 @@ export default function ProfilePage() {
                     icon={
                       field.type === "password"
                         ? togglePassType[field.name]
-                          ? "eyeOff"
-                          : "filledEye"
+                          ? "filledEye"
+                          : "eyeOff"
                         : undefined
                     }
                     onPasswordToggle={() => handleTogglePasswordType(field.name)}

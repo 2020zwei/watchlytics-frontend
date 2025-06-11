@@ -47,7 +47,7 @@ export default function ForgotPassword() {
 
   return (
     <div className="flex justify-center items-center">
-      <div className="w-full max-w-xl mx-auto px-4">
+      <div className="w-fit max-w-xl mx-auto px-4">
         <div className="flex items-center mb-8">
           <Image src="/clock.svg" alt="clock" width={48} height={48} />
           <span className="text-[#003BFF] font-medium text-lg ml-2">

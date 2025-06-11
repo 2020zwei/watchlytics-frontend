@@ -75,7 +75,7 @@ export default function SignIn() {
 
   return (
     <div className="flex justify-center items-center">
-      <div className="w-full max-w-xl mx-auto">
+      <div className="w-fit max-w-xl mx-auto">
         <div className="flex items-center mb-8">
           <Image src="/clock.svg" alt="clock" width={48} height={48} />
           <span className="text-[#003BFF] font-medium text-lg ml-2">
@@ -115,8 +115,8 @@ export default function SignIn() {
                   icon={
                     field.type === "password"
                       ? togglePassType[field.name]
-                        ? "eyeOff"
-                        : "filledEye"
+                        ? "filledEye"
+                        : "eyeOff"
                       : undefined
                   }
                   onPasswordToggle={() => handleTogglePasswordType(field.name)}
