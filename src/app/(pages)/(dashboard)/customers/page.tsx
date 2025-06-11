@@ -147,6 +147,14 @@ const page = () => {
             setIsAllChecked(false);
         }
     };
+    const resetAction = () => {
+        setTimeout(() => {
+            setSelectedIds(new Set());
+            setSelectedData([]);
+            setIsAllChecked(false);
+            setSelectedAction("")
+        }, 100);
+    }
     const handleAction = (val: string) => {
         setSelectedAction(val);
         // const payload = val === "delete" ? {
@@ -160,15 +168,11 @@ const page = () => {
 
         if (selectedData.length > 0 && downloadRef.current && val === "csv") {
             downloadRef.current.handleClick();
-            setTimeout(() => {
-                setSelectedIds(new Set());
-                setSelectedData([]);
-                setIsAllChecked(false);
-                setSelectedAction("")
-            }, 100);
+            resetAction()
         }
         if (customers?.data?.results?.length && val === "pdf") {
             exportToPDF({ data: customers?.data?.results, label: "customer" })
+            resetAction()
         }
 
     };
