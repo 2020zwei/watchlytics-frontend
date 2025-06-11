@@ -908,14 +908,12 @@ export const SignInSchema = z.object({
         }),
 })
 export const ResetsswordSchema = z.object({
-    password: z.string().min(8)
-        .refine(val => !val || val.length >= 8, {
-            message: "Password must be at least 8 characters",
-        })
-        .refine(val => !val || /[A-Z]/.test(val), {
+    password: z.string()
+        .min(8, { message: "Password must be at least 8 characters" })
+        .refine((val) => /[A-Z]/.test(val), {
             message: "Password must contain at least 1 uppercase letter",
         })
-        .refine(val => !val || /[!@#$%^&*(),.?":{}|<>]/.test(val), {
+        .refine((val) => /[!@#$%^&*(),.?":{}|<>]/.test(val), {
             message: "Password must contain at least 1 special character",
         }),
 

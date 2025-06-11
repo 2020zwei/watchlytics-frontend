@@ -12,8 +12,8 @@ export const reportStats = () =>
 
 
 
-export const expenseReports = () =>
-    apiClient.get(URLS.REPORTS_EXPENSES).then(res => res);
+export const expenseReports = (page:number) =>
+    apiClient.get(`${URLS.REPORTS_EXPENSES}?/page=${page}`).then(res => res);
 
 export const stockReport = (query: { brand?: string; model?: string }) => {
     const filteredQuery: Record<string, string> = {};
