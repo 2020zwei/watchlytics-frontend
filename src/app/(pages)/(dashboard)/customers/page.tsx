@@ -16,6 +16,8 @@ import { useRouter } from 'next/navigation'
 import { useCustomers, useRemoveCustomer } from '@/hooks/useCustomerHooks'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { exportToPDF } from '@/utils/exportToPDF'
+import SearchBar from '@/components/common/SearchBar'
+import Checkbox from '@/components/Checkbox'
 
 const buttons: any = {
     "status": ["active", "inactive"],
@@ -40,8 +42,10 @@ const page = () => {
     const [followUps, setFollowUps] = useState<Record<string, string>>({});
     const [sortConfig, setSortConfig] = useState<SortConfig<T>>(null);
     const [sortedData, setSortedData] = useState<T[]>([]);
-
+    const [isAllChecked, setIsAllChecked] = useState(false);
+    const [selectedData, setSelectedData] = useState([]);
     const [deleteAlert, setDeleteAlert] = useState(false)
+    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
     const [note, setNote] = useState<any>()
     const navigate = useRouter()
     const pageRef = useRef(1)
@@ -111,6 +115,26 @@ const page = () => {
             }
             return { key, direction: 'asc' };
         });
+    };
+    const handleFilter = (query: string) => {
+        console.log(query)
+    }
+    const allIds = customers?.data?.results?.map((row: any) => row.id) || [];
+    const handleCheck = (id: number, checked: boolean) => {
+        setSelectedIds((prev) => {
+            const next = new Set(prev);
+            checked ? next.add(id) : next.delete(id);
+            return next;
+        });
+    };
+    const handleCheckAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.checked) {
+            setSelectedIds(new Set(allIds));
+            setIsAllChecked(true);
+        } else {
+            setSelectedIds(new Set());
+            setIsAllChecked(false);
+        }
     };
 
     useEffect(() => {
@@ -217,10 +241,29 @@ const page = () => {
                         })}
                         {Object.keys(filters)?.length ? <li className='rounded-md border !border-gray-70 h-10 px-4 flex items-center justify-center cursor-pointer' onClick={() => { setFilters({}); navigate.push("/customers") }}>Clear</li> : null}
                     </ul>
-                    <div className='lg-xl:w-auto w-full text-end'>
-                        <button onClick={() => exportToPDF(sortedData, 'Customer Report')}>Export PDF</button>
-
-                        <Link href="/customers/add" className='bg-blue-gradient ms-auto text-white rounded-lg text-sm h-10 w-[128px] flex items-center justify-center'>Add Customer</Link>
+                    <div className='lg-xl:w-auto flex items-center justify-end gap-3 w-full mt-4'>
+                        {/* <button onClick={() => exportToPDF(sortedData, 'Customer Report')}>Export PDF</button> */}
+                        <div className='sm:min-w-[250px] max-w-[250px] flex items-center border !border-gray-70 rounded-lg placeholder: flex-1 ps-3 font-normal'>
+                            <SearchBar placeholder='Search...' icon='search'
+                                inputClass='order-1 !h-[38px] !text-xs  w-full'
+                                placeholderClass='placeholder:text-[#71717a] placeholder:text-sm'
+                                onChange={handleFilter}
+                            />
+                        </div>
+                        <div>
+                            <SelectWidget
+                                onValueChange={(value) => { }}
+                                placeholder="Select option"
+                                options={["PDF", "CSV"]}
+                                classNames={{
+                                    trigger:
+                                        "!rounded-lg bg-transparent capitalize border !border-gray-70 !text-read-500 font-normal text-sm w-[150px] follow-up",
+                                    base: "rounded-none",
+                                    popoverContent: "rounded-none",
+                                }}
+                            />
+                        </div>
+                        <Link href="/customers/add" className='bg-blue-gradient text-white rounded-lg text-sm h-10 w-[128px] flex items-center justify-center'>Add Customer</Link>
                     </div>
                 </div>
 
@@ -231,6 +274,14 @@ const page = () => {
                                 <table className="border-collapse min-w-[1200px] w-full text-start">
                                     <thead className="bg-blue-gradient text-white">
                                         <tr>
+                                            <th className="w-3 rounded-tl-lg rounded-bl-lg">
+                                                <div className='w-4 ps-3'>
+                                                    <Checkbox
+                                                        checked={isAllChecked}
+                                                        onChange={handleCheckAll}
+                                                    />
+                                                </div>
+                                            </th>
                                             <th className={clsx("text-sm font-bold py-3 rounded-tl-lg rounded-bl-lg  first-letter:uppercase whitespace-nowrap px-4")}
                                             >Name </th>
                                             <th className={clsx("text-sm font-bold py-3 first-letter:uppercase whitespace-nowrap px-4")}
@@ -261,7 +312,18 @@ const page = () => {
                                     </thead>
                                     <tbody>
                                         {sortedData?.map((item: any, index: number) => (
-                                            <tr key={item?.id} className={clsx("border-b border-gray-200 last:border-b-0 text-sm font-medium text-dark-700", (index + 1) / 2 !== 0 ? " hover:bg-gray-10" : "")}                                    >
+                                            <tr key={item?.id} className={clsx("border-b border-gray-200 last:border-b-0 text-sm font-medium text-dark-700", (index + 1) % 2 !== 0 ? " hover:bg-gray-10 bg-gray-10" : "")}                                    >
+
+                                                <td>
+                                                    <div className='ps-2.5'>
+                                                        <Checkbox
+                                                            value={item.id}
+                                                            checked={selectedIds.has(item.id)}
+                                                            onChange={(e) => handleCheck(item.id, e.target.checked)}
+                                                        />
+
+                                                    </div>
+                                                </td>
                                                 <td>
                                                     <div className='flex items-center gap-2 ms-3'>
                                                         <RoundedBox className="relative items-center justify-center flex  my-2 !bg-gray-80 p-2 h-7 w-7 !rounded-full">
@@ -312,7 +374,7 @@ const page = () => {
                                                         />
                                                         <label
                                                             htmlFor={`id_${item?.id}`}
-                                                            className={clsx("block w-full h-5 rounded-full cursor-pointer transition-colors", item?.status ? "peer-checked:bg-[#10A760]" : "bg-[#DA3E33]")}
+                                                            className={clsx("block w-full h-5 rounded-full cursor-default transition-colors", item?.status ? "peer-checked:bg-[#10A760]" : "bg-[#DA3E33]")}
                                                         ></label>
                                                         <span
                                                             className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200 transform peer-checked:translate-x-5"

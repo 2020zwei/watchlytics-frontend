@@ -93,6 +93,9 @@ body .searchbale-select__control--is-focused{
 .follow-up span{
   @apply !text-[#808080]
 }
+.recharts-cartesian-axis.recharts-yAxis.yAxis{
+  @apply hidden
+}
 @media(max-width:500px){
 
   .inventory-btns li button{

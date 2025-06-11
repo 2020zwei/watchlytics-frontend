@@ -153,7 +153,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (expenseData?.status === 200) {
       const data = expenseData?.data?.map((item: { period: string, sales: number, purchases: number, expenses: number }) => (
-        { month: item?.period, sales: item?.sales, purchase: item?.purchases, expense: item?.expenses }))
+        { month: item?.period, sales: item?.sales, purchases: item?.purchases, expenses: item?.expenses }))
       setExpense(data);
     }
   }, [expenseData])
@@ -259,54 +259,59 @@ export default function Dashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={expense}
-                  margin={{ top: 10, right: 0, left: 0, bottom: 90 }}
+                  margin={{ top: 10, right: 0, left: 0, bottom: 40 }}
                 >
                   <CartesianGrid vertical={false} stroke="#f0f0f0" />
+
                   <XAxis
                     dataKey="month"
                     tick={{ fontSize: 12 }}
-                    padding={{ right: 10, left: 30 }}
+                    padding={{ right: 10, left: 0 }}
                     tickMargin={40}
                     axisLine={false}
                     tickLine={false}
                   />
                   <YAxis
+                    yAxisId="left"
                     tick={{ fontSize: 12 }}
                     axisLine={false}
                     tickLine={false}
-                    domain={([dataMin, dataMax]) => {
-                      if (dataMin === dataMax) {
-                        return [0, dataMax + 10000];
-                      }
-                      return [Math.max(0, dataMin - 10000), dataMax];
-                    }}
+                    orientation="left"
                   />
+
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    tick={{ fontSize: 12 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+
                   <Tooltip
                     formatter={(value: any) => new Intl.NumberFormat().format(value)}
                   />
+
                   <Line
-                    type="monotone"
-                    dataKey="sales"
-                    stroke="#EB2F96"
-                    dot={{ r: 3 }}
-                    strokeWidth={2}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="purchase"
+                    dataKey="purchases"
+                    yAxisId="left"
                     stroke="#52C41A"
-                    dot={{ r: 3 }}
-                    strokeWidth={2}
                   />
+
                   <Line
-                    type="monotone"
-                    dataKey="expense"
-                    stroke="red"
-                    dot={{ r: 3 }}
-                    strokeWidth={2}
+                    dataKey="sales"
+                    yAxisId="right"
+                    stroke="#EB2F96"
                   />
+
+                  <Line
+                    dataKey="expenses"
+                    yAxisId="right"
+                    stroke="red"
+                  />
+
                 </LineChart>
               </ResponsiveContainer>
+
             </div>
           </div>
 
@@ -343,13 +348,6 @@ export default function Dashboard() {
                   <Cell key={`cell-${index}`} fill={entry.color} style={{ cursor: "pointer", outline: 'none' }} />
                 ))}
               </Pie>
-              {/* <Tooltip formatter={(value, name, props) => {
-                // show actual value in tooltip
-                const realValue = income?.[props.index]?.value;
-                return `$${realValue}`;
-              }} /> */}
-
-
             </PieChart>
           </ResponsiveContainer>
         </RoundedBox>
