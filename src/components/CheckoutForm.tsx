@@ -47,7 +47,7 @@ const CheckoutForm = ({ planName, priceId }: { planName: string, priceId: string
             toast.error("Please fill card holder field")
             return false
         }
-        if (name.length > 2) {
+        if (name.length < 3) {
             toast.error("Holder name at least 3 characters")
             return false
         }
