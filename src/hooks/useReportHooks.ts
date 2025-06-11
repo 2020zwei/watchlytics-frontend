@@ -18,7 +18,7 @@ export const useBestSelling = (page: number) => {
     });
 };
 
-export const useExpenseReport = (page:number) => {
+export const useExpenseReport = (page?:number) => {
     return useQuery({
         queryKey: ['expensereports'],
         queryFn: () => expenseReports(page),

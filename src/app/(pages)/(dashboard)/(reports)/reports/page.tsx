@@ -41,39 +41,39 @@ const page = () => {
             </div>
             <div className='grid md:grid-cols-2 gap-5 mt-4 report-cards'>
                 {/* cards */}
-                <RoundedBox className='!bg-white'>
+                <RoundedBox className='!bg-white reports-cards'>
                     <div className='px-3 pt-4 border-b text-gray-650 pb-5 mb-5'>
                         <Heading as='h3'>Overview</Heading>
                         <div className=' grid grid-cols-3 pt-5'>
                             <div className=' text-sm text-gray-500'>
-                                <div>${stats?.total_profit}</div>
+                                <div className='doller-sign'>{stats?.total_profit ? formatCurrency(stats?.total_profit, 'en-US', 'USD') : "No Data"}</div>
                                 <div className=' text-sm font-medium text-dark-600 mt-3'>Total Profit</div>
                             </div>
                             <div className=' text-sm text-gray-500'>
-                                <div>${stats?.revenue}</div>
+                                <div className='doller-sign'> {stats?.revenue ? formatCurrency(stats?.revenue, 'en-US', 'USD') : "No Data"}</div>
                                 <div className=' text-sm font-medium text-orange-700 mt-3'>Revenue</div>
                             </div>
                             <div className=' text-sm text-gray-500'>
-                                <div>${stats?.sales}</div>
+                                <div className='doller-sign'>{stats?.sales ? formatCurrency(stats?.sales, 'en-US', 'USD') : "No Data"}</div>
                                 <div className=' text-sm font-medium text-pink-500 mt-3'>Sales</div>
                             </div>
                         </div>
                     </div>
                     <div className='flex justify-between px-3 pb-5 gap-3'>
                         <div className="">
-                            <div className='text-gray-600 text-sm '>${stats?.total_profit}</div>
+                            <div className='text-gray-600 text-sm doller-sign'>{stats?.total_profit ? formatCurrency(stats?.total_profit, 'en-US', 'USD') : "No Data"}</div>
                             <div className=' text-sm font-medium text-dark-500 mt-3'>Total Profit</div>
                         </div>
                         <div className="">
-                            <div className='text-gray-600 text-sm '>${stats?.net_sales_value}</div>
+                            <div className='text-gray-600 text-sm '>{stats?.net_sales_value ? formatCurrency(stats?.net_sales_value, 'en-US', 'USD') : "No Data"}</div>
                             <div className=' text-sm font-medium text-dark-500 mt-3'>Net sales value</div>
                         </div>
                         <div className="md:pe-6">
-                            <div className='text-gray-600 text-sm '>${stats?.mom_profit}</div>
+                            <div className='text-gray-600 text-sm doller-sign'>{stats?.mom_profit ? formatCurrency(stats?.mom_profit, 'en-US', 'USD') : "No Data"}</div>
                             <div className=' text-sm font-medium text-dark-500 mt-3'>MoM Profit</div>
                         </div>
                         <div className="md:pe-6">
-                            <div className='text-gray-600 text-sm '>${stats?.yoy_profit}</div>
+                            <div className='text-gray-600 text-sm doller-sign'>{stats?.yoy_profit ? formatCurrency(stats?.yoy_profit, 'en-US', 'USD') : "No Data"}</div>
                             <div className=' text-sm font-medium text-dark-500 mt-3'>YoY Profit</div>
                         </div>
                     </div>
@@ -97,8 +97,8 @@ const page = () => {
                                         expensesData?.data?.results?.map((item: any) => (
                                             <tr key={item?.product} className='border'>
                                                 <td className='text-gray-650 text-sm test-start px-4 py-2'>{item?.model}</td>
-                                                <td className='text-sm text text-dark-500 text-center py-2'>${item?.repairs}</td>
-                                                <td className='text-sm text text-dark-500 text-center py-2'>${item?.shipping}</td>
+                                                <td className='text-sm text text-dark-500 text-center py-2 doller-sign'>{item?.repairs ? formatCurrency(item?.repairs, 'en-US', 'USD') : "No Data"}</td>
+                                                <td className='text-sm text text-dark-500 text-center py-2 doller-sign'>{item?.shipping ? formatCurrency(item?.shipping, 'en-US', 'USD') : "No Data"}</td>
                                                 <td className='text-sm text text-green-500 text-center px-4 py-2'>{item?.impact}%</td>
                                             </tr>
                                         ))}
