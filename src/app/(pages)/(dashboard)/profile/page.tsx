@@ -97,16 +97,19 @@ export default function ProfilePage() {
 
       if (formData.get("confirm_password")) {
         localStorage.removeItem("isLoggedin");
-        await fetch('/api/logout');
-        navigate.push("/login");
+        fetch('/api/logout').then(() => {
+          navigate.push("/login");
+        });
+
       }
 
       toast.success(res?.data?.message || "Profile updated successfully");
     } catch (err: any) {
       const errors = err?.response?.data;
+      console.log(errors)
       if (errors && typeof errors === 'object') {
         Object.keys(errors).forEach((key) => {
-          toast.error(errors[key][0] || "Failed to update profile");
+          toast.error(errors[key] || "Failed to update profile");
         });
       } else {
         toast.error("Something went wrong while updating the profile");
