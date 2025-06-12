@@ -307,22 +307,22 @@ const Inventory = () => {
                         <Heading className=' text-orange-800'>Total Products</Heading>
                         <div className='grid grid-cols-2 font-semibold text-base text-gray-600'>
                             <span>{stats?.data?.total_products?.count}</span>
-                            <span className="text-center doller-sign">{formatCurrency(stats?.data?.total_products?.revenue, 'en-US', 'USD')}</span>
+                            <span className="ms-auto doller-sign">{formatCurrency(stats?.data?.total_products?.revenue, 'en-US', 'USD')}</span>
                         </div>
                         <div className='grid grid-cols-2 gap-10 font-semibold text-base text-gray-500'>
                             <span>{stats?.data?.total_products?.label}</span>
-                            <span className="text-center">Revenue</span>
+                            <span className="text-end">Revenue</span>
                         </div>
                     </div>
                     <div className="lg:w-auto sm:w-[49%] w-full lg:p-0 p-4 rounded-lg grid grid-cols-1 gap-3 border-r border-gray-200 bg-white  xl:px-12 lg:px-6 md:px-4 px-3">
                         <Heading className=' text-pink-500'>Top Selling</Heading>
                         <div className='grid grid-cols-2 gap-10 font-semibold text-base text-gray-600'>
                             <span>{stats?.data?.top_selling?.count}</span>
-                            <span className="text-center doller-sign">{formatCurrency(stats?.data?.top_selling?.cost, 'en-US', 'USD')}</span>
+                            <span className="ms-auto doller-sign">{formatCurrency(stats?.data?.top_selling?.cost, 'en-US', 'USD')}</span>
                         </div>
                         <div className='grid grid-cols-2 gap-10 font-semibold text-base text-gray-500'>
                             <span>{stats?.data?.top_selling?.label}</span>
-                            <span className="text-center">Cost</span>
+                            <span className="text-end">Cost</span>
                         </div>
                     </div>
                     <div className="lg:w-auto sm:w-[49%] w-full lg:p-0 p-4 rounded-lg grid grid-cols-1 bg-white gap-3 xl:ps-12 lg:ps-6 md:ps-4 ps-3">
@@ -551,16 +551,16 @@ const Inventory = () => {
                                                                     currencyFields.includes(col)
                                                                         ? row?.[col]
                                                                             ? <span className="flex items-center first-letter:text-lg">{formatCurrency(row?.[col], 'en-US', 'USD')}</span>
-                                                                            : "No Data"
+                                                                            : <span className='block text-center'>No Data</span>
                                                                         : col === "profit_margin"
-                                                                            ? row?.[col] ? `${row?.[col]}%` : "No Data"
+                                                                            ? row?.[col] ? `${row?.[col]}%` : <span className='block text-center'>No Data</span>
                                                                             : col === "hold_time"
                                                                                 ? `~${row?.[col]}`
                                                                                 : col === "is_sold"
                                                                                     ? <div className={clsx("min-w-5 mx-auto w-5 h-5 rounded border flex items-center justify-between", row?.is_sold ? "bg-blue-850" : "")}>
                                                                                         <Icon name='checkmark' className=' text-white text-lg' />
                                                                                     </div>
-                                                                                    : row?.[col] || "No Data"
+                                                                                    : row?.[col] || <span className='block text-center'>No Data</span>
                                                                 }
                                                             </div>
                                                         </td>
