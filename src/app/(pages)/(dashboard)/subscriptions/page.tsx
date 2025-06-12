@@ -4,49 +4,37 @@ import RoundedBox from '@/components/common/baseButton/RoundedBox'
 import { TransparentButton } from '@/components/common/baseButton/TransparentButton'
 import Heading from '@/components/common/heading'
 import Icon from '@/components/common/Icon'
-import { sendRequest } from '@/utils/apis'
+import { useCancelSubscription, useSubcriptionDetail } from '@/hooks/useSubscription'
 import { Spinner } from '@heroui/react'
 import { useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { toast } from 'react-toastify'
 
 const page = () => {
-  const [subscription, setSubscription] = useState<any>()
   const [loading, setLoading] = useState(false)
   const navigate = useRouter()
   const [isDisabled, setIsDisabled] = useState(false)
-
-  const getSubscriptionDetail = () => {
-    setLoading(true)
-    sendRequest({ url: "/subscription/details/", method: "GET" }).then(res => {
-      setLoading(false)
-      setSubscription(res?.data?.plan)
-    })
-  }
+  const { mutateAsync: cacelSubscription, isPending } = useCancelSubscription();
+  const { data, isLoading } = useSubcriptionDetail()
 
   const handleCancleSubscription = () => {
-    sendRequest({ url: "/subscribe/", method: "POST", payload: { is_cancelled_subscription: "true" } }).then(res => {
-      if (res?.data?.success) {
-        toast.success(res?.data?.message)
+    cacelSubscription({ is_cancelled_subscription: "true" }, {
+      onSuccess(data) {
+        toast.success(data?.data?.message)
         setIsDisabled(true)
-      }
-      else {
-        toast.error("Something went wrong")
-      }
+      },
+      onError(error) {
+        // @ts-ignore
+        toast.error(error?.response?.data?.message || "Something went wrong")
+      },
     })
   }
 
-  useEffect(() => {
-    getSubscriptionDetail()
-  }, [])
-
-
-
-  if (loading) {
+  if (isLoading) {
     return <div className="h-[calc(100vh-200px)] flex justify-center items-center"><Spinner /></div>
   }
-
-
+  const subscription = data?.data?.plan
+  console.log(subscription)
 
   return (
     <div>
@@ -77,8 +65,8 @@ const page = () => {
           </div>
           <div className='flex flex-col gap-2'>
             {subscription?.current_subscription && subscription?.current_subscription?.toLowerCase() !== "pro" ?
-              <Button title='Upgrade Plan' className='h-10 !min-w-[166px] max-w-[166px]' onPress={() => navigate.push(`/subscription`)}></Button> :null}
-            {subscription?.current_subscription && subscription?.current_subscription?.toLowerCase() !== "basic" && subscription?.current_subscription?.toLowerCase() !=="free" ?
+              <Button title='Upgrade Plan' className='h-10 !min-w-[166px] max-w-[166px]' onPress={() => navigate.push(`/subscription`)}></Button> : null}
+            {subscription?.current_subscription && subscription?.current_subscription?.toLowerCase() !== "basic" && subscription?.current_subscription?.toLowerCase() !== "free" ?
               <Button title='Downgrade Plan' className='h-10 !min-w-[166px] max-w-[166px]' onPress={() => navigate.push(`/subscription`)}></Button> : null}
             {
               subscription?.current_subscription && subscription?.current_subscription?.toLowerCase() !== "free" ?

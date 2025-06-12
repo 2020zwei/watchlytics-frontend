@@ -9,8 +9,8 @@ export const products = (query: string) => {
     return apiClient.get(`${URLS.PRODUCTS}${query}`).then(res => res);
 };
 
-export const productDetail = () => {
-    return apiClient.get(URLS.PRODUT_DETAIL).then(res => res);
+export const productDetail = (id: number |string) => {
+    return apiClient.get(`${URLS.PRODUT_DETAIL}${id}/`).then(res => res);
 };
 
 export const createProduct = (formData: FormData) => {

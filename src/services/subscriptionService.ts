@@ -19,6 +19,15 @@ export const createSubcription = (payload?: Record<string, any>) => {
 export const addCard = (payload?: Record<string, any>) => {
     return apiClient.post(URLS.CARDS, payload).then(res => res);
 };
+export const getCards = () => {
+    return apiClient.get(URLS.CARDS).then(res => res);
+};
+export const deleteCard = (id: number) => {
+    return apiClient.delete(`${URLS.CARDS}${id}/`).then(res => res);
+};
+export const setDefaultCard = (id: number) => {
+    return apiClient.post(`${URLS.CARDS}${id}/set_default/`).then(res => res);
+};
 
 export const cancelSubscription = (payload?: Record<string, any>) => {
     return apiClient.post(URLS.SUBSCRBE, payload).then(res => res);

@@ -1,35 +1,21 @@
 "use client"
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Icon from '../common/Icon';
 import Heading from '../common/heading';
 import { useParams } from 'next/navigation';
-import { METHODS, URLS } from '@/utils/constants';
-import { RequestTypes } from '@/types';
-import { sendRequest } from '@/utils/apis';
-import { Spinner } from '@heroui/react';
+import { useProductDetail } from '@/hooks/useInventory';
+import LoaderWidget from '../common/LoaderWidget';
 
 const ProductDetail = () => {
-    const { id } = useParams()
-    const [product, setProduct] = useState<any>()
-    const [loading, setLoading] = useState<boolean>(false)
-    const getProductDetail = async () => {
-        setLoading(true)
-        const PAYLOAD: RequestTypes = {
-            url: `${URLS.PRODUCTS}/${id}/`,
-            method: METHODS.GET,
-        }
-        sendRequest(PAYLOAD).then((res) => {
-            if (res?.status === 200) {
-                setProduct(res.data)
-            }
-        }).finally(() => setLoading(false))
-    }
+    const params = useParams()
+    const id = Number(params?.id);
+    const { data, isLoading } = useProductDetail(id)
 
-    useEffect(() => { getProductDetail() }, [id])
-    if (loading) {
-        return <div className='text-center mt-5'><Spinner /></div>
+    if (isLoading) {
+        return <LoaderWidget />
     }
+    const product = data?.data
     return (
         <div className="p-4 bg-white rounded-lg font-inter text-dark-300 font-medium">
             <div className=" mb-6 border-b">
@@ -73,7 +59,7 @@ const ProductDetail = () => {
 
                             <div className='flex items-center justify-between gap-4'>
                                 <div className=' text-start flex-1 text-gray-500'>Availability</div>
-                                <div className="text-green-600 font-medium text-start flex-1 capitalize">{product?.availability?.replaceAll("_"," ")}</div>
+                                <div className="text-green-600 font-medium text-start flex-1 capitalize">{product?.availability?.replaceAll("_", " ")}</div>
                             </div>
 
                             <div className='flex items-center justify-between gap-4'>

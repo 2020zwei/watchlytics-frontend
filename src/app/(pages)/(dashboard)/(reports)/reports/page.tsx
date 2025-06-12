@@ -87,9 +87,9 @@ const page = () => {
                                 <thead>
                                     <tr>
                                         <th className='text-sm text text-dark-500 text-start px-4 py-2'>Product</th>
-                                        <th className='text-sm text text-dark-500 text-center py-2'>Repairs</th>
-                                        <th className='text-sm text text-dark-500 text-center py-2'>Shipping</th>
-                                        <th className='text-sm text text-dark-500 text-center px-4 py-2'>Impact</th>
+                                        <th className='text-sm text text-dark-500 py-2 text-start'>Repairs</th>
+                                        <th className='text-sm text text-dark-500 text-start py-2'>Shipping</th>
+                                        <th className='text-sm text text-dark-500 text-start px-4 py-2'>Impact</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -97,9 +97,9 @@ const page = () => {
                                         expensesData?.data?.results?.map((item: any) => (
                                             <tr key={item?.product} className='border'>
                                                 <td className='text-gray-650 text-sm test-start px-4 py-2'>{item?.model}</td>
-                                                <td className='text-sm text text-dark-500 text-center py-2 doller-sign'>{item?.repairs ? formatCurrency(item?.repairs, 'en-US', 'USD') : "No Data"}</td>
-                                                <td className='text-sm text text-dark-500 text-center py-2 doller-sign'>{item?.shipping ? formatCurrency(item?.shipping, 'en-US', 'USD') : "No Data"}</td>
-                                                <td className='text-sm text text-green-500 text-center px-4 py-2'>{item?.impact}%</td>
+                                                <td className='text-sm text text-dark-500 text-start py-2 doller-sign'>{item?.repairs ? formatCurrency(item?.repairs, 'en-US', 'USD') : "No Data"}</td>
+                                                <td className='text-sm text text-dark-500 text-start py-2 doller-sign'>{item?.shipping ? formatCurrency(item?.shipping, 'en-US', 'USD') : "No Data"}</td>
+                                                <td className='text-sm text text-green-500 text-start px-4 py-2'>{item?.impact}%</td>
                                             </tr>
                                         ))}
                                 </tbody>

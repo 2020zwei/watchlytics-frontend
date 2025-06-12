@@ -388,38 +388,38 @@ export default function Dashboard() {
                   <th className='text-start px-4 first:rounded-s-lg  overflow-hidden'>
                     Image
                   </th>
-                  <th className='text-start px-4 whitespace-nowrap'>
+                  <th className='text-center px-4 whitespace-nowrap'>
                     Reference Number
                   </th>
-                  <th className='text-start px-4 whitespace-nowrap'>
+                  <th className='text-center px-4 whitespace-nowrap'>
                     Buying Price
                   </th>
-                  <th className='text-start px-4 whitespace-nowrap'>
+                  <th className='text-center px-4 whitespace-nowrap'>
                     ebay
                     <span className="px-1 cursor-pointer" onClick={() => toggleSort('ebay')}>
                       {sortConfig?.key === 'ebay' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}
                     </span>
                   </th>
-                  <th className='text-start px-4 whitespace-nowrap'>
+                  <th className='text-center px-4 whitespace-nowrap'>
                     <span className="px-4">Change %</span>
                   </th>
-                  <th className='text-start px-4 whitespace-nowrap'>
+                  <th className='text-center px-4 whitespace-nowrap'>
                     Chrono24
                     <span className="px-1 cursor-pointer" onClick={() => toggleSort('chrono24')}>
                       {sortConfig?.key === 'chrono24' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}
                     </span>
 
                   </th>
-                  <th className='text-start px-4 whitespace-nowrap'>
+                  <th className='text-center px-4 whitespace-nowrap'>
                     <span className="px-4">Change %</span>
                   </th>
-                  <th className='text-start px-4 whitespace-nowrap'>
+                  <th className='text-center px-4 whitespace-nowrap'>
                     Bezel
                     <span className="px-1 cursor-pointer" onClick={() => toggleSort('bezel')}>
                       {sortConfig?.key === 'bezel' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}
                     </span>
                   </th>
-                  <th className='text-start px-4 whitespace-nowrap'>
+                  <th className='text-center px-4 whitespace-nowrap'>
                     <span className="px-4">Change %</span>
                   </th>
                   <th className='text-end px-4 whitespace-nowrap'>
@@ -511,7 +511,7 @@ export default function Dashboard() {
                         </>
                       </td>
                       <td className=' text-start py-3 px-4 whitespace-nowrap'>
-                        <div className="flex items-center justify-end first-letter:text-red-600">
+                        <div className="flex items-center justify-center">
                           {item?.sources?.grailzee?.price? <span className={item?.sources?.grailzee?.price > item?.buying_price ? "" : "rotate-180"}>
                             <Icon name="arrow" stroke={item?.sources?.grailzee?.price > item?.buying_price ? "" : "red"} /></span>:null}
                           {item?.sources?.grailzee?.price ? formatCurrency(item?.sources?.grailzee?.price, 'en-US', 'USD') : "No Data"}
