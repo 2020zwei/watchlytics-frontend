@@ -484,19 +484,19 @@ const CustomersComp = () => {
 
                                                 <td className="py-3 whitespace-nowrap px-4 text-center">
                                                     <div className="relative w-10">
-                                                        <input
+                                                        {/* <input
                                                             type="radio"
                                                             id={`id_${item?.id}`}
                                                             name="card"
-                                                            checked={item?.status_display === "Active" ? true : false}
+                                                            checked={true}
                                                             className="sr-only peer"
-                                                        />
+                                                        /> */}
                                                         <label
                                                             htmlFor={`id_${item?.id}`}
-                                                            className={clsx("block w-full h-5 rounded-full cursor-default transition-colors", item?.status ? "peer-checked:bg-[#10A760]" : "bg-[#DA3E33]")}
+                                                            className={clsx("block w-full h-5 rounded-full cursor-default transition-colors", item?.status ? "bg-[#10A760]" : "bg-[#DA3E33]")}
                                                         ></label>
                                                         <span
-                                                            className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200 transform peer-checked:translate-x-5"
+                                                            className={clsx("absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200 transform", item?.status?"translate-x-5":"")}
                                                         />
                                                     </div>
                                                 </td>
