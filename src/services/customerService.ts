@@ -9,6 +9,8 @@ export const customerList = () =>
 
 export const customer = (id: number) =>
     apiClient.get(`${URLS.CUSTOMERS}${id}/`).then(res => res);
+export const customerOrders = (id: number) =>
+    apiClient.get(`${URLS.CUSTOMERS}${id}/orders/`).then(res => res);
 
 export const create = (payload: any) =>
     apiClient.post(URLS.CUSTOMERS, payload).then(res => res);

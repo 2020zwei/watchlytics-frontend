@@ -121,6 +121,9 @@ body .searchbale-select__control--is-focused {
 .search-customer button{
   @apply !hidden
 }
+.order .flex.items-center{
+  @apply justify-center
+}
 
 @media(max-width:500px) {
 
