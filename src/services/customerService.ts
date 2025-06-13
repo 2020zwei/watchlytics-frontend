@@ -13,6 +13,9 @@ export const customer = (id: number) =>
 export const create = (payload: any) =>
     apiClient.post(URLS.CUSTOMERS, payload).then(res => res);
 
+export const bulkAction = (payload: any) =>
+    apiClient.post(URLS.CUSTOMER_BULK_ACTIONS, payload).then(res => res);
+
 export const remove = (id: number) =>
     apiClient.delete(`${URLS.CUSTOMERS}${id}`).then(res => res);
 
@@ -21,4 +24,6 @@ export const update = (payload: any, id: number) =>
 
 export const reportStats = () =>
     apiClient.get(URLS.REPORT_STATE).then(res => res.data);
+export const stats = () =>
+    apiClient.get(URLS.DASHBOARD_METRICS).then(res => res.data);
 

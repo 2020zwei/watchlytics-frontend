@@ -6,16 +6,24 @@ import {
     remove,
     update,
     reportStats,
-    customerList
+    customerList,
+    stats,
+    bulkAction
 } from '@/services/customerService';
 
 // Fetch all customers with query params
-export const useCustomers = (query?: string | undefined) => {
+export const useCustomers = (query: string | undefined, enabled: boolean) => {
     return useQuery({
         queryKey: ['customers', query],
         queryFn: () => customers(query!),
-        enabled: !!query,
+        enabled,
         placeholderData: (prev) => prev,
+    });
+};
+export const useCustomerStats = () => {
+    return useQuery({
+        queryKey: ['customers'],
+        queryFn: () => stats()
     });
 };
 
@@ -48,6 +56,16 @@ export const useCreateCustomer = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: create,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['customers'] });
+        },
+    });
+};
+
+export const useBulkAction = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: bulkAction,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['customers'] });
         },
