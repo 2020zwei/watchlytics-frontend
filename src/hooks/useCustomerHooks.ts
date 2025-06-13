@@ -8,7 +8,8 @@ import {
     reportStats,
     customerList,
     stats,
-    bulkAction
+    bulkAction,
+    customerOrders
 } from '@/services/customerService';
 
 // Fetch all customers with query params
@@ -39,6 +40,13 @@ export const useCustomer = (id: number) => {
     return useQuery({
         queryKey: ['customer', id],
         queryFn: () => customer(id),
+        enabled: !!id,
+    });
+};
+export const useCustomerOrders = (id: number) => {
+    return useQuery({
+        queryKey: ['customer', id],
+        queryFn: () => customerOrders(id),
         enabled: !!id,
     });
 };

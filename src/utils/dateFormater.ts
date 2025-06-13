@@ -11,5 +11,7 @@
 export const formatDate = (date: Date | string) => {
     if (!date) return "";
     if (typeof date === "string") return date;
-    return date.toISOString().split("T")[0]; // 'YYYY-MM-DD'
+    const rel=date.toISOString().split("T")[0]
+    console.log(rel,"rel")
+    return rel; // 'YYYY-MM-DD'
 };
