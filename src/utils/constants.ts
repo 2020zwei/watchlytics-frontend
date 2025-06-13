@@ -58,6 +58,8 @@ export const URLS = {
   MARKAS_SOLD: "/v1/inventory/bulk-mark-sold/",
   BULK_OPERATION: "/v1/inventory/bulk-operations/",
   DASHBOARD_REPORTS: "/v1/dashboard/income-reports/",
+  DASHBOARD_METRICS: "/v1/dashboard-metrics/",
+  CUSTOMER_BULK_ACTIONS: "/v1/customers/bulk/actions/",
 };
 
 export const METHODS = {
